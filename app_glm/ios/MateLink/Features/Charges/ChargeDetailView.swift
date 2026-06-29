@@ -221,6 +221,10 @@ struct ChargeDetailView: View {
             chartContent
                 .frame(height: 300)
                 .chartYScale(domain: yDomain)
+            Text("Simulated data — detailed charging telemetry not yet available from API")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
 
             if isZoomed {
                 Button {

@@ -246,6 +246,10 @@ struct DriveDetailView: View {
             // Chart
             chartContent
                 .frame(height: 300)
+            Text("Simulated data — detailed telemetry not yet available from API")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
                 .chartXAxis {
                     AxisMarks(values: .automatic(desiredCount: 6)) { value in
                         if let mins = value.as(Double.self) {
