@@ -64,5 +64,45 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Boot receiver: reschedule workers after device reboot -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Charging monitor foreground service -->
+        <service
+            android:name=".service.ChargingMonitorService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Monitoring charging sessions and TPMS pressure for Tesla vehicle" />
+        </service>
+
+        <!-- Home screen widget -->
+        <receiver
+            android:name=".widget.CarWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/car_widget_info" />
+        </receiver>
+
+        <activity
+            android:name=".widget.CarWidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MateLink">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
