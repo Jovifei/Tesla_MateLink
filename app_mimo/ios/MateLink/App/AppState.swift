@@ -2,6 +2,9 @@ import SwiftUI
 import Security
 
 private enum KeychainHelper {
+    // 仅本机、解锁时可访问，且不通过 iCloud 钥匙串同步，防止 token 跨设备泄露
+    private static let accessibility = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+
     static func save(_ value: String, key: String) {
         let data = Data(value.utf8)
         let query: [String: Any] = [
@@ -12,7 +15,8 @@ private enum KeychainHelper {
         let attrs: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key,
-            kSecValueData as String: data
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: accessibility
         ]
         SecItemAdd(attrs as CFDictionary, nil)
     }
@@ -22,7 +26,8 @@ private enum KeychainHelper {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key,
             kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
+            kSecMatchLimit as String: kSecMatchLimitOne,
+            kSecAttrAccessible as String: accessibility
         ]
         var item: CFTypeRef?
         guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
