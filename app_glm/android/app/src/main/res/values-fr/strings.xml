@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tesla MateLink</string>
+    <string name="widget_error_configure">Erreur de configuration du widget</string>
+    <string name="widget_loading">Chargement...</string>
+    <string name="widget_select_car_title">Sélectionner un véhicule</string>
+    <string name="no_vehicles_found">Aucun véhicule trouvé</string>
+    <string name="error_loading_data">Erreur de chargement des données</string>
+
+    <!-- Charging notification -->
+    <string name="charging_notification_title">%1$s en charge</string>
+    <string name="charging_notification_loading">Chargement de l\'état de charge…</string>
+    <string name="charging_notification_dc_finished_title">%1$s charge rapide DC terminée</string>
+    <string name="charging_notification_dc_finished_content">Débrancher pour éviter les frais d\'inactivité</string>
+    <string name="charging_channel_name">Session de charge</string>
+    <string name="charging_channel_description">Notifications pendant les sessions de charge actives</string>
+
+    <!-- Sentry notification -->
+    <string name="sentry_notification_title">%1$s alerte sentinelle</string>
+    <string name="sentry_action_open_tesla">Ouvrir Tesla</string>
+    <string name="sentry_channel_name">Alertes sentinelle</string>
+    <string name="sentry_channel_description">Notifications pour les événements du mode sentinelle</string>
+
+    <!-- TPMS notification -->
+    <string name="tpms_notification_title">Alerte pression des pneus</string>
+    <string name="tpms_notification_body">%1$s : Pression basse sur %2$s</string>
+    <string name="tpms_notification_cleared">%1$s : Alertes de pression des pneus effacées</string>
+    <string name="tire_fl_full">Avant gauche</string>
+    <string name="tire_fr_full">Avant droit</string>
+    <string name="tire_rl_full">Arrière gauche</string>
+    <string name="tire_rr_full">Arrière droit</string>
+    <string name="tpms_channel_name">Pression des pneus</string>
+    <string name="tpms_channel_description">Notifications pour les alertes de pression des pneus</string>
+
+    <!-- Data sync notification -->
+    <string name="sync_notification_title">Synchronisation MateLink</string>
+    <string name="sync_notification_progress">Synchronisation des données…</string>
+    <string name="sync_notification_starting">Démarrage de la synchronisation…</string>
+    <string name="sync_notification_syncing_car">Synchronisation du véhicule %1$d/%2$d…</string>
+    <string name="sync_channel_name">Synchronisation des données</string>
+    <string name="sync_channel_description">Synchronisation en arrière-plan des données statistiques</string>
+
+    <!-- UI strings - Dashboard -->
+    <string name="cd_back">Retour</string>
+    <string name="cd_settings">Paramètres</string>
+    <string name="cd_switch_car">Changer de véhicule</string>
+    <string name="nav_quick_access">Accès rapide</string>
+    <string name="location_title">Position</string>
+    <string name="location_home">Domicile</string>
+    <string name="no_location_data">Aucune donnée de localisation</string>
+    <string name="map_unavailable">Carte indisponible, configurez la clé API AMap</string>
+
+    <!-- UI strings - Settings -->
+    <string name="settings">Paramètres</string>
+    <string name="server_connection">Connexion au serveur</string>
+    <string name="server_url">URL du serveur</string>
+    <string name="api_token">Jeton API</string>
+    <string name="save_reconnect">Enregistrer &amp; Reconnecter</string>
+    <string name="appearance">Apparence</string>
+    <string name="dark_theme">Thème sombre</string>
+    <string name="debug">Débogage</string>
+    <string name="mock_mode">Mode simulation</string>
+    <string name="mock_mode_description">Utiliser des données simulées au lieu de l\'API</string>
+    <string name="about">À propos</string>
+    <string name="open">Ouvrir</string>
+
+    <!-- UI strings - Drives -->
+    <string name="drives">Trajets</string>
+    <string name="today">Aujourd\'hui</string>
+    <string name="yesterday">Hier</string>
+
+    <!-- UI strings - Charges -->
+    <string name="charging_sessions">Sessions de charge</string>
+    <string name="filter_all">Toutes</string>
+
+    <!-- UI strings - About -->
+    <string name="about_version">Version 1.0.0</string>
+    <string name="about_disclaimer">Cette application n\'est pas affiliée à, approuvée ou parrainée par Tesla, Inc. Tesla est une marque déposée de Tesla, Inc.</string>
+    <string name="about_description">TeslaMateLink est une application tiers indépendante pour consulter les données de votre Tesla via une instance de serveur TeslaMate.</string>
+</resources>

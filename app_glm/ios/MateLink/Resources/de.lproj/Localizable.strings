@@ -1,0 +1,54 @@
+/*
+  Localizable.strings
+  Tesla MateLink - German Localization
+*/
+
+"dashboard.title" = "Dashboard";
+"drives.title" = "Fahrten";
+"charges.title" = "Laden";
+"battery.title" = "Batteriezustand";
+"settings.title" = "Einstellungen";
+"about.title" = "Über";
+"connection.test" = "Verbindung testen";
+"mock.mode" = "Simulationsmodus";
+"dark.mode" = "Dunkelmodus";
+"tariff.config" = "Tarif";
+"statistics.title" = "Statistiken";
+"heatmap.title" = "Fahrt-Heatmap";
+"efficiency.title" = "Energiekurve";
+"vampire.title" = "Standby-Verbrauch";
+"cost.title" = "Ladekosten";
+"destinations.title" = "Häufige Ziele";
+"timeline.title" = "Zeitachse";
+"range.title" = "Reichweitenprognose";
+"updates.title" = "Software-Updates";
+"battery.health" = "Batteriezustand";
+"battery.excellent" = "Ausgezeichnet";
+"battery.good" = "Gut";
+"battery.fair" = "Befriedigend";
+"battery.poor" = "Schlecht";
+
+/* TariffConfigView */
+"tariff.toggle" = "Zeitvariable Tarife";
+"tariff.toggle.footer" = "Abrechnung nach Spitzen-, Neben- und Schwachlastzeiten zur Förderung des Ladens in Nebenzeiten.";
+"tariff.peak.label" = "Spitzenlast";
+"tariff.peak.add" = "Spitzenlastzeit hinzufügen";
+"tariff.peak.header" = "Spitzenlast";
+"tariff.flat.label" = "Nebenlast";
+"tariff.flat.add" = "Nebenlastzeit hinzufügen";
+"tariff.flat.header" = "Nebenlast";
+"tariff.valley.label" = "Schwachlast";
+"tariff.valley.add" = "Schwachlastzeit hinzufügen";
+"tariff.valley.header" = "Schwachlast";
+"tariff.savings.label" = "Ersparnis";
+"tariff.cost.label" = "Kosten";
+"tariff.assumption" = "Basierend auf %d kWh monatlichem Laden";
+"tariff.preview.header" = "Kostenvorschau";
+"tariff.reset" = "Auf Shanghai-Standard zurücksetzen";
+"tariff.unit.price" = "Einzelpreis";
+"tariff.period.price" = "%@/kWh";
+"tariff.period.pct_hours" = "%d%% · %ldh";
+
+/* CostView */
+"cost.tou_estimate" = "TOU-Schätzung";
+"cost.default_rate" = "Standardtarif";

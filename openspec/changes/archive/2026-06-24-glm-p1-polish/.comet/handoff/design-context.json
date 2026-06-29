@@ -1,0 +1,13 @@
+{
+  "change": "glm-p1-polish",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "0957883ca344e978a95ec63bfab1133ef44e28da82be7b86f627ce9b1af08878",
+  "files": [
+    { "path": "openspec/changes/glm-p1-polish/proposal.md", "sha256": "8854f0483673eeb8523ac69db81c32cb2934402cae22f92eebdff7ddc62af47d" },
+    { "path": "openspec/changes/glm-p1-polish/design.md", "sha256": "f08db537b3b8dd94222dd0a3e3f3ac29e8a29dfe9e7fb1916f08724b29cbc79c" },
+    { "path": "openspec/changes/glm-p1-polish/tasks.md", "sha256": "348a6d55e7f07b6370d3d6331e20e82aba1821eee61496bf9443176c1013c0a7" }
+  ]
+}

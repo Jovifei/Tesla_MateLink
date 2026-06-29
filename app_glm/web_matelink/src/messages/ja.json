@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "drives": "走行履歴",
+    "charges": "充電",
+    "battery": "バッテリー",
+    "mileage": "走行距離",
+    "statistics": "統計",
+    "heatmap": "ヒートマップ",
+    "destinations": "目的地",
+    "efficiency": "効率",
+    "countries": "訪問地域",
+    "sentry": "セントリー",
+    "trips": "旅行",
+    "updates": "更新",
+    "settings": "設定"
+  },
+  "dashboard": {
+    "loading": "ダッシュボード読み込み中...",
+    "battery": "バッテリー",
+    "odometer": "走行距離",
+    "location": "位置",
+    "inside_temp": "車内",
+    "outside_temp": "車外",
+    "lock_locked": "ロック済み",
+    "lock_unlocked": "ロック解除",
+    "plug_plugged": "接続済み",
+    "plug_unplugged": "未接続",
+    "climate_on": "エアコン ON",
+    "climate_off": "エアコン OFF",
+    "sentry_armed": "セントリー稼働中",
+    "sentry_off": "セントリー OFF",
+    "high_soc_warning": "充電レベルが高い - 日常使用では80〜90%に抑えることをお勧めします",
+    "tire_pressure": "タイヤ空気圧",
+    "battery_trend": "7日間のバッテリー推移"
+  },
+  "status": {
+    "online": "オンライン",
+    "driving": "走行中",
+    "charging": "充電中",
+    "asleep": "スリープ",
+    "offline": "オフライン"
+  },
+  "charges": {
+    "title": "充電履歴",
+    "detail": "充電詳細",
+    "in_progress": "充電中",
+    "power": "電力",
+    "added": "充電量",
+    "remaining": "残り時間"
+  },
+  "drives": {
+    "title": "走行履歴",
+    "detail": "走行詳細"
+  },
+  "battery_health": {
+    "title": "バッテリー健康",
+    "health": "健康度",
+    "original_capacity": "初期容量",
+    "current_capacity": "現在の容量",
+    "degradation": "劣化"
+  },
+  "settings": {
+    "title": "設定",
+    "connection": "接続",
+    "server_url": "サーバーURL",
+    "api_token": "APIトークン",
+    "test_connection": "接続テスト",
+    "preferences": "環境設定",
+    "units": "単位",
+    "temperature": "温度",
+    "theme": "テーマ",
+    "mock_mode": "モックモード",
+    "about": "アプリ情報"
+  },
+  "common": {
+    "back": "戻る",
+    "loading": "読み込み中...",
+    "no_data": "データがありません",
+    "offline": "オフライン - キャッシュデータを表示"
+  }
+}

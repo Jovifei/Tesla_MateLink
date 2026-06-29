@@ -1,0 +1,13 @@
+{
+  "change": "glm-real-repository",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "a735477df3a188faa19efada971fcaf5c598104be9fa56a691961e692da2cd8d",
+  "files": [
+    { "path": "openspec/changes/glm-real-repository/proposal.md", "sha256": "72e285b3e528ffeb353890f392b37570a10b0b5b8cb649d8f34e3b1fc92b2466" },
+    { "path": "openspec/changes/glm-real-repository/design.md", "sha256": "0e5ed3b36038acd8badde7f03498e4d87a81fb0ca6b93cb3ab1bf3cfe0e8dd64" },
+    { "path": "openspec/changes/glm-real-repository/tasks.md", "sha256": "6b224b049b9b1bb246540371ef2a8eb638e784846f22806fc17c8c4b8de687cc" }
+  ]
+}

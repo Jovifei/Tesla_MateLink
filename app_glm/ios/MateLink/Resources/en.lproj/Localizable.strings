@@ -1,0 +1,54 @@
+/*
+  Localizable.strings
+  Tesla MateLink - English Localization
+*/
+
+"dashboard.title" = "Dashboard";
+"drives.title" = "Trips";
+"charges.title" = "Charging";
+"battery.title" = "Battery Health";
+"settings.title" = "Settings";
+"about.title" = "About";
+"connection.test" = "Test Connection";
+"mock.mode" = "Mock Mode";
+"dark.mode" = "Dark Mode";
+"tariff.config" = "Tariff";
+"statistics.title" = "Statistics";
+"heatmap.title" = "Driving Heatmap";
+"efficiency.title" = "Energy Curve";
+"vampire.title" = "Vampire Drain";
+"cost.title" = "Charging Cost";
+"destinations.title" = "Frequent Destinations";
+"timeline.title" = "Timeline";
+"range.title" = "Range Prediction";
+"updates.title" = "Software Updates";
+"battery.health" = "Battery Health";
+"battery.excellent" = "Excellent";
+"battery.good" = "Good";
+"battery.fair" = "Fair";
+"battery.poor" = "Poor";
+
+/* TariffConfigView */
+"tariff.toggle" = "Time-of-Use Pricing";
+"tariff.toggle.footer" = "Charge by peak, off-peak, and valley periods to encourage off-peak charging.";
+"tariff.peak.label" = "Peak";
+"tariff.peak.add" = "Add Peak Period";
+"tariff.peak.header" = "Peak";
+"tariff.flat.label" = "Off-Peak";
+"tariff.flat.add" = "Add Off-Peak Period";
+"tariff.flat.header" = "Off-Peak";
+"tariff.valley.label" = "Valley";
+"tariff.valley.add" = "Add Valley Period";
+"tariff.valley.header" = "Valley";
+"tariff.savings.label" = "Savings";
+"tariff.cost.label" = "Cost";
+"tariff.assumption" = "Assuming %d kWh monthly charging";
+"tariff.preview.header" = "Cost Preview";
+"tariff.reset" = "Reset to Shanghai Defaults";
+"tariff.unit.price" = "Unit Price";
+"tariff.period.price" = "%@/kWh";
+"tariff.period.pct_hours" = "%d%% · %ldh";
+
+/* CostView */
+"cost.tou_estimate" = "TOU Est.";
+"cost.default_rate" = "Default Rate";

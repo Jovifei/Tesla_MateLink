@@ -1,0 +1,15 @@
+{
+  "change": "glm-p1-notify",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "5c8bf3eb5176692e3c39dc481e87e9572b8afe0e6cbccd288cb2a2faa2073d14",
+  "files": [
+    { "path": "openspec/changes/glm-p1-notify/proposal.md", "sha256": "8922e137298e8939189c9dd4d18b94f79e89f5ee1fd75ca90d42e3ade5af665c" },
+    { "path": "openspec/changes/glm-p1-notify/design.md", "sha256": "25878f6d5e694d6f1390d1bda21124e2d965f5aeac5ce4e04f54cf5517ea5c81" },
+    { "path": "openspec/changes/glm-p1-notify/tasks.md", "sha256": "1605312f03cee335e475dcad55f47d379dcf3f43da9e711c9a6e16e872c0ea2d" },
+    { "path": "openspec/changes/glm-p1-notify/specs/ios-widget-enhancement/spec.md", "sha256": "3f56ca43ae729c95ec39b8c7a66fd4664e3870dd124151747de3a5fd273db1ba" },
+    { "path": "openspec/changes/glm-p1-notify/specs/push-notifications/spec.md", "sha256": "dce7666e95c1a4ecce3b05135f0234ab6d56c100f80bd87dc5b3c4f3627753c1" }
+  ]
+}

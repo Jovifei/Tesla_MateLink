@@ -1,0 +1,13 @@
+{
+  "change": "glm-p2-3d-watch",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "edc64a2bb1078e57799e71df72fb3cfe1751869e5ee73c05fdb0fcab1b8efb9a",
+  "files": [
+    { "path": "openspec/changes/glm-p2-3d-watch/proposal.md", "sha256": "f1cfaaa50fb9455f88e0998909d4323aec3f09c98f8de26a00cb4459df8438e1" },
+    { "path": "openspec/changes/glm-p2-3d-watch/design.md", "sha256": "432200f645771985b18aef038353a3822d61aadb5d28c8a344ffc3da76ff06cc" },
+    { "path": "openspec/changes/glm-p2-3d-watch/tasks.md", "sha256": "e8a25ebece5123a2699050e613add9d21349e279778e0c6df1b4d8b5201ecf3b" }
+  ]
+}

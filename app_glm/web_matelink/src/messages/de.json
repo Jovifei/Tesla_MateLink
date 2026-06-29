@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "drives": "Fahrten",
+    "charges": "Laden",
+    "battery": "Batterie",
+    "mileage": "Kilometerstand",
+    "statistics": "Statistiken",
+    "heatmap": "Heatmap",
+    "destinations": "Ziele",
+    "efficiency": "Effizienz",
+    "countries": "Länder",
+    "sentry": "Wächter",
+    "trips": "Reisen",
+    "updates": "Updates",
+    "settings": "Einstellungen"
+  },
+  "dashboard": {
+    "loading": "Dashboard wird geladen...",
+    "battery": "Batterie",
+    "odometer": "Kilometerstand",
+    "location": "Standort",
+    "inside_temp": "Innen",
+    "outside_temp": "Außen",
+    "lock_locked": "Verriegelt",
+    "lock_unlocked": "Entriegelt",
+    "plug_plugged": "Angeschlossen",
+    "plug_unplugged": "Nicht angeschlossen",
+    "climate_on": "Klimaanlage EIN",
+    "climate_off": "Klimaanlage AUS",
+    "sentry_armed": "Wächter AKTIV",
+    "sentry_off": "Wächter AUS",
+    "high_soc_warning": "Hoher Ladestand - für den täglichen Gebrauch auf 80-90% reduzieren",
+    "tire_pressure": "Reifendruck",
+    "battery_trend": "7-Tage Batterie-Trend"
+  },
+  "status": {
+    "online": "Online",
+    "driving": "Fahrt",
+    "charging": "Laden",
+    "asleep": "Schlafend",
+    "offline": "Offline"
+  },
+  "charges": {
+    "title": "Ladeverlauf",
+    "detail": "Ladedetails",
+    "in_progress": "Wird geladen",
+    "power": "Leistung",
+    "added": "Geladen",
+    "remaining": "Verbleibend"
+  },
+  "drives": {
+    "title": "Fahrverlauf",
+    "detail": "Fahrtdetails"
+  },
+  "battery_health": {
+    "title": "Batteriezustand",
+    "health": "Zustand",
+    "original_capacity": "Ursprüngliche Kapazität",
+    "current_capacity": "Aktuelle Kapazität",
+    "degradation": "Degradation"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "connection": "Verbindung",
+    "server_url": "Server-URL",
+    "api_token": "API-Token",
+    "test_connection": "Verbindung testen",
+    "preferences": "Einstellungen",
+    "units": "Einheiten",
+    "temperature": "Temperatur",
+    "theme": "Design",
+    "mock_mode": "Simulationsmodus",
+    "about": "Über"
+  },
+  "common": {
+    "back": "Zurück",
+    "loading": "Wird geladen...",
+    "no_data": "Keine Daten verfügbar",
+    "offline": "Offline - zeige zwischengespeicherte Daten"
+  }
+}

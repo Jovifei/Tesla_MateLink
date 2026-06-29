@@ -1,0 +1,13 @@
+{
+  "change": "glm-p2-multi-instance",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "4f250e9b5a01825f8fbb984a908fe9cd388affb7f232c453ba1e5ea786f3a53b",
+  "files": [
+    { "path": "openspec/changes/glm-p2-multi-instance/proposal.md", "sha256": "22588b653f9ef4e6f770bf6ebcaf3c14a5765d63f0c77d6ed482d5004138213f" },
+    { "path": "openspec/changes/glm-p2-multi-instance/design.md", "sha256": "549e3f57bf06cdbbd8a981a0028500acb83ad0d0614032cd65356dd89627a1bc" },
+    { "path": "openspec/changes/glm-p2-multi-instance/tasks.md", "sha256": "702263631ebcd4ffebb0840fdc4d7a18d8cfeccc2ac72b13a364c6666c4aa96a" }
+  ]
+}

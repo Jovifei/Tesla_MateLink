@@ -1,0 +1,54 @@
+/*
+  Localizable.strings
+  Tesla MateLink - Japanese Localization
+*/
+
+"dashboard.title" = "ダッシュボード";
+"drives.title" = "走行履歴";
+"charges.title" = "充電";
+"battery.title" = "バッテリー健康";
+"settings.title" = "設定";
+"about.title" = "アプリ情報";
+"connection.test" = "接続テスト";
+"mock.mode" = "モックモード";
+"dark.mode" = "ダークモード";
+"tariff.config" = "料金設定";
+"statistics.title" = "統計";
+"heatmap.title" = "走行ヒートマップ";
+"efficiency.title" = "エネルギーカーブ";
+"vampire.title" = "吸血電力";
+"cost.title" = "充電コスト";
+"destinations.title" = "よく行く場所";
+"timeline.title" = "タイムライン";
+"range.title" = "航続距離予測";
+"updates.title" = "ソフトウェア更新";
+"battery.health" = "バッテリー健康";
+"battery.excellent" = "優良";
+"battery.good" = "良好";
+"battery.fair" = "普通";
+"battery.poor" = "不良";
+
+/* TariffConfigView */
+"tariff.toggle" = "時間帯別料金";
+"tariff.toggle.footer" = "ピーク・オフピーク・谷間の時間帯別料金で、オフピーク充電を促進します。";
+"tariff.peak.label" = "ピーク";
+"tariff.peak.add" = "ピーク時間帯を追加";
+"tariff.peak.header" = "ピーク";
+"tariff.flat.label" = "オフピーク";
+"tariff.flat.add" = "オフピーク時間帯を追加";
+"tariff.flat.header" = "オフピーク";
+"tariff.valley.label" = "谷間";
+"tariff.valley.add" = "谷間時間帯を追加";
+"tariff.valley.header" = "谷間";
+"tariff.savings.label" = "節約額";
+"tariff.cost.label" = "コスト";
+"tariff.assumption" = "月間 %d kWh の充電を想定";
+"tariff.preview.header" = "コストプレビュー";
+"tariff.reset" = "上海デフォルトに戻す";
+"tariff.unit.price" = "単価";
+"tariff.period.price" = "%@/kWh";
+"tariff.period.pct_hours" = "%d%% · %ldh";
+
+/* CostView */
+"cost.tou_estimate" = "TOU概算";
+"cost.default_rate" = "デフォルト料金";

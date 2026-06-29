@@ -1,0 +1,22 @@
+{
+  "change": "mimo-mvp",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "1e0e9d0d971e9c22a1c1395b99268efee9c0f299fb696ce610b04d5259cb8432",
+  "files": [
+    { "path": "openspec/changes/mimo-mvp/proposal.md", "sha256": "3a2d022d1ef6d458188489d087529550f815ece5e9e196df7ab278ba5b8d8b0a" },
+    { "path": "openspec/changes/mimo-mvp/design.md", "sha256": "44c8ab6d4c04ad861010063196717d74fee58c3faf30233a1e657df1e375ac7c" },
+    { "path": "openspec/changes/mimo-mvp/tasks.md", "sha256": "aaf13964d4b7f5ce38b874f2eba28d505efced366b22f655df688ddf48fa2a6e" },
+    { "path": "openspec/changes/mimo-mvp/specs/app-foundation/spec.md", "sha256": "bb6ffaca542afb926a947dabcf5a5728a187a796ccfbbecaaeed14332fad1bf2" },
+    { "path": "openspec/changes/mimo-mvp/specs/battery-health/spec.md", "sha256": "12eef1749eb3ff45fce9145b8957ec9f0a08943ff0e3fa30e8045f99975830f8" },
+    { "path": "openspec/changes/mimo-mvp/specs/charge-history/spec.md", "sha256": "175b7b89c308934aaa5961c91a4c1721bf64a0d5e17238a154723ee787a8e363" },
+    { "path": "openspec/changes/mimo-mvp/specs/china-localization/spec.md", "sha256": "ccba71925b740df94e754e34845423de1b0307b221fca958b529f1eb56388171" },
+    { "path": "openspec/changes/mimo-mvp/specs/dashboard/spec.md", "sha256": "f67daf07169a15c47835e98927cf7f575bf237aa8c16a240e5404dfd9c31627d" },
+    { "path": "openspec/changes/mimo-mvp/specs/drive-history/spec.md", "sha256": "5cef982209d33fb1a8d9fcfb1dc28f04dfcbc0cec0545a605a1782127efa180a" },
+    { "path": "openspec/changes/mimo-mvp/specs/mock-mode/spec.md", "sha256": "fe7c04be7121f6cba031856554a1d1e89c6b615ab3ee224b14a0b63272ff1649" },
+    { "path": "openspec/changes/mimo-mvp/specs/offline-cache/spec.md", "sha256": "f508ead34544a1e68b4501e910e20ab41052c3977d149e7cba4b8780fc388219" },
+    { "path": "openspec/changes/mimo-mvp/specs/settings/spec.md", "sha256": "70c9dac06fb854a2b42fb9f865039b9bc9bb31f78417625c5a0a040766ed2bc2" }
+  ]
+}

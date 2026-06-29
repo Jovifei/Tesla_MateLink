@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "drives": "Trajets",
+    "charges": "Recharge",
+    "battery": "Batterie",
+    "mileage": "Kilométrage",
+    "statistics": "Statistiques",
+    "heatmap": "Carte de chaleur",
+    "destinations": "Destinations",
+    "efficiency": "Efficacité",
+    "countries": "Pays",
+    "sentry": "Sentinelle",
+    "trips": "Voyages",
+    "updates": "Mises à jour",
+    "settings": "Paramètres"
+  },
+  "dashboard": {
+    "loading": "Chargement du tableau de bord...",
+    "battery": "Batterie",
+    "odometer": "Kilométrage",
+    "location": "Position",
+    "inside_temp": "Intérieur",
+    "outside_temp": "Extérieur",
+    "lock_locked": "Verrouillé",
+    "lock_unlocked": "Déverrouillé",
+    "plug_plugged": "Branché",
+    "plug_unplugged": "Débranché",
+    "climate_on": "Climatisation ON",
+    "climate_off": "Climatisation OFF",
+    "sentry_armed": "Sentinelle ACTIVE",
+    "sentry_off": "Sentinelle OFF",
+    "high_soc_warning": "Niveau de charge élevé - réduire à 80-90% pour un usage quotidien",
+    "tire_pressure": "Pression des pneus",
+    "battery_trend": "Tendance batterie sur 7 jours"
+  },
+  "status": {
+    "online": "En ligne",
+    "driving": "En conduite",
+    "charging": "En charge",
+    "asleep": "En veille",
+    "offline": "Hors ligne"
+  },
+  "charges": {
+    "title": "Historique de recharge",
+    "detail": "Détails de recharge",
+    "in_progress": "Recharge en cours",
+    "power": "Puissance",
+    "added": "Ajouté",
+    "remaining": "Restant"
+  },
+  "drives": {
+    "title": "Historique des trajets",
+    "detail": "Détails du trajet"
+  },
+  "battery_health": {
+    "title": "Santé de la batterie",
+    "health": "Santé",
+    "original_capacity": "Capacité d\'origine",
+    "current_capacity": "Capacité actuelle",
+    "degradation": "Dégradation"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "connection": "Connexion",
+    "server_url": "URL du serveur",
+    "api_token": "Jeton API",
+    "test_connection": "Tester la connexion",
+    "preferences": "Préférences",
+    "units": "Unités",
+    "temperature": "Température",
+    "theme": "Thème",
+    "mock_mode": "Mode simulation",
+    "about": "À propos"
+  },
+  "common": {
+    "back": "Retour",
+    "loading": "Chargement...",
+    "no_data": "Aucune donnée disponible",
+    "offline": "Hors ligne - affichage des données en cache"
+  }
+}

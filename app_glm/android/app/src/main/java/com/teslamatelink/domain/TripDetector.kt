@@ -1,0 +1,144 @@
+package com.teslamatelink.domain
+
+import com.teslamatelink.data.local.entity.ChargeEntity
+import com.teslamatelink.data.local.entity.DriveEntity
+import com.teslamatelink.domain.model.Trip
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import javax.inject.Inject
+import javax.inject.Singleton
+
+/**
+ * Detects highway/road trips from drive and DC charge data.
+ *
+ * A trip is a sequence of drives connected by DC charge stops.
+ * Micro-drives (< 1 km, e.g. parking maneuvers at charger locations) are
+ * filtered out before detection to avoid breaking chains.
+ *
+ * Gap thresholds:
+ * - drive -> charge: max 15 min
+ * - charge -> drive: max 3 hours
+ * - drive -> drive:  max 30 min (e.g. highway rest stop without charging)
+ * - charge -> charge: max 3 hours (charger hop at same location)
+ *
+ * Minimum: 2 real drives + 1 DC charge.
+ */
+@Singleton
+class TripDetector @Inject constructor() {
+
+    companion object {
+        private const val MICRO_DRIVE_THRESHOLD_KM = 1.0
+        private const val MIN_TRIP_DISTANCE_KM = 300.0
+        private const val MAX_DRIVE_TO_CHARGE_GAP_MIN = 15L
+        private const val MAX_CHARGE_TO_DRIVE_GAP_MIN = 180L
+        private const val MAX_DRIVE_TO_DRIVE_GAP_MIN = 30L
+    }
+
+    private sealed class Event(val startDate: String, val endDate: String) {
+        class Drive(val drive: DriveEntity) : Event(drive.startDate ?: "", drive.endDate ?: "")
+        class Charge(val charge: ChargeEntity) : Event(charge.startDate ?: "", charge.endDate ?: "")
+    }
+
+    fun detectTrips(
+        drives: List<DriveEntity>,
+        dcCharges: List<ChargeEntity>
+    ): List<Trip> {
+        val realDrives = drives.filter { (it.distanceKm ?: 0.0) >= MICRO_DRIVE_THRESHOLD_KM }
+
+        val events = mutableListOf<Event>()
+        realDrives.forEach { events.add(Event.Drive(it)) }
+        dcCharges.forEach { events.add(Event.Charge(it)) }
+        events.sortBy { parseDateTime(it.startDate) ?: LocalDateTime.MIN }
+
+        val trips = mutableListOf<Trip>()
+        var currentDrives = mutableListOf<DriveEntity>()
+        var currentCharges = mutableListOf<ChargeEntity>()
+        var lastEventEnd: LocalDateTime? = null
+        var lastWasDrive = false
+
+        for (event in events) {
+            val eventStart = parseDateTime(event.startDate) ?: continue
+
+            if (lastEventEnd == null) {
+                if (event is Event.Drive) {
+                    currentDrives.add(event.drive)
+                    lastEventEnd = parseDateTime(event.endDate)
+                    lastWasDrive = true
+                }
+                continue
+            }
+
+            val gapMin = ChronoUnit.MINUTES.between(lastEventEnd, eventStart)
+
+            when {
+                // drive -> charge: max 15min gap
+                lastWasDrive && event is Event.Charge && gapMin <= MAX_DRIVE_TO_CHARGE_GAP_MIN -> {
+                    currentCharges.add(event.charge)
+                    lastEventEnd = parseDateTime(event.endDate)
+                    lastWasDrive = false
+                }
+                // charge -> drive: max 3h gap
+                !lastWasDrive && event is Event.Drive && gapMin <= MAX_CHARGE_TO_DRIVE_GAP_MIN -> {
+                    currentDrives.add(event.drive)
+                    lastEventEnd = parseDateTime(event.endDate)
+                    lastWasDrive = true
+                }
+                // drive -> drive: max 30min gap (e.g. rest stop without charging)
+                lastWasDrive && event is Event.Drive && gapMin <= MAX_DRIVE_TO_DRIVE_GAP_MIN -> {
+                    currentDrives.add(event.drive)
+                    lastEventEnd = parseDateTime(event.endDate)
+                    lastWasDrive = true
+                }
+                // charge -> charge: max 3h gap (charger hop at same location)
+                !lastWasDrive && event is Event.Charge && gapMin <= MAX_CHARGE_TO_DRIVE_GAP_MIN -> {
+                    currentCharges.add(event.charge)
+                    lastEventEnd = parseDateTime(event.endDate)
+                    lastWasDrive = false
+                }
+                else -> {
+                    emitTrip(currentDrives, currentCharges, trips)
+                    currentDrives = mutableListOf()
+                    currentCharges = mutableListOf()
+                    lastEventEnd = null
+                    lastWasDrive = false
+                    if (event is Event.Drive) {
+                        currentDrives.add(event.drive)
+                        lastEventEnd = parseDateTime(event.endDate)
+                        lastWasDrive = true
+                    }
+                }
+            }
+        }
+
+        emitTrip(currentDrives, currentCharges, trips)
+        return trips
+    }
+
+    private fun parseDateTime(s: String?): LocalDateTime? = parseIsoDateTime(s)
+
+    private fun emitTrip(
+        drives: List<DriveEntity>,
+        charges: List<ChargeEntity>,
+        trips: MutableList<Trip>
+    ) {
+        if (drives.size < 2 || charges.isEmpty()) return
+        val totalDistance = drives.sumOf { it.distanceKm ?: 0.0 }
+        if (totalDistance < MIN_TRIP_DISTANCE_KM) return
+        TripAggregator.buildTrip(drives, charges)?.let { trips.add(it) }
+    }
+}
+
+/**
+ * Parses an ISO-8601 date-time string into LocalDateTime.
+ * Handles formats with and without trailing 'Z'.
+ */
+internal fun parseIsoDateTime(dateStr: String?): LocalDateTime? {
+    if (dateStr.isNullOrBlank()) return null
+    return try {
+        val normalized = dateStr.trim().replace(" ", "T")
+            .let { if (it.endsWith("Z")) it.dropLast(1) else it }
+        LocalDateTime.parse(normalized)
+    } catch (_: Exception) {
+        null
+    }
+}

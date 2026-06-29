@@ -1,0 +1,13 @@
+{
+  "change": "mimo-localization-test",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "53a66f3c50d11eba5a69a56218456af2a7ad1d0b6ecc6c2ba8a8271d40528a11",
+  "files": [
+    { "path": "openspec/changes/mimo-localization-test/proposal.md", "sha256": "ed8bd4e02ed649ad41e71c68b6c5bfe70c3b0c0820da00fe1076497c58b206b8" },
+    { "path": "openspec/changes/mimo-localization-test/design.md", "sha256": "fb4fe298c3aee1a20f2f96a948649c125c1c0bf69ddb25f8bb0762b69a564de8" },
+    { "path": "openspec/changes/mimo-localization-test/tasks.md", "sha256": "6335eedb8f5955aa1f2e9d810e82bbf54421481c490da9af0bf25a8e69c2d07c" }
+  ]
+}

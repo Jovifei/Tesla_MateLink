@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Base theme for Tesla MateLink.
+        The Compose Material3 theme (MateLinkTheme) is the
+        primary styling mechanism; this XML theme provides
+        the launch / splash / dialog styling.
+    -->
+    <style name="Theme.MateLink" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

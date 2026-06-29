@@ -1,0 +1,13 @@
+{
+  "change": "mimo-fixes",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "fbcd7c93119b3192beb089ee4426063fce3683e80afaf1a8b54eb1768cf55164",
+  "files": [
+    { "path": "openspec/changes/mimo-fixes/proposal.md", "sha256": "2242b279c155c472db2edd54b02bb1a7f51a74369ee67a5a809089742dcf3459" },
+    { "path": "openspec/changes/mimo-fixes/design.md", "sha256": "246939309a9a9f25b4258bbf38a84443adea7eca3006a0826746db4e4c287c3d" },
+    { "path": "openspec/changes/mimo-fixes/tasks.md", "sha256": "0475e215a9ee092fea098c3e21780d366ad3989290bfe127a795b599d2ec59e5" }
+  ]
+}

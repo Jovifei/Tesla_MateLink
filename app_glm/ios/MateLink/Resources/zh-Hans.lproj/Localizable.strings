@@ -1,0 +1,57 @@
+/*
+  Localizable.strings
+  Tesla MateLink - Chinese (Simplified) Localization
+
+  Generated for zh-Hans.lproj
+  All keys follow reverse-domain convention with dot-separated sections.
+*/
+
+"dashboard.title" = "仪表盘";
+"drives.title" = "行程记录";
+"charges.title" = "充电记录";
+"battery.title" = "电池健康";
+"settings.title" = "设置";
+"about.title" = "关于";
+"connection.test" = "测试连接";
+"mock.mode" = "模拟模式";
+"dark.mode" = "深色模式";
+"tariff.config" = "分时电价";
+"statistics.title" = "统计分析";
+"heatmap.title" = "驾驶热力图";
+"efficiency.title" = "能耗曲线";
+"vampire.title" = "停车耗电";
+"cost.title" = "充电成本";
+"destinations.title" = "常去地点";
+"timeline.title" = "时间线";
+"range.title" = "续航预测";
+"updates.title" = "软件更新";
+"battery.health" = "电池健康度";
+"battery.excellent" = "优秀";
+"battery.good" = "良好";
+"battery.fair" = "一般";
+"battery.poor" = "较差";
+
+/* TariffConfigView */
+"tariff.toggle" = "分时电价";
+"tariff.toggle.footer" = "按峰、平、谷三个时段分别计费，鼓励错峰充电。";
+"tariff.peak.label" = "峰时段";
+"tariff.peak.add" = "添加峰时段";
+"tariff.peak.header" = "峰";
+"tariff.flat.label" = "平时段";
+"tariff.flat.add" = "添加平时段";
+"tariff.flat.header" = "平";
+"tariff.valley.label" = "谷时段";
+"tariff.valley.add" = "添加谷时段";
+"tariff.valley.header" = "谷";
+"tariff.savings.label" = "节省";
+"tariff.cost.label" = "费用";
+"tariff.assumption" = "假设月充电 %d kWh";
+"tariff.preview.header" = "费用预览";
+"tariff.reset" = "重置为上海默认值";
+"tariff.unit.price" = "单价";
+"tariff.period.price" = "%@/kWh";
+"tariff.period.pct_hours" = "%d%% · %ldh";
+
+/* CostView */
+"cost.tou_estimate" = "TOU 估算";
+"cost.default_rate" = "默认费率";

@@ -1,0 +1,16 @@
+{
+  "change": "glm-p1-china",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "7c51f7cf33df1e09700e4c4f277c8cf411dbe6cc3ce2b1353e23baacede95d69",
+  "files": [
+    { "path": "openspec/changes/glm-p1-china/proposal.md", "sha256": "6c9a961e1cf95d01f891073f9d45dace59adafa6aad45c18ecf718396cafe9a9" },
+    { "path": "openspec/changes/glm-p1-china/design.md", "sha256": "0b25d873fef560471c454a17aa987361af50a38ca286f2e72205ec6751fa6b35" },
+    { "path": "openspec/changes/glm-p1-china/tasks.md", "sha256": "7883afdc89e25d51ea0f6159825801bd255279f4f74a560bb7706a9f3417a038" },
+    { "path": "openspec/changes/glm-p1-china/specs/android-amap-integration/spec.md", "sha256": "0c02c6b7d15bc08cc1515a8ba0dc49e4eb7901037e050c6db667cdbca45e271e" },
+    { "path": "openspec/changes/glm-p1-china/specs/china-hk-macau-handling/spec.md", "sha256": "d1ceb26094bcfe007dbf886301e7ee27bdbf804996835a2f8698ce1404d35b48" },
+    { "path": "openspec/changes/glm-p1-china/specs/tou-tariff-cost-display/spec.md", "sha256": "905bfc54565be010f0376969814b1d9c6e28fb49ded77bf0f2fdccaa8670e68f" }
+  ]
+}

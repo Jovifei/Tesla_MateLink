@@ -1,0 +1,17 @@
+{
+  "change": "glm-review-fix-critical",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "5e7194845707489099d0ef5120e0234288ce8df3b10c29a759cb6e1656bc8197",
+  "files": [
+    { "path": "openspec/changes/glm-review-fix-critical/proposal.md", "sha256": "f0af7afa9acf9f15ebdc9c47dca3d4057ace2c447489171f460e2ec6156f2412" },
+    { "path": "openspec/changes/glm-review-fix-critical/design.md", "sha256": "ad39e87760a0b85c638e0884279b4ba008c02d9465ea6792866ad44275357665" },
+    { "path": "openspec/changes/glm-review-fix-critical/tasks.md", "sha256": "b35d30a901f6d4f52b98dd14ff09d6b923a0b3ff34a49b0fdb525c22fb21ddd3" },
+    { "path": "openspec/changes/glm-review-fix-critical/specs/android-gcj02/spec.md", "sha256": "5a36a145e206784df4f547ff532ebaa649ac1df3edc0e0c4116f08b8941315b4" },
+    { "path": "openspec/changes/glm-review-fix-critical/specs/android-map-dashboard/spec.md", "sha256": "d343642dba9a08cd2a744121923e5e79802b5d20970b44d926dd347bdba4a7ab" },
+    { "path": "openspec/changes/glm-review-fix-critical/specs/android-stats-drilldown/spec.md", "sha256": "58cfebfbbf9418112386ef1dd6bf9c21cdbb7ee70d5310a619309ea37a75e56a" },
+    { "path": "openspec/changes/glm-review-fix-critical/specs/api-url-fix/spec.md", "sha256": "f3856aacd8f2e6d2b3d0ac059aa111c4af8941aca155326c64feb1dff43def2a" }
+  ]
+}
