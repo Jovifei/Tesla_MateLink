@@ -79,6 +79,9 @@ class AppState: ObservableObject {
     init() {
         AppState.shared = self
         apiToken = KeychainHelper.load("apiToken") ?? ""
+        // 持久化恢复：onboardingDone + serverURL
+        onboardingDone = sharedDefaults?.bool(forKey: "onboardingDone") ?? false
+        serverURL = sharedDefaults?.string(forKey: "serverURL") ?? ""
         loadInstances()
         loadCars()
         PhoneWCSessionManager.shared.activate()
@@ -130,6 +133,9 @@ class AppState: ObservableObject {
         let resp: CarApiResponse = try await api.fetch("/api/v1/cars")
         self.real = api; self.serverURL = url; self.apiToken = token; self.onboardingDone = true
         KeychainHelper.save(token, key: "apiToken")
+        // 持久化 onboardingDone + serverURL
+        sharedDefaults?.set(true, forKey: "onboardingDone")
+        sharedDefaults?.set(url, forKey: "serverURL")
         if let id = activeInstanceId {
             KeychainHelper.save(token, key: "token_\(id)")
         }

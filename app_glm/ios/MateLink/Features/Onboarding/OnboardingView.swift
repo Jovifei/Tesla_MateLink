@@ -40,7 +40,10 @@ struct OnboardingView: View {
             }
 
             Spacer()
-            Button("Skip — Use Mock Mode") { state.onboardingDone = true }.font(.caption).foregroundColor(.secondary)
+            Button("Skip — Use Mock Mode") {
+                state.onboardingDone = true
+                state.sharedDefaults?.set(true, forKey: "onboardingDone")
+            }.font(.caption).foregroundColor(.secondary)
             Spacer()
         }
     }
@@ -53,11 +56,11 @@ struct OnboardingView: View {
 
                 // Step 1: ping — server reachable?
                 currentStep = steps[0]
-                try await api.checkStatus("api/ping")
+                try await api.checkStatus("/api/ping")
 
                 // Step 2: readyz — backend services healthy?
                 currentStep = steps[1]
-                try await api.checkStatus("api/readyz")
+                try await api.checkStatus("/api/readyz")
 
                 // Step 3: cars — token valid & data accessible
                 currentStep = steps[2]
@@ -66,10 +69,13 @@ struct OnboardingView: View {
                     throw ApiError.serverError(0, "No cars found on this server")
                 }
 
-                // Save and navigate
+                // Save and navigate + 持久化
                 state.real = api; state.serverURL = url; state.apiToken = token
                 state.cars = resp.data.cars.map(Car.init(from:))
                 state.onboardingDone = true
+                state.sharedDefaults?.set(true, forKey: "onboardingDone")
+                state.sharedDefaults?.set(url, forKey: "serverURL")
+                KeychainHelper.save(token, key: "apiToken")
                 currentStep = nil; loading = false
             } catch let e as ApiError {
                 error = e.localizedDescription; currentStep = nil; loading = false
