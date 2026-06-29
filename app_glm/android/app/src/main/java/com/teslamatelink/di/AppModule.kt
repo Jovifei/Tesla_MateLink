@@ -104,6 +104,15 @@ object AppModule {
         apiInterceptor: ApiInterceptor,
         dynamicBaseUrlInterceptor: DynamicBaseUrlInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val url = chain.request().url.toString()
+            if (!com.teslamatelink.util.UrlSecurity.isSafe(url)) {
+                throw IllegalArgumentException(
+                    "Refusing request: cleartext HTTP to public host (token exposure risk). url=$url"
+                )
+            }
+            chain.proceed(chain.request())
+        }
         .addInterceptor(dynamicBaseUrlInterceptor)
         .addInterceptor(apiInterceptor)
         .addInterceptor(HttpLoggingInterceptor().apply {
