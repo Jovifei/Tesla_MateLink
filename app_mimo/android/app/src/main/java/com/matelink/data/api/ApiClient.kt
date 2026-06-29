@@ -99,6 +99,14 @@ class ApiClient @Inject constructor(
 
         val url = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
 
+        // 安全校验：非空 baseUrl 必须安全（HTTPS 或 LAN/localhost），否则拒绝创建会泄露 token 的客户端
+        if (baseUrl.isNotBlank() && !UrlSecurity.isSafe(baseUrl)) {
+            throw IllegalArgumentException(
+                "Refusing to create API client: baseUrl uses cleartext HTTP to a public host " +
+                "(token would be exposed). Use HTTPS or a local/private address. baseUrl=$baseUrl"
+            )
+        }
+
         return Retrofit.Builder()
             .baseUrl(url.ifBlank { "http://localhost/" }) // Fallback for initial creation
             .client(client)
