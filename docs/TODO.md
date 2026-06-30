@@ -18,6 +18,9 @@
 | 7 | Onboarding 持久化 + ping path 修复 | 79fdd37 | app_glm |
 | 8 | Gradle wrapper 补全 | pending | 双端 |
 | 9 | 详情页图表 "Simulated data" 标注 | pending | app_glm |
+| 10 | RealCarRepository + DelegatingCarRepository | feature/20260626/glm-real-repository | app_glm Android |
+| 11 | SettingsScreen 数据源 Switch（Mock/Real 切换） | feature/20260626/glm-real-repository | app_glm Android |
+| 12 | 17 轮交叉审核 Android CRITICAL/HIGH 清零 | 0101ebf / 4f46ecd / a2af2ec / c3e1816 | app_mimo Android |
 
 ---
 
@@ -27,7 +30,7 @@
 
 | # | 问题 | 模块 | 难度 |
 |---|---|---|---|
-| G-1 | Android 8 个分析页硬编码 mock（Battery/Heatmap/Efficiency/Vampire/Range/Destinations/Cost/Updates） | Android | 中 |
+| G-1 | Android 8 个分析页硬编码 mock（Battery/Heatmap/Efficiency/Vampire/Range/Destinations/Cost/Updates）。**RealCarRepository 已完成（feature/20260626/glm-real-repository），切换路径已打通——SettingsScreen 开启 "Use Real Backend" 即可。但无真实 TeslaMate 后端，Mock 仍是默认。** | Android | 中 |
 | G-2 | iOS Drive/Charge 详情页图表用 sin()/random() 假数据 | iOS | 中（需 API 端点支持时间序列数据） |
 | G-3 | Android CI/CD 完全缺失（无 .github/workflows/） | Android | 小 |
 | G-4 | Android 上架配置缺失（play publisher/隐私政策/截图） | Android | 中 |
@@ -75,6 +78,47 @@
 | Q-4 | app_mimo Android Room schema JSON 未生成 | Android |
 | Q-5 | app_mimo iOS UpdatesView 无数据源（Mock 返回空数组） | iOS |
 | Q-6 | app_mimo iOS Timeline 缺休息段 + 驾驶段颜色不符 | iOS |
+
+---
+
+## 🔵 iOS/Watch 审核遗留（17 轮交叉审核，需 Mac/Xcode）
+
+> 以下问题在 Android 侧已清零，iOS 侧因无 Mac 编译环境无法修复。
+> 验证方式：Mac + Xcode 编译后运行，对照 issue 逐项确认。
+
+| # | 严重级别 | 问题 | 文件 |
+|---|---|---|---|
+| I-1 | **CRITICAL** | @State 数据竞争 — Task.detached 中读取 selectedYear/yearCharges/chargeEnergyAdded，需在 detached 前捕获为局部变量 | `app_mimo/ios/.../AnnualReportPDFView.swift:363,381,384` |
+| I-2 | **CRITICAL** | WCSession delegate 回调访问 lastStatus 无 @MainActor 保护，后台线程与主线程并发读写 | `app_glm/ios/.../PhoneWCSessionManager.swift:50-62` |
+| I-3 | HIGH | Timer 未取消 — DashboardView 5s 轮询在 view offscreen 时继续，无 .onDisappear | `app_glm/ios/.../DashboardView.swift:8,73` |
+| I-4 | HIGH | writeWidgetData() 每 5s 重建 ImageRenderer + JPEG 编码，无变更检测门控 | `app_glm/ios/.../DashboardView.swift:100-103` |
+| I-5 | HIGH | KeychainHelper.save 丢弃 SecItemAdd 返回值，静默失败 | `app_glm/ios/.../AppState.swift:5-18` |
+| I-6 | HIGH | cacheNodes() 在 .usdz 加载失败的 fallback 分支未调用 | `app_glm/ios/.../Vehicle3DView.swift:28-36` |
+| I-7 | HIGH | WatchConnectivityManager 缺 @MainActor，@Published 属性从后台线程修改 | `app_glm/ios/.../WatchConnectivityManager.swift:16` |
+| I-8 | HIGH | AnnualReportPDFView 多余的 newPage() 导致 PDF 首页空白 | `app_mimo/ios/.../AnnualReportPDFView.swift:361` |
+| I-9 | HIGH | CSV/JSON 导出用 efficiency 反算 energyKwh 而非直接使用 consumptionKwh 字段 | `app_mimo/ios/.../ExportView.swift:197,231` |
+| I-10 | MEDIUM | ExportView 日期解析用固定 DateFormatter 而非 ISO8601DateFormatter（丢失时区偏移） | `app_mimo/ios/.../ExportView.swift:141` |
+| I-11 | MEDIUM | PhoneWCSessionManager.activate() 无双重激活保护 | `app_glm/ios/.../PhoneWCSessionManager.swift:15-19` |
+| I-12 | MEDIUM | Watch sendToWatch 仅持久化 batteryLevel/range 2 字段（共 5 字段，state/isClimateOn/isLocked 丢失） | `app_glm/ios/.../WatchConnectivityManager.swift:50-52` |
+| I-13 | MEDIUM | ClockKit 已废弃（watchOS 10+），应迁移到 WidgetKit | `app_glm/ios/.../ComplicationController.swift:1` |
+
+---
+
+## 🟣 RealCarRepository 接入清单（app_glm Android）
+
+> RealCarRepository + DelegatingCarRepository + SettingsScreen Switch 已实现。
+> 以下 8 个分析页当前硬编码 mock 数据，切换 "Use Real Backend" 后需验证数据流是否正常。
+
+| # | 页面 | 当前数据源 | 接入 Real 后预期 |
+|---|---|---|---|
+| R-1 | BatteryScreen | 硬编码 | 需确认 BatteryHealth API 端点数据格式 |
+| R-2 | HeatmapScreen | 硬编码 | 需有真实行程数据（经纬度序列） |
+| R-3 | EfficiencyScreen | 硬编码 | 从 getDrives 获取 efficiency 字段 |
+| R-4 | VampireScreen | 硬编码 | 需检测连续静止期间的电池消耗 |
+| R-5 | RangeScreen | 硬编码 | 从 getCharges 获取 idealRange 数据 |
+| R-6 | DestinationsScreen | 硬编码 | 从 getDrives 提取 endAddress 统计 |
+| R-7 | CostScreen | 硬编码 | 从 getCharges 获取 cost 字段 |
+| R-8 | UpdatesScreen | 硬编码 | 从 getUpdates 获取 update 历史 |
 
 ---
 
