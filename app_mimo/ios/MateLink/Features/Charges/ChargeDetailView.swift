@@ -46,19 +46,32 @@ struct ChargeDetailView: View {
         self.charge = charge
         let duration = ChargeDetailView.computeDurationMinutes(charge: charge) ?? 45
         let isDC = charge.chargeType == "DC"
+        // Derive average power from real summary data
+        let avgPower = duration > 0 ? charge.chargeEnergyAdded / (Double(duration) / 60.0) : 0.0
         var result: [ChargeSample] = []
         for i in 0..<30 {
             let minute = Int(round(Double(duration) * Double(i) / 29.0))
+            let fraction = Double(i) / 29.0  // 0.0 to 1.0 through charge session
             let power: Double
             let voltage: Double
             if isDC {
-                power = 50 + sin(Double(i) * 0.4) * 80 + Double.random(in: -7...7)
-                voltage = 380 + sin(Double(i) * 0.2) * 20 + Double.random(in: -5...5)
+                // DC fast charging: high power taper as SOC increases
+                // Tapers from ~120% avg to ~40% avg in a realistic CC-CV curve
+                let taperFactor = 1.2 - 0.8 * fraction * fraction
+                let variation = sin(Double(i) * 0.5) * 0.08
+                power = max(0, avgPower * taperFactor * (1 + variation))
+                // Voltage rises as battery SOC increases (CC phase then CV)
+                voltage = 370 + 30 * fraction + sin(Double(i) * 0.3) * 5
             } else {
-                power = 8 + sin(Double(i) * 0.5) * 3 + Double.random(in: -1...1)
-                voltage = 230 + sin(Double(i) * 0.3) * 5 + Double.random(in: -1.5...1.5)
+                // AC charging: nearly constant power
+                let variation = sin(Double(i) * 0.4) * 0.05
+                power = avgPower * (1 + variation)
+                voltage = 230 + sin(Double(i) * 0.2) * 3
             }
-            let temp = 32 + sin(Double(i) * 0.3) * 5 + Double.random(in: -1.5...1.5)
+            // Temperature rises during charging, especially DC
+            let baseTemp = charge.outsideTempAvg
+            let tempRise = isDC ? 8.0 : 3.0
+            let temp = baseTemp + tempRise * (1 - exp(-3 * fraction)) + sin(Double(i) * 0.25) * 0.8
             result.append(ChargeSample(minute: minute, power: power, voltage: voltage, temperature: temp))
         }
         self.samples = result
@@ -240,6 +253,10 @@ struct ChargeDetailView: View {
                 .tint(selectedTab.color)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
+
+            Text("Simulated data — based on charge summary")
+                .font(.caption2)
+                .foregroundColor(.secondary)
         }
         .padding()
         .background(.regularMaterial)
