@@ -303,7 +303,7 @@
     }
   ],
   "battery_health": [
-    { "car_id": 1, "date": "2024-01-15", "battery_level": 100, "rated_range_km": 500, "ideal_range_km": 530, "odometer": 0, "outside_temp": 15, "usable_battery_level": 100 },
+    { "car_id": 1, "date": "2024-01-15", "battery_level": 100, "rated_range_km": 500, "ideal_range_km": 530, "odometer": 0, "outside_temp": 15, "usable_battery_level": 100, "capacity_degradation_percent": 4.2, "original_capacity_kwh": 82.0, "current_capacity_kwh": 78.5, "history": [{"date": "2024-01-15", "capacity_kwh": 82.0}, {"date": "2024-04-15", "capacity_kwh": 81.2}, {"date": "2024-07-15", "capacity_kwh": 80.1}, {"date": "2024-10-15", "capacity_kwh": 79.3}, {"date": "2025-01-15", "capacity_kwh": 78.5}] },
     { "car_id": 1, "date": "2024-04-15", "battery_level": 98, "rated_range_km": 490, "ideal_range_km": 520, "odometer": 5000, "outside_temp": 20, "usable_battery_level": 97 },
     { "car_id": 1, "date": "2024-07-15", "battery_level": 97, "rated_range_km": 485, "ideal_range_km": 515, "odometer": 10000, "outside_temp": 32, "usable_battery_level": 96 },
     { "car_id": 1, "date": "2024-10-15", "battery_level": 96, "rated_range_km": 480, "ideal_range_km": 510, "odometer": 15000, "outside_temp": 22, "usable_battery_level": 95 },
