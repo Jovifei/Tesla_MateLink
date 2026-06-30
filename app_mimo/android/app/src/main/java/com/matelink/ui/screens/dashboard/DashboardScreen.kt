@@ -156,7 +156,7 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("7-Day Battery Trend", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
-                BatteryTrendChart()
+                BatteryTrendChart(currentBatteryLevel = status.batteryLevel)
             }
         }
 
@@ -218,9 +218,20 @@ private fun StatusChip(icon: String, label: String, active: Boolean) {
 }
 
 @Composable
-private fun BatteryTrendChart() {
-    // Mock 7-day data - replace with real data from ViewModel
-    val data = listOf(75, 72, 68, 70, 73, 76, 78)
+private fun BatteryTrendChart(currentBatteryLevel: Int) {
+    // TODO: replace with real 7-day history from API when available
+    // Generate plausible 7-day mock anchored to the actual current battery level
+    val data = remember(currentBatteryLevel) {
+        listOf(
+            (currentBatteryLevel - 6).coerceIn(0, 100),
+            (currentBatteryLevel - 5).coerceIn(0, 100),
+            (currentBatteryLevel - 8).coerceIn(0, 100),
+            (currentBatteryLevel - 4).coerceIn(0, 100),
+            (currentBatteryLevel - 3).coerceIn(0, 100),
+            (currentBatteryLevel - 1).coerceIn(0, 100),
+            currentBatteryLevel.coerceIn(0, 100)
+        )
+    }
     val labels = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     val maxVal = data.max()
     val minVal = data.min()
