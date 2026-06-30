@@ -79,12 +79,12 @@ actor MockAPI {
     func getDrives(_ carId: Int) -> [Drive] { data.drives.filter { $0.carId == carId } }
     func getCharges(_ carId: Int) -> [Charge] { data.charges.filter { $0.carId == carId } }
     func getBatteryHealth(_ carId: Int) -> BatteryHealth { data.batteryHealth[String(carId)] ?? BatteryHealth(carId: carId, date: "", batteryLevel: 0, ratedRangeKm: 0, idealRangeKm: 0, odometer: 0, outsideTemp: 0, usableBatteryLevel: 0, capacityDegradationPercent: nil, originalCapacityKwh: nil, currentCapacityKwh: nil, history: nil) }
-    func getUpdates(_ carId: Int) -> [UpdateItem] { data.updates[String(carId)] ?? [] }
+    func getUpdates(_ carId: Int) -> [UpdateItem] { data.updates.filter { $0.carId == carId } }
 }
 
 class MockData: Codable {
     let cars: [CarRaw]; let status: [String: CarStatus]; let drives: [Drive]; let charges: [Charge]
-    let batteryHealth: [String: BatteryHealth]; let updates: [String: [UpdateItem]]
+    let batteryHealth: [String: BatteryHealth]; let updates: [UpdateItem]
 
     static func load() -> MockData {
         guard let url = Bundle.main.url(forResource: "mock_data", withExtension: "json"),
@@ -93,7 +93,7 @@ class MockData: Codable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case cars, status, drives, charges; case batteryHealth = "batteryHealth"; case updates
+        case cars, status, drives, charges; case batteryHealth = "batteryHealth"; case updates = "software_updates"
     }
 }
 
