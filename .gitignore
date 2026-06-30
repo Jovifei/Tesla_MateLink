@@ -73,3 +73,5 @@ docs/git_ref/
 
 # Claude local settings (personal)
 .claude/settings.local.json
+# Added by code-review-graph
+.code-review-graph/
