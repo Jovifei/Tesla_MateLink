@@ -157,6 +157,16 @@ struct AnnualReportPDFView: View {
                 statItem(value: String(format: "%.0f", stats.avgEfficiency), unit: "Wh/km")
             }
             .frame(maxWidth: .infinity)
+
+            HStack(spacing: 24) {
+                statItem(value: String(format: "%.2f", totalCost), unit: "cost")
+                Divider().frame(height: 32)
+                let ac = acChargeCount; let dc = dcChargeCount
+                statItem(value: "\(ac)/\(dc)", unit: "AC/DC")
+                Divider().frame(height: 32)
+                statItem(value: String(format: "%.0f", avgChargeDuration), unit: "avg min")
+            }
+            .frame(maxWidth: .infinity)
         }
         .padding()
         .background(.regularMaterial)
@@ -166,6 +176,32 @@ struct AnnualReportPDFView: View {
 
     private var chargeEnergyAdded: Double {
         yearCharges.reduce(0) { $0 + $1.chargeEnergyAdded }
+    }
+
+    private var totalCost: Double {
+        yearCharges.reduce(0) { $0 + ($1.cost ?? 0) }
+    }
+
+    private var acChargeCount: Int {
+        yearCharges.filter { $0.chargingType.uppercased() == "AC" }.count
+    }
+
+    private var dcChargeCount: Int {
+        yearCharges.filter { $0.chargingType.uppercased() == "DC" }.count
+    }
+
+    private var avgChargeDuration: Double {
+        yearCharges.isEmpty ? 0 : yearCharges.reduce(0) { $0 + Double($1.durationMin) } / Double(yearCharges.count)
+    }
+
+    private var mostCommonChargeHour: Int? {
+        var hourCounts = [Int: Int]()
+        for c in yearCharges {
+            guard let date = parseDate(c.startDate) else { continue }
+            let hour = calendar.component(.hour, from: date)
+            hourCounts[hour, default: 0] += 1
+        }
+        return hourCounts.max(by: { $0.value < $1.value })?.key
     }
 
     private func statItem(value: String, unit: String) -> some View {
@@ -454,6 +490,23 @@ struct AnnualReportPDFView: View {
                     }
                     _ = drawText("Efficiency Rating: \(rating)",
                                  font: UIFont.systemFont(ofSize: 12))
+                }
+
+                // Charging habits
+                if !yearCharges.isEmpty {
+                    drawDivider(spacing: 16)
+                    _ = drawText("Charging Habits",
+                                 font: UIFont.boldSystemFont(ofSize: 18), spacing: 28)
+                    _ = drawText("Total Cost: \(String(format: "%.2f", totalCost))",
+                                 font: UIFont.systemFont(ofSize: 12))
+                    _ = drawText("AC Charges: \(acChargeCount)  |  DC Charges: \(dcChargeCount)",
+                                 font: UIFont.systemFont(ofSize: 12))
+                    _ = drawText("Avg Charge Duration: \(String(format: "%.0f", avgChargeDuration)) min",
+                                 font: UIFont.systemFont(ofSize: 12))
+                    if let hour = mostCommonChargeHour {
+                        _ = drawText("Most Common Charge Time: \(String(format: "%02d:00", hour))",
+                                     font: UIFont.systemFont(ofSize: 12))
+                    }
                 }
 
                 // Footer
