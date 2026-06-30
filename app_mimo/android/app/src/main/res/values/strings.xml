@@ -73,4 +73,25 @@
     <string name="loading">Loading...</string>
     <string name="no_data">No data available</string>
     <string name="offline">Offline - showing cached data</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Tariff Config -->
+    <string name="tariff_title">Tariff Configuration</string>
+    <string name="tariff_enable_label">Time-of-Use Tariff</string>
+    <string name="tariff_enable_hint">Enable peak/flat/valley pricing for charging cost calculation</string>
+    <string name="tariff_peak">Peak</string>
+    <string name="tariff_flat">Flat</string>
+    <string name="tariff_valley">Valley</string>
+    <string name="tariff_price_label">Unit Price</string>
+    <string name="tariff_add_range">Add Time Range</string>
+    <string name="tariff_delete_range">Delete range</string>
+    <string name="tariff_add_range_title">Add Time Range</string>
+    <string name="tariff_start_hour">Start Hour</string>
+    <string name="tariff_end_hour">End Hour</string>
+    <string name="tariff_reset">Reset to Shanghai Defaults</string>
+    <string name="tariff_preview_title">Monthly Cost Preview</string>
+    <string name="tariff_saves">Saves</string>
+    <string name="tariff_costs">Costs</string>
+    <string name="tariff_assume_monthly">Assuming %d kWh monthly charging</string>
 </resources>

@@ -30,6 +30,7 @@ import com.matelink.ui.screens.drives.DriveDetailScreen
 import com.matelink.ui.screens.drives.DrivesScreen
 import com.matelink.ui.screens.mileage.MileageScreen
 import com.matelink.ui.screens.settings.SettingsScreen
+import com.matelink.ui.screens.settings.TariffConfigScreen
 import com.matelink.ui.screens.reports.AnnualReportPDFScreen
 import com.matelink.ui.screens.reports.AnnualReportScreen
 import com.matelink.ui.screens.reports.ExportScreen
@@ -58,6 +59,9 @@ import kotlinx.serialization.Serializable
 sealed interface Screen {
     @Serializable
     data object Settings : Screen
+
+    @Serializable
+    data object TariffConfig : Screen
 
     @Serializable
     data object Dashboard : Screen
@@ -214,7 +218,16 @@ fun NavGraph(
                 },
                 onNavigateToPalettePreview = {
                     navController.navigate(Screen.PalettePreview)
+                },
+                onNavigateToTariffConfig = {
+                    navController.navigate(Screen.TariffConfig)
                 }
+            )
+        }
+
+        composable<Screen.TariffConfig> {
+            TariffConfigScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

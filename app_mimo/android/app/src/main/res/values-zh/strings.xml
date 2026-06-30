@@ -73,4 +73,25 @@
     <string name="loading">加载中...</string>
     <string name="no_data">暂无数据</string>
     <string name="offline">离线 - 显示缓存数据</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+
+    <!-- Tariff Config -->
+    <string name="tariff_title">分时电价配置</string>
+    <string name="tariff_enable_label">分时电价</string>
+    <string name="tariff_enable_hint">启用峰、平、谷三时段计费，鼓励错峰充电</string>
+    <string name="tariff_peak">峰</string>
+    <string name="tariff_flat">平</string>
+    <string name="tariff_valley">谷</string>
+    <string name="tariff_price_label">单价</string>
+    <string name="tariff_add_range">添加时段</string>
+    <string name="tariff_delete_range">删除时段</string>
+    <string name="tariff_add_range_title">添加时段</string>
+    <string name="tariff_start_hour">开始时间</string>
+    <string name="tariff_end_hour">结束时间</string>
+    <string name="tariff_reset">重置为上海默认值</string>
+    <string name="tariff_preview_title">月费用预览</string>
+    <string name="tariff_saves">节省</string>
+    <string name="tariff_costs">费用</string>
+    <string name="tariff_assume_monthly">假设月充电 %d kWh</string>
 </resources>

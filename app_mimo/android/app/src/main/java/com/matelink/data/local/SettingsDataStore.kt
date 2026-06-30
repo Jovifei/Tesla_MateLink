@@ -56,7 +56,14 @@ data class AppSettings(
     val showShortDrivesCharges: Boolean = false,
     val teslamateBaseUrl: String = "",
     val lastSelectedCarId: Int? = null,
-    val languageCode: String = ""
+    val languageCode: String = "",
+    val tariffEnabled: Boolean = true,
+    val tariffPeakPrice: Double = 1.0,
+    val tariffFlatPrice: Double = 0.7,
+    val tariffValleyPrice: Double = 0.3,
+    val tariffPeakRanges: String = "[[10,14],[18,20]]",
+    val tariffFlatRanges: String = "[[7,9],[15,17],[21,22]]",
+    val tariffValleyRanges: String = "[[23,23],[0,6]]"
 ) {
     val isConfigured: Boolean
         get() = serverUrl.isNotBlank()
@@ -80,6 +87,13 @@ class SettingsDataStore @Inject constructor(
     private val carImageOverridesKey = stringPreferencesKey("car_image_overrides")
     private val languageCodeKey = stringPreferencesKey("language_code")
     private val notificationPermissionAskedKey = booleanPreferencesKey("notification_permission_asked")
+    private val tariffEnabledKey = booleanPreferencesKey("tariff_enabled")
+    private val tariffPeakPriceKey = stringPreferencesKey("tariff_peak_price")
+    private val tariffFlatPriceKey = stringPreferencesKey("tariff_flat_price")
+    private val tariffValleyPriceKey = stringPreferencesKey("tariff_valley_price")
+    private val tariffPeakRangesKey = stringPreferencesKey("tariff_peak_ranges")
+    private val tariffFlatRangesKey = stringPreferencesKey("tariff_flat_ranges")
+    private val tariffValleyRangesKey = stringPreferencesKey("tariff_valley_ranges")
 
     /** SharedPreferences for language code — shared with MateLinkApplication for early reads. */
     private val languagePrefs: SharedPreferences =
@@ -101,7 +115,14 @@ class SettingsDataStore @Inject constructor(
             showShortDrivesCharges = preferences[showShortDrivesChargesKey] ?: false,
             teslamateBaseUrl = preferences[teslamateBaseUrlKey] ?: "",
             lastSelectedCarId = preferences[lastSelectedCarIdKey],
-            languageCode = languagePrefs.getString("language_code", "") ?: ""
+            languageCode = languagePrefs.getString("language_code", "") ?: "",
+            tariffEnabled = preferences[tariffEnabledKey] ?: true,
+            tariffPeakPrice = preferences[tariffPeakPriceKey]?.toDoubleOrNull() ?: 1.0,
+            tariffFlatPrice = preferences[tariffFlatPriceKey]?.toDoubleOrNull() ?: 0.7,
+            tariffValleyPrice = preferences[tariffValleyPriceKey]?.toDoubleOrNull() ?: 0.3,
+            tariffPeakRanges = preferences[tariffPeakRangesKey] ?: "[[10,14],[18,20]]",
+            tariffFlatRanges = preferences[tariffFlatRangesKey] ?: "[[7,9],[15,17],[21,22]]",
+            tariffValleyRanges = preferences[tariffValleyRangesKey] ?: "[[23,23],[0,6]]"
         )
     }
 
@@ -240,6 +261,26 @@ class SettingsDataStore @Inject constructor(
     suspend fun saveNotificationPermissionAsked() {
         context.dataStore.edit { preferences ->
             preferences[notificationPermissionAskedKey] = true
+        }
+    }
+
+    suspend fun saveTariffConfig(
+        enabled: Boolean,
+        peakPrice: Double,
+        flatPrice: Double,
+        valleyPrice: Double,
+        peakRanges: String,
+        flatRanges: String,
+        valleyRanges: String
+    ) {
+        context.dataStore.edit { preferences ->
+            preferences[tariffEnabledKey] = enabled
+            preferences[tariffPeakPriceKey] = peakPrice.toString()
+            preferences[tariffFlatPriceKey] = flatPrice.toString()
+            preferences[tariffValleyPriceKey] = valleyPrice.toString()
+            preferences[tariffPeakRangesKey] = peakRanges
+            preferences[tariffFlatRangesKey] = flatRanges
+            preferences[tariffValleyRangesKey] = valleyRanges
         }
     }
 

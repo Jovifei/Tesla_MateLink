@@ -86,6 +86,7 @@ import com.matelink.ui.theme.StatusSuccess
 fun SettingsScreen(
     onNavigateToDashboard: () -> Unit,
     onNavigateToPalettePreview: () -> Unit = {},
+    onNavigateToTariffConfig: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
     instanceViewModel: InstanceViewModel = hiltViewModel()
 ) {
@@ -219,6 +220,7 @@ private fun SettingsContent(
     onTestConnection: () -> Unit,
     onSave: () -> Unit,
     onPalettePreview: () -> Unit = {},
+    onNavigateToTariffConfig: () -> Unit = {},
     onForceResync: () -> Unit = {},
     onSimulateTpmsWarning: (TirePosition) -> Unit = {},
     onClearTpmsWarning: () -> Unit = {},
@@ -625,6 +627,44 @@ private fun SettingsContent(
                         }
                     )
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // === Tariff Config Entry ===
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onNavigateToTariffConfig() },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.tariff_title),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = stringResource(R.string.tariff_enable_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
 
