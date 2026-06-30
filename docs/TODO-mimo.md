@@ -40,9 +40,9 @@
 | ~~I-6~~ | ~~BatteryHealth mock 数据缺失~~ | ~~Battery~~ | ~~小~~ | ✅ a8e2697 |
 | ~~I-7~~ | ~~UpdatesView 无数据源~~ | ~~Updates~~ | ~~小~~ | ✅ 32818e9 |
 | ~~I-8~~ | ~~Timeline 缺休息段 + 驾驶段颜色不符~~ | ~~Timeline~~ | ~~小~~ | ✅ f5af2bd |
-| I-9 | Drive/Charge 详情页图表用 sin()/random() 假数据 | Drives/Charges | 中 | 需 API 时间序列端点 |
+| ~~I-9~~ | ~~Drive/Charge 详情页图表假数据~~ | ~~Drives/Charges~~ | ~~中~~ | ✅ 0c7a347 |
 | I-10 | DestinationsView 无地图标注（仅列表） | Destinations | 中 | 依赖 I-2 |
-| I-11 | 年度报告缺总费用汇总 + 充电习惯分析 | Reports | 小 | — |
+| ~~I-11~~ | ~~年度报告缺总费用汇总 + 充电习惯~~ | ~~Reports~~ | ~~小~~ | ✅ cdae8da |
 | I-12 | 导出缺 Excel 格式（仅 CSV/JSON） | Reports | 中 | 需 Excel 库 |
 
 ### Android
@@ -50,9 +50,9 @@
 | # | 问题 | 模块 | 难度 | 依赖 |
 |---|---|---|---|---|
 | ~~A-1~~ | ~~Dashboard 7 天电量趋势硬编码~~ | ~~Dashboard~~ | ~~小~~ | ✅ 4cfb5d6 |
-| A-2 | 分时电价 UI 缺失（TariffConfig 数据模型+计算逻辑已就绪，缺配置页面） | Settings | 中 | — |
+| ~~A-2~~ | ~~分时电价 UI 缺失~~ | ~~Settings~~ | ~~中~~ | ✅ 16e362a |
 | ~~A-3~~ | ~~语言切换 UI 缺失~~ | ~~Settings~~ | ~~小~~ | ✅ 23fd322 |
-| A-4 | Mock 模式数据层未实现（Settings 有开关但 API/Repository 无 mock 拦截器） | API | 中 | — |
+| ~~A-4~~ | ~~Mock 模式数据层未实现~~ | ~~API~~ | ~~中~~ | ✅ 154c765 |
 | A-5 | 年度报告缺"常用路线"分析 | Reports | 中 | 需地理聚合 |
 | A-6 | 导出缺 Excel 格式（仅 CSV/JSON） | Reports | 中 | 需 Excel 库 |
 
@@ -60,10 +60,10 @@
 
 | # | 问题 | 模块 | 难度 | 依赖 |
 |---|---|---|---|---|
-| W-1 | API client 纯 mock 无真实 fetch（api/client.ts 全部 delay+mockData） | API | 中 | — |
+| ~~W-1~~ | ~~API client 纯 mock 无真实 fetch~~ | ~~API~~ | ~~中~~ | ✅ 2a2e081 |
 | W-2 | 无 Dockerfile / nginx.conf 部署配置 | DevOps | 小 | — |
 | ~~W-3~~ | ~~Trips.tsx 纯空壳~~ | ~~Pages~~ | ~~小~~ | ✅ 9c5328f |
-| W-4 | 6 页面半实现（Math.random / 硬编码数据）：TopDestinations / EfficiencyCurve / Mileage / Heatmap / Statistics / SentryEvents | Pages | 中 | 依赖 W-1 |
+| ~~W-4~~ | ~~6 页面半实现（Math.random / 硬编码）~~ | ~~Pages~~ | ~~中~~ | ✅ f1194ae |
 | W-5 | 全站零真实地图渲染（4 处地图均为 placeholder 文字） | Map | 中 | 需 Leaflet 集成 |
 | ~~W-6~~ | ~~状态管理未统一~~ | ~~State~~ | ~~小~~ | ✅ a6aab6d |
 
