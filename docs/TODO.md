@@ -1,7 +1,11 @@
-# Tesla_MateLink TODO — 待完成与优化清单
+# Tesla_MateLink TODO — 总览
 
 > 最后更新: 2026-06-30
-> 基于 12 opus agent 需求符合性审核结果整理
+
+本文件为总览索引。详细清单按工程拆分：
+
+- **[TODO-glm.md](TODO-glm.md)** — app_glm 工程（glm AI 产出：iOS + Android MVP+P1+P2）
+- **[TODO-mimo.md](TODO-mimo.md)** — app_mimo 工程（mimo AI 产出：iOS + Android + Web MVP+P1+P2）
 
 ---
 
