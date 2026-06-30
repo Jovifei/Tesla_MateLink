@@ -42,6 +42,7 @@ data class SettingsUiState(
     val acceptInvalidCerts: Boolean = false,
     val currencyCode: String = "EUR",
     val showShortDrivesCharges: Boolean = false,
+    val languageCode: String = "",
     val isLoading: Boolean = true,
     val isTesting: Boolean = false,
     val isSaving: Boolean = false,
@@ -105,6 +106,7 @@ class SettingsViewModel @Inject constructor(
                 acceptInvalidCerts = settings.acceptInvalidCerts,
                 currencyCode = settings.currencyCode,
                 showShortDrivesCharges = settings.showShortDrivesCharges,
+                languageCode = settings.languageCode,
                 isLoading = false
             )
         }
@@ -177,6 +179,15 @@ class SettingsViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showShortDrivesCharges = show)
         viewModelScope.launch {
             settingsDataStore.saveShowShortDrivesCharges(show)
+        }
+    }
+
+    fun updateLanguage(languageCode: String) {
+        _uiState.value = _uiState.value.copy(languageCode = languageCode)
+        viewModelScope.launch {
+            settingsDataStore.saveLanguageCode(languageCode)
+            // Apply the locale change immediately
+            com.matelink.locale.LocaleHelper.applyLocale(context, languageCode)
         }
     }
 

@@ -128,6 +128,7 @@ fun SettingsScreen(
                 onHttpBasicAuthUsernameChange = viewModel::updateHttpBasicAuthUsername,
                 onHttpBasicAuthPasswordChange = viewModel::updateHttpBasicAuthPassword,
                 onAcceptInvalidCertsChange = viewModel::updateAcceptInvalidCerts,
+                onLanguageChange = viewModel::updateLanguage,
                 onCurrencyChange = viewModel::updateCurrency,
                 onShowShortDrivesChargesChange = viewModel::updateShowShortDrivesCharges,
                 onTestConnection = viewModel::testConnection,
@@ -212,6 +213,7 @@ private fun SettingsContent(
     onHttpBasicAuthUsernameChange: (String) -> Unit,
     onHttpBasicAuthPasswordChange: (String) -> Unit,
     onAcceptInvalidCertsChange: (Boolean) -> Unit,
+    onLanguageChange: (String) -> Unit = {},
     onCurrencyChange: (String) -> Unit,
     onShowShortDrivesChargesChange: (Boolean) -> Unit,
     onTestConnection: () -> Unit,
@@ -235,6 +237,7 @@ private fun SettingsContent(
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     var basicAuthPasswordVisible by remember { mutableStateOf(false) }
+    var languageDropdownExpanded by remember { mutableStateOf(false) }
     var currencyDropdownExpanded by remember { mutableStateOf(false) }
     var showShortDrivesChargesInfoDialog by remember { mutableStateOf(false) }
     var showResyncConfirmDialog by remember { mutableStateOf(false) }
@@ -544,6 +547,47 @@ private fun SettingsContent(
         // TODO(parity): iOS SettingsView has an explicit dark mode toggle (isDarkMode).
         //  Android currently follows system theme only.
         //  Ref: app_mimo/ios/MateLink/Features/Settings/SettingsView.swift
+
+        // Language selection
+        val languageOptions = com.matelink.locale.LocaleHelper.SUPPORTED_LOCALES
+        val currentLanguageName = languageOptions.firstOrNull { it.first == uiState.languageCode }?.second
+            ?: languageOptions.first().second
+
+        Box {
+            OutlinedTextField(
+                value = currentLanguageName,
+                onValueChange = {},
+                label = { Text("Language") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { languageDropdownExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "Select language"
+                        )
+                    }
+                }
+            )
+
+            DropdownMenu(
+                expanded = languageDropdownExpanded,
+                onDismissRequest = { languageDropdownExpanded = false },
+                modifier = Modifier.fillMaxWidth(0.9f)
+            ) {
+                languageOptions.forEach { (code, name) ->
+                    DropdownMenuItem(
+                        text = { Text(name) },
+                        onClick = {
+                            onLanguageChange(code)
+                            languageDropdownExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Currency selection
         val selectedCurrency = Currency.findByCode(uiState.currencyCode)

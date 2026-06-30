@@ -1,6 +1,7 @@
 package com.matelink.data.local
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -54,7 +55,8 @@ data class AppSettings(
     val currencyCode: String = "EUR",
     val showShortDrivesCharges: Boolean = false,
     val teslamateBaseUrl: String = "",
-    val lastSelectedCarId: Int? = null
+    val lastSelectedCarId: Int? = null,
+    val languageCode: String = ""
 ) {
     val isConfigured: Boolean
         get() = serverUrl.isNotBlank()
@@ -76,7 +78,12 @@ class SettingsDataStore @Inject constructor(
     private val teslamateBaseUrlKey = stringPreferencesKey("teslamate_base_url")
     private val lastSelectedCarIdKey = intPreferencesKey("last_selected_car_id")
     private val carImageOverridesKey = stringPreferencesKey("car_image_overrides")
+    private val languageCodeKey = stringPreferencesKey("language_code")
     private val notificationPermissionAskedKey = booleanPreferencesKey("notification_permission_asked")
+
+    /** SharedPreferences for language code — shared with MateLinkApplication for early reads. */
+    private val languagePrefs: SharedPreferences =
+        context.getSharedPreferences("matelink_language", Context.MODE_PRIVATE)
 
     val notificationPermissionAsked: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[notificationPermissionAskedKey] ?: false
@@ -93,8 +100,13 @@ class SettingsDataStore @Inject constructor(
             currencyCode = preferences[currencyCodeKey] ?: "EUR",
             showShortDrivesCharges = preferences[showShortDrivesChargesKey] ?: false,
             teslamateBaseUrl = preferences[teslamateBaseUrlKey] ?: "",
-            lastSelectedCarId = preferences[lastSelectedCarIdKey]
+            lastSelectedCarId = preferences[lastSelectedCarIdKey],
+            languageCode = languagePrefs.getString("language_code", "") ?: ""
         )
+    }
+
+    val languageCode: Flow<String> = kotlinx.coroutines.flow.flow {
+        emit(languagePrefs.getString("language_code", "") ?: "")
     }
 
     val showShortDrivesCharges: Flow<Boolean> = context.dataStore.data.map { preferences ->
@@ -186,6 +198,10 @@ class SettingsDataStore @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[showShortDrivesChargesKey] = show
         }
+    }
+
+    suspend fun saveLanguageCode(languageCode: String) {
+        languagePrefs.edit().putString("language_code", languageCode).apply()
     }
 
     suspend fun saveTeslamateBaseUrl(url: String) {
