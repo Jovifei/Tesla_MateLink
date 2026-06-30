@@ -97,11 +97,38 @@ final class TimelineViewModel: ObservableObject {
 
         merged.sort { $0.start > $1.start }
 
-        if !merged.isEmpty {
-            merged[merged.count - 1].isLast = true
+        // Insert rest events for gaps > 30 minutes
+        var withRests: [TimelineEvent] = []
+        for i in 0..<merged.count {
+            withRests.append(merged[i])
+            guard i + 1 < merged.count else { continue }
+            let curEnd = merged[i].end ?? merged[i].start
+            let nextStart = merged[i + 1].start
+            let gapMin = nextStart.timeIntervalSince(curEnd) / 60
+            if gapMin > 30 {
+                let restStart = curEnd
+                let restEnd = nextStart
+                let duration = Int(gapMin)
+                let hrs = duration / 60
+                let mins = duration % 60
+                let durStr = hrs > 0 ? "\(hrs)h \(mins)m" : "\(mins)m"
+                withRests.append(TimelineEvent(
+                    id: "rest_\(Int(restStart.timeIntervalSince1970))",
+                    type: "rest",
+                    start: restStart,
+                    end: restEnd,
+                    label: "Parked",
+                    detail: "Car was idle \u{00b7} \(durStr)",
+                    metrics: durStr
+                ))
+            }
         }
 
-        self.events = merged
+        if !withRests.isEmpty {
+            withRests[withRests.count - 1].isLast = true
+        }
+
+        self.events = withRests
     }
 }
 
@@ -158,11 +185,19 @@ struct TimelineEventRow: View {
     let event: TimelineEvent
 
     private var dotColor: Color {
-        event.type == "drive" ? Color(red: 0.23, green: 0.51, blue: 0.96) : Color(red: 0.96, green: 0.62, blue: 0.04)
+        switch event.type {
+        case "drive": return Color(red: 0.18, green: 0.68, blue: 0.38)
+        case "rest": return Color(.systemGray3)
+        default: return Color(red: 0.96, green: 0.62, blue: 0.04) // charge
+        }
     }
 
     private var iconName: String {
-        event.type == "drive" ? "car.fill" : "bolt.fill"
+        switch event.type {
+        case "drive": return "car.fill"
+        case "rest": return "moon.fill"
+        default: return "bolt.fill" // charge
+        }
     }
 
     var body: some View {
