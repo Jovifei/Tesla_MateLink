@@ -37,9 +37,9 @@
 | I-3 | 6 页面无地图（DriveDetail / ChargeDetail / TripDetail / WhereWasI / RegionsVisited / TopDestinations） | Map | 大 | 依赖 I-2 |
 | I-4 | 多实例完全缺失（单实例架构，AppState 无 Instance 模型） | Settings | 大 | AppState 重构 |
 | I-5 | Apple Watch 完全缺失（无 WatchKit 项目） | Watch | 大 | Xcode 项目配置 |
-| I-6 | BatteryHealth mock 数据缺失（可选字段为 nil，显示 0%） | Battery | 小 | 补 mock_data.json |
-| I-7 | UpdatesView 无数据源（Mock 返回空数组，页面永远空白） | Updates | 小 | 接 getUpdates API |
-| I-8 | Timeline 缺休息段 + 驾驶段颜色不符需求（蓝色应为绿色） | Timeline | 小 | — |
+| ~~I-6~~ | ~~BatteryHealth mock 数据缺失~~ | ~~Battery~~ | ~~小~~ | ✅ a8e2697 |
+| ~~I-7~~ | ~~UpdatesView 无数据源~~ | ~~Updates~~ | ~~小~~ | ✅ 32818e9 |
+| ~~I-8~~ | ~~Timeline 缺休息段 + 驾驶段颜色不符~~ | ~~Timeline~~ | ~~小~~ | ✅ f5af2bd |
 | I-9 | Drive/Charge 详情页图表用 sin()/random() 假数据 | Drives/Charges | 中 | 需 API 时间序列端点 |
 | I-10 | DestinationsView 无地图标注（仅列表） | Destinations | 中 | 依赖 I-2 |
 | I-11 | 年度报告缺总费用汇总 + 充电习惯分析 | Reports | 小 | — |
@@ -49,9 +49,9 @@
 
 | # | 问题 | 模块 | 难度 | 依赖 |
 |---|---|---|---|---|
-| A-1 | Dashboard 7 天电量趋势硬编码 `listOf(75,72,68,70,73,76,78)` | Dashboard | 小 | 接历史电池数据 |
+| ~~A-1~~ | ~~Dashboard 7 天电量趋势硬编码~~ | ~~Dashboard~~ | ~~小~~ | ✅ 4cfb5d6 |
 | A-2 | 分时电价 UI 缺失（TariffConfig 数据模型+计算逻辑已就绪，缺配置页面） | Settings | 中 | — |
-| A-3 | 语言切换 UI 缺失（values-zh 翻译已就绪，缺 Settings 入口） | Settings | 小 | — |
+| ~~A-3~~ | ~~语言切换 UI 缺失~~ | ~~Settings~~ | ~~小~~ | ✅ 23fd322 |
 | A-4 | Mock 模式数据层未实现（Settings 有开关但 API/Repository 无 mock 拦截器） | API | 中 | — |
 | A-5 | 年度报告缺"常用路线"分析 | Reports | 中 | 需地理聚合 |
 | A-6 | 导出缺 Excel 格式（仅 CSV/JSON） | Reports | 中 | 需 Excel 库 |
@@ -62,10 +62,10 @@
 |---|---|---|---|---|
 | W-1 | API client 纯 mock 无真实 fetch（api/client.ts 全部 delay+mockData） | API | 中 | — |
 | W-2 | 无 Dockerfile / nginx.conf 部署配置 | DevOps | 小 | — |
-| W-3 | Trips.tsx 纯空壳（按钮无 onClick，整页空状态） | Pages | 小 | — |
+| ~~W-3~~ | ~~Trips.tsx 纯空壳~~ | ~~Pages~~ | ~~小~~ | ✅ 9c5328f |
 | W-4 | 6 页面半实现（Math.random / 硬编码数据）：TopDestinations / EfficiencyCurve / Mileage / Heatmap / Statistics / SentryEvents | Pages | 中 | 依赖 W-1 |
 | W-5 | 全站零真实地图渲染（4 处地图均为 placeholder 文字） | Map | 中 | 需 Leaflet 集成 |
-| W-6 | 状态管理未统一（store.ts 已建但 App.tsx / Settings / Onboarding 仍用本地 useState） | State | 小 | — |
+| ~~W-6~~ | ~~状态管理未统一~~ | ~~State~~ | ~~小~~ | ✅ a6aab6d |
 
 ---
 
