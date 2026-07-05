@@ -128,4 +128,15 @@
     <string name="efficiency_total_distance">Total Distance</string>
     <string name="efficiency_by_speed_title">Efficiency by Speed</string>
     <string name="efficiency_by_speed_subtitle">Wh/km at different speed ranges</string>
+
+    <!-- Cost Analysis -->
+    <string name="cost_title">Cost Analysis</string>
+    <string name="cost_total">Total Cost</string>
+    <string name="cost_energy_added">Energy Added</string>
+    <string name="cost_charges_count">%d charges</string>
+    <string name="cost_monthly_breakdown">Monthly Breakdown</string>
+    <string name="cost_ac">AC Charging</string>
+    <string name="cost_dc">DC Charging</string>
+    <string name="cost_top_locations">Top Locations</string>
+    <string name="cost_location_count">%d charges</string>
 </resources>
