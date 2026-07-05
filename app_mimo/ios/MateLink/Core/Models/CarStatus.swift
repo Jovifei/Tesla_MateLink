@@ -117,3 +117,43 @@ struct UpdateItem: Codable, Identifiable {
     let id: Int; let carId: Int; let startDate: String; let endDate: String; let version: String
     enum CodingKeys: String, CodingKey { case id; case carId = "car_id"; case startDate = "start_date"; case endDate = "end_date"; case version }
 }
+
+/// Sentry mode alert event (mock `sentry_events` array).
+/// iOS API does not yet expose a real sentry endpoint; this models the mock payload
+/// so SentryHistoryView can render a list/detail shell.
+struct SentryEvent: Codable, Identifiable {
+    let id: Int
+    let startDate: String
+    let endDate: String?
+    let latitude: Double
+    let longitude: Double
+    let address: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case latitude, longitude, address
+    }
+}
+
+// MARK: - Charge compat aliases
+//
+// Several consumers (ChargeListView / ChargeDetailView / CostView / TimelineView) were
+// written against an older/Android-leaning field set that the iOS `Charge` model does
+// not currently store: `chargeType`, `chargeEnergyUsed`, `fastChargerBrand`,
+// `fastChargerType`. Rather than touch every call site, expose read-only compat props
+// here so the consumers compile against the real `chargingType`/optional `cost`/
+// `address` storage. When the iOS API gains the real fields, swap these out.
+extension Charge {
+    /// Alias for the stored `chargingType` (JSON `charging_type`).
+    var chargeType: String { chargingType }
+
+    /// Real `charge_energy_used` is not yet exposed by the iOS API/mock.
+    /// Returns 0 to signal "unknown"; views render "—" when 0.
+    var chargeEnergyUsed: Double { 0 }
+
+    /// Fast-charger metadata is not yet modeled on iOS; nil-safe stubs for view compat.
+    var fastChargerBrand: String? { nil }
+    var fastChargerType: String? { nil }
+}

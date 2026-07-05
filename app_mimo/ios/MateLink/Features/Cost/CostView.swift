@@ -111,7 +111,7 @@ struct CostView: View {
         for c in charges {
             let month = String(c.startDate.prefix(7))
             var entry = monthMap[month] ?? (0, 0)
-            if c.chargeType == "DC" { entry.dc += c.cost } else { entry.ac += c.cost }
+            if c.chargeType == "DC" { entry.dc += c.cost ?? 0 } else { entry.ac += c.cost ?? 0 }
             monthMap[month] = entry
         }
         monthlyData = monthMap.sorted { $0.key < $1.key }.map {
@@ -121,11 +121,12 @@ struct CostView: View {
         // Location ranking
         var locMap: [String: (cost: Double, kWh: Double, count: Int)] = [:]
         for c in charges {
-            var entry = locMap[c.address] ?? (0, 0, 0)
-            entry.cost += c.cost
+            let addr = c.address ?? "Unknown"
+            var entry = locMap[addr] ?? (0, 0, 0)
+            entry.cost += c.cost ?? 0
             entry.kWh += c.chargeEnergyAdded
             entry.count += 1
-            locMap[c.address] = entry
+            locMap[addr] = entry
         }
         ranking = locMap.map { addr, v in
             LocationCost(address: addr, cost: v.cost, kWh: v.kWh,

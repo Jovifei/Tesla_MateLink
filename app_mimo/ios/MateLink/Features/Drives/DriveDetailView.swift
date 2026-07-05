@@ -585,14 +585,25 @@ struct DriveDetailView: View {
             id: 1, carId: 1,
             startDate: "2025-06-22T10:30:00.000Z",
             endDate: "2025-06-22T11:15:00.000Z",
-            startAddress: "Home",
-            endAddress: "Office",
             distanceKm: 35.2,
             durationMin: 45,
             efficiency: 185,
+            startAddress: "Home",
+            endAddress: "Office",
+            startLatitude: 31.2304,
+            startLongitude: 121.4737,
+            endLatitude: 31.2211,
+            endLongitude: 121.4555,
             startBatteryLevel: 85,
             endBatteryLevel: 72,
-            outsideTempAvg: 22.5
+            startIdealRangeKm: 420,
+            endIdealRangeKm: 368,
+            outsideTempAvg: 22.5,
+            speedMax: 118,
+            powerMax: 64,
+            powerMin: -22,
+            elevationGain: 55,
+            elevationLoss: 41
         )
     )
 }

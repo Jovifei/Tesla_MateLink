@@ -69,9 +69,9 @@ actor MockAPI {
     init() { self.data = MockData.load() }
 
     func mockStatus(_ carId: Int) -> CarStatus {
-        var s = data.status[String(carId)] ?? CarStatus(carId: carId, state: .offline, since: "", healthy: true, odometer: 0, batteryLevel: 0, usableBatteryLevel: 0, usableBatteryRangeKm: 0, idealBatteryRangeKm: 0, chargeEnergyAdded: 0, chargeLimitSoc: 0, chargerPower: 0, chargerActualCurrent: 0, chargerVoltage: 0, chargePortDoorOpen: false, timeToFullCharge: 0, insideTemp: 0, outsideTemp: 0, isClimateOn: false, locked: false, sentryMode: false, pluggedIn: false, tirePressureFrontLeft: 0, tirePressureFrontRight: 0, tirePressureRearLeft: 0, tirePressureRearRight: 0, latitude: 0, longitude: 0, elevation: 0, speed: 0, power: 0, heading: 0, shiftState: nil)
-        s.batteryLevel = min(100, max(10, Int(s.batteryLevel) + (Int.random(in: -1...1))))
-        return s
+        let base = data.status[String(carId)] ?? CarStatus(carId: carId, state: .offline, since: "", healthy: true, odometer: 0, batteryLevel: 0, usableBatteryLevel: 0, usableBatteryRangeKm: 0, idealBatteryRangeKm: 0, chargeEnergyAdded: 0, chargeLimitSoc: 0, chargerPower: 0, chargerActualCurrent: 0, chargerVoltage: 0, chargePortDoorOpen: false, timeToFullCharge: 0, insideTemp: 0, outsideTemp: 0, isClimateOn: false, locked: false, sentryMode: false, pluggedIn: false, tirePressureFrontLeft: 0, tirePressureFrontRight: 0, tirePressureRearLeft: 0, tirePressureRearRight: 0, latitude: 0, longitude: 0, elevation: 0, speed: 0, power: 0, heading: 0, shiftState: nil)
+        let adjustedBattery = min(100, max(10, base.batteryLevel + Int.random(in: -1...1)))
+        return base.withBatteryLevel(adjustedBattery)
     }
 
     func getCars() -> [CarRaw] { data.cars }
@@ -80,11 +80,15 @@ actor MockAPI {
     func getCharges(_ carId: Int) -> [Charge] { data.charges.filter { $0.carId == carId } }
     func getBatteryHealth(_ carId: Int) -> BatteryHealth { data.batteryHealth[String(carId)] ?? BatteryHealth(carId: carId, date: "", batteryLevel: 0, ratedRangeKm: 0, idealRangeKm: 0, odometer: 0, outsideTemp: 0, usableBatteryLevel: 0, capacityDegradationPercent: nil, originalCapacityKwh: nil, currentCapacityKwh: nil, history: nil) }
     func getUpdates(_ carId: Int) -> [UpdateItem] { data.updates.filter { $0.carId == carId } }
+    /// Sentry events. Mock payload does not carry `car_id`, so all events are returned.
+    /// Real iOS endpoint not yet wired (see TODO above); SentryHistoryView treats this as mock-only.
+    func getSentryEvents(_ carId: Int) -> [SentryEvent] { data.sentryEvents }
 }
 
-class MockData: Codable {
+class MockData: Decodable {
     let cars: [CarRaw]; let status: [String: CarStatus]; let drives: [Drive]; let charges: [Charge]
     let batteryHealth: [String: BatteryHealth]; let updates: [UpdateItem]
+    let sentryEvents: [SentryEvent]
 
     static func load() -> MockData {
         guard let url = Bundle.main.url(forResource: "mock_data", withExtension: "json"),
@@ -92,8 +96,76 @@ class MockData: Codable {
         return try! JSONDecoder().decode(MockData.self, from: d)
     }
 
-    enum CodingKeys: String, CodingKey {
-        case cars, status, drives, charges; case batteryHealth = "batteryHealth"; case updates = "software_updates"
+    private enum CodingKeys: String, CodingKey {
+        case cars
+        case status
+        case statuses
+        case drives
+        case charges
+        case batteryHealthDict = "batteryHealth"
+        case batteryHealthArray = "battery_health"
+        case updates = "software_updates"
+        case sentryEvents = "sentry_events"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cars = try container.decode([CarRaw].self, forKey: .cars)
+        status =
+            try container.decodeIfPresent([String: CarStatus].self, forKey: .status)
+            ?? container.decode([String: CarStatus].self, forKey: .statuses)
+        drives = try container.decode([Drive].self, forKey: .drives)
+        charges = try container.decode([Charge].self, forKey: .charges)
+
+        if let dict = try container.decodeIfPresent([String: BatteryHealth].self, forKey: .batteryHealthDict) {
+            batteryHealth = dict
+        } else {
+            let entries = try container.decodeIfPresent([BatteryHealth].self, forKey: .batteryHealthArray) ?? []
+            batteryHealth = Dictionary(uniqueKeysWithValues: entries.map { (String($0.carId), $0) })
+        }
+
+        updates = try container.decodeIfPresent([UpdateItem].self, forKey: .updates) ?? []
+        sentryEvents = try container.decodeIfPresent([SentryEvent].self, forKey: .sentryEvents) ?? []
+    }
+}
+
+private extension CarStatus {
+    func withBatteryLevel(_ newBatteryLevel: Int) -> CarStatus {
+        CarStatus(
+            carId: carId,
+            state: state,
+            since: since,
+            healthy: healthy,
+            odometer: odometer,
+            batteryLevel: newBatteryLevel,
+            usableBatteryLevel: usableBatteryLevel,
+            usableBatteryRangeKm: usableBatteryRangeKm,
+            idealBatteryRangeKm: idealBatteryRangeKm,
+            chargeEnergyAdded: chargeEnergyAdded,
+            chargeLimitSoc: chargeLimitSoc,
+            chargerPower: chargerPower,
+            chargerActualCurrent: chargerActualCurrent,
+            chargerVoltage: chargerVoltage,
+            chargePortDoorOpen: chargePortDoorOpen,
+            timeToFullCharge: timeToFullCharge,
+            insideTemp: insideTemp,
+            outsideTemp: outsideTemp,
+            isClimateOn: isClimateOn,
+            locked: locked,
+            sentryMode: sentryMode,
+            pluggedIn: pluggedIn,
+            tirePressureFrontLeft: tirePressureFrontLeft,
+            tirePressureFrontRight: tirePressureFrontRight,
+            tirePressureRearLeft: tirePressureRearLeft,
+            tirePressureRearRight: tirePressureRearRight,
+            latitude: latitude,
+            longitude: longitude,
+            elevation: elevation,
+            speed: speed,
+            power: power,
+            heading: heading,
+            shiftState: shiftState
+        )
     }
 }
 

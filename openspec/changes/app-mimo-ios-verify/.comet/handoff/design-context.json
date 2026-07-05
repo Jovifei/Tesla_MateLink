@@ -1,0 +1,14 @@
+{
+  "change": "app-mimo-ios-verify",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "3791915167d2660c73df5a054647ed4ecbddbd72806bf55832eba8a57455d183",
+  "files": [
+    { "path": "openspec/changes/app-mimo-ios-verify/proposal.md", "sha256": "35c1943b6d5fa805f4c428a569ee474611ccfc9ca4f1869a62771cace84f5dbb" },
+    { "path": "openspec/changes/app-mimo-ios-verify/design.md", "sha256": "4cf33bba39b86a38a777c191b0878ad51fb2c0ecb45c46238028290dd1bbc0bf" },
+    { "path": "openspec/changes/app-mimo-ios-verify/tasks.md", "sha256": "9f9e8bdd9ab1f2f41da3e03cceb971a0232f184e7424762c831f9193556aefa3" },
+    { "path": "openspec/changes/app-mimo-ios-verify/specs/ios-environment-verification/spec.md", "sha256": "098c933d1685043b19489f41725b4683a20c4383963b41d2e0fea4fdf6f6d83d" }
+  ]
+}

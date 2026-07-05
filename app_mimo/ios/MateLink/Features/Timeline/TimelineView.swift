@@ -30,10 +30,10 @@ private let iso8601NoFraction: ISO8601DateFormatter = {
     return f
 }()
 
-private func parseDate(_ raw: String) -> Date {
+private func parseDate(_ raw: String) -> Date? {
     if let d = iso8601Full.date(from: raw) { return d }
     if let d = iso8601NoFraction.date(from: raw) { return d }
-    return Date(timeIntervalSince1970: 0)
+    return nil
 }
 
 private let timeFormatter: DateFormatter = {
@@ -66,7 +66,7 @@ final class TimelineViewModel: ObservableObject {
         var merged: [TimelineEvent] = []
 
         for d in drives {
-            let start = parseDate(d.startDate)
+            guard let start = parseDate(d.startDate) else { continue }
             let end = parseDate(d.endDate)
             merged.append(TimelineEvent(
                 id: "drive_\(d.id)",
@@ -80,10 +80,10 @@ final class TimelineViewModel: ObservableObject {
         }
 
         for c in charges {
-            let start = parseDate(c.startDate)
-            let end = c.endDate.map(parseDate)
+            guard let start = parseDate(c.startDate) else { continue }
+            let end = c.endDate.flatMap(parseDate)
             let typeLabel = c.chargeType.isEmpty ? "Charging" : "\(c.chargeType) Charging"
-            let addr = c.address.isEmpty ? "Unknown" : shortAddress(c.address)
+            let addr = (c.address ?? "").isEmpty ? "Unknown" : shortAddress(c.address ?? "Unknown")
             merged.append(TimelineEvent(
                 id: "charge_\(c.id)",
                 type: "charge",
@@ -91,7 +91,7 @@ final class TimelineViewModel: ObservableObject {
                 end: end,
                 label: typeLabel,
                 detail: "\(addr) \u{00b7} \(String(format: "%.1f", c.chargeEnergyAdded)) kWh added",
-                metrics: "+\(String(format: "%.1f", c.chargeEnergyAdded)) kWh \u{00b7} $\(String(format: "%.2f", c.cost))"
+                metrics: "+\(String(format: "%.1f", c.chargeEnergyAdded)) kWh \u{00b7} $\(String(format: "%.2f", c.cost ?? 0))"
             ))
         }
 
