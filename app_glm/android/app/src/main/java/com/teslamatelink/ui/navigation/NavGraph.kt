@@ -1,6 +1,7 @@
 package com.teslamatelink.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -24,6 +25,7 @@ import com.teslamatelink.ui.settings.SettingsScreen
 import com.teslamatelink.ui.statistics.DayDetailScreen
 import com.teslamatelink.ui.statistics.MonthDetailScreen
 import com.teslamatelink.ui.statistics.StatisticsScreen
+import com.teslamatelink.ui.more.MoreScreen
 import com.teslamatelink.ui.timeline.TimelineScreen
 import com.teslamatelink.ui.updates.UpdatesScreen
 import com.teslamatelink.ui.vampire.VampireScreen
@@ -48,6 +50,7 @@ object Routes {
     const val TIMELINE = "timeline"
     const val UPDATES = "updates"
     const val SETTINGS = "settings"
+    const val MORE = "more"
     const val ABOUT = "about"
 
     fun driveDetail(id: Int) = "driveDetail/$id"
@@ -57,9 +60,14 @@ object Routes {
 @Composable
 fun NavGraph(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Routes.DASHBOARD
+    startDestination: String = Routes.DASHBOARD,
+    modifier: Modifier = Modifier
 ) {
-    NavHost(navController = navController, startDestination = startDestination) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
 
         // -- Onboarding --
         composable(Routes.ONBOARDING) {
@@ -206,6 +214,14 @@ fun NavGraph(
         // -- Updates --
         composable(Routes.UPDATES) {
             UpdatesScreen(onNavigateBack = { navController.popBackStack() })
+        }
+
+        // -- More --
+        composable(Routes.MORE) {
+            MoreScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigate = { route -> navController.navigate(route) }
+            )
         }
 
         // -- Settings --

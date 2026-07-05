@@ -65,8 +65,8 @@ class AppState: ObservableObject {
     var real: TeslaMateAPI?
 
     enum Tab: String, CaseIterable { case dashboard, drives, charges, more
-        var icon: String { switch self { case .dashboard: return "car.fill"; case .drives: return "road.lanes"; case .charges: return "bolt.fill"; case .more: return "ellipsis.circle" } }
-        var label: String { switch self { case .dashboard: return "Vehicle"; case .drives: return "Drives"; case .charges: return "Charges"; case .more: return "More" } }
+        var icon: String { switch self { case .dashboard: return "gauge.with.dots.needle.33percent"; case .drives: return "point.topleft.down.to.point.bottomright.curvepath"; case .charges: return "bolt.fill"; case .more: return "ellipsis" } }
+        var label: String { switch self { case .dashboard: return "仪表盘"; case .drives: return "行程"; case .charges: return "充电"; case .more: return "更多" } }
     }
 
     var currentCar: Car? { cars.first { $0.id == currentCarId } }

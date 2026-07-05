@@ -1,8 +1,6 @@
 package com.teslamatelink.ui.dashboard
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -24,16 +21,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,22 +36,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.teslamatelink.domain.GCJ02Converter
-import com.teslamatelink.ui.components.AmapComposeView
-import com.teslamatelink.ui.components.CarImage
-import com.teslamatelink.ui.components.MapMarker
-import com.teslamatelink.util.MapUtils
-import com.teslamatelink.ui.dashboard.components.BatteryCard
-import com.teslamatelink.ui.dashboard.components.ChargingCard
-import com.teslamatelink.ui.dashboard.components.InfoGrid
-import com.teslamatelink.R
-import com.teslamatelink.ui.dashboard.components.StatusBadge
+import com.teslamatelink.ui.components.ChipStatus
+import com.teslamatelink.ui.components.StitchCard
+import com.teslamatelink.ui.components.StitchDataRow
+import com.teslamatelink.ui.components.StitchStatusChip
+import com.teslamatelink.ui.theme.JetBrainsMonoFamily
+import com.teslamatelink.ui.theme.StitchColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,8 +69,12 @@ fun DashboardScreen(
     var showCarSwitcher by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = StitchColors.Background,
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = StitchColors.Background
+                ),
                 title = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -90,18 +82,32 @@ fun DashboardScreen(
                     ) {
                         Text(
                             text = state.carStatus?.displayName ?: "Tesla MateLink",
-                            style = MaterialTheme.typography.titleLarge
+                            color = StitchColors.OnSurface,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 24.sp,
+                            letterSpacing = (-0.24).sp
                         )
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowDown,
-                            contentDescription = stringResource(R.string.cd_switch_car),
+                            contentDescription = "Switch car",
+                            tint = StitchColors.OnSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                 },
                 actions = {
+                    val isOnline = state.carStatus?.state == "online"
+                    StitchStatusChip(
+                        text = if (isOnline) "ONLINE" else "OFFLINE",
+                        status = if (isOnline) ChipStatus.ONLINE else ChipStatus.OFFLINE
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.cd_settings))
+                        Icon(
+                            Icons.Filled.Settings,
+                            contentDescription = "Settings",
+                            tint = StitchColors.OnSurface
+                        )
                     }
                     // Car switcher dropdown
                     DropdownMenu(
@@ -112,11 +118,15 @@ fun DashboardScreen(
                             DropdownMenuItem(
                                 text = {
                                     Column {
-                                        Text(car.name, style = MaterialTheme.typography.bodyMedium)
+                                        Text(
+                                            car.name,
+                                            color = StitchColors.OnSurface,
+                                            fontSize = 16.sp
+                                        )
                                         Text(
                                             "${car.model} · ${car.totalDrives} drives",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = StitchColors.OnSurfaceVariant,
+                                            fontSize = 14.sp
                                         )
                                     }
                                 },
@@ -132,12 +142,11 @@ fun DashboardScreen(
         }
     ) { padding ->
         if (state.isLoading) {
-            Column(
+            Box(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = StitchColors.OnSurface)
             }
         } else {
             state.carStatus?.let { status ->
@@ -146,175 +155,369 @@ fun DashboardScreen(
                         .fillMaxSize()
                         .padding(padding)
                         .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    // Header row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    Spacer(modifier = Modifier.height(0.dp))
+
+                    // ── Battery Card ─────────────────────────────────────────
+                    StitchCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onNavigateToBattery)
                     ) {
-                        Text(
-                            text = status.displayName,
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        StatusBadge(state = status.state)
-                    }
-
-                    // Car image
-                    CarImage(
-                        exteriorColor = state.cars.find { it.id == state.selectedCarId }?.exteriorColor,
-                        isDark = isSystemInDarkTheme()
-                    )
-
-                    // Location (TG-06)
-                    LocationCard(
-                        latitude = status.latitude,
-                        longitude = status.longitude,
-                        address = null
-                    )
-
-                    // Battery
-                    BatteryCard(
-                        batteryLevel = status.batteryLevel,
-                        rangeKm = status.estBatteryRangeKm,
-                        chargeLimit = status.chargeLimitSoc,
-                        isCharging = status.isCharging,
-                        onClick = onNavigateToBattery
-                    )
-
-                    // Charging
-                    if (status.isCharging && status.chargerPower != null) {
-                        ChargingCard(
-                            powerKw = status.chargerPower,
-                            addedKwh = status.chargeEnergyAdded ?: 0.0,
-                            remainingHours = status.timeToFullChargeHours ?: 0.0
-                        )
-                    }
-
-                    // Info grid
-                    InfoGrid(
-                        odometer = status.odometer,
-                        location = stringResource(R.string.location_home),
-                        insideTemp = status.insideTemp,
-                        outsideTemp = status.outsideTemp,
-                        frontLeftPsi = status.frontLeftPsi,
-                        frontRightPsi = status.frontRightPsi,
-                        rearLeftPsi = status.rearLeftPsi,
-                        rearRightPsi = status.rearRightPsi
-                    )
-
-                    // Quick navigation chips — row 1 (core)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.nav_quick_access),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        QuickNavChip("Drives", onClick = onNavigateToDrives)
-                        QuickNavChip("Charges", onClick = onNavigateToCharges)
-                        QuickNavChip("Battery", onClick = onNavigateToBattery)
-                        QuickNavChip("Updates", onClick = onNavigateToUpdates)
-                    }
-
-                    // Quick navigation chips — row 2 (analytics)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        QuickNavChip("Stats", onClick = onNavigateToStatistics)
-                        QuickNavChip("Heatmap", onClick = onNavigateToHeatmap)
-                        QuickNavChip("Efficiency", onClick = onNavigateToEfficiency)
-                        QuickNavChip("Vampire", onClick = onNavigateToVampire)
-                    }
-
-                    // Quick navigation chips — row 3 (more analytics)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        QuickNavChip("Range", onClick = onNavigateToRange)
-                        QuickNavChip("Cost", onClick = onNavigateToCost)
-                        QuickNavChip("Places", onClick = onNavigateToDestinations)
-                        QuickNavChip("Timeline", onClick = onNavigateToTimeline)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun LocationCard(latitude: Double?, longitude: Double?, address: String?) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(stringResource(R.string.location_title), style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-            if (latitude != null && longitude != null) {
-                if (MapUtils.isChineseLocale()) {
-                    val context = LocalContext.current
-                    if (MapUtils.isAmapKeyConfigured(context)) {
-                        AmapComposeView(
-                            lat = latitude,
-                            lng = longitude,
-                            markers = listOf(
-                                MapMarker(
-                                    lat = latitude, lng = longitude, title = "Tesla", snippet = address
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            Column {
+                                Text(
+                                    text = "BATTERY",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
                                 )
-                            ),
-                            modifier = Modifier.fillMaxWidth().height(200.dp)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "${status.batteryLevel}%",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = JetBrainsMonoFamily
+                                )
+                            }
+                            Text(
+                                text = "${status.estBatteryRangeKm.toInt()} km",
+                                color = StitchColors.OnSurfaceVariant,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = JetBrainsMonoFamily
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        LinearProgressIndicator(
+                            progress = { status.batteryLevel / 100f },
+                            modifier = Modifier.fillMaxWidth().height(4.dp),
+                            color = StitchColors.OnSurface,
+                            trackColor = StitchColors.Border,
                         )
-                    } else {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Limit: ${status.chargeLimitSoc}%",
+                                color = StitchColors.OnSurfaceVariant,
+                                fontSize = 12.sp,
+                                letterSpacing = 0.6.sp
+                            )
+                            Text(
+                                text = "${status.odometer.toInt()} km",
+                                color = StitchColors.OnSurfaceVariant,
+                                fontSize = 12.sp,
+                                letterSpacing = 0.6.sp
+                            )
+                        }
+                    }
+
+                    // ── Charging Card (conditional) ──────────────────────────
+                    if (status.isCharging && status.chargerPower != null) {
+                        StitchCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onNavigateToCharges)
+                        ) {
+                            Text(
+                                text = "CHARGING",
+                                color = StitchColors.StatusCharging,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 0.6.sp
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = "Power",
+                                        color = StitchColors.OnSurfaceVariant,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.6.sp
+                                    )
+                                    Text(
+                                        text = "${status.chargerPower?.toInt() ?: 0} kW",
+                                        color = StitchColors.OnSurface,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = JetBrainsMonoFamily
+                                    )
+                                }
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Added",
+                                        color = StitchColors.OnSurfaceVariant,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.6.sp
+                                    )
+                                    Text(
+                                        text = "${String.format("%.1f", status.chargeEnergyAdded ?: 0.0)} kWh",
+                                        color = StitchColors.OnSurface,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = JetBrainsMonoFamily
+                                    )
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = "Remaining",
+                                        color = StitchColors.OnSurfaceVariant,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.6.sp
+                                    )
+                                    Text(
+                                        text = "${String.format("%.1f", status.timeToFullChargeHours ?: 0.0)}h",
+                                        color = StitchColors.OnSurface,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = JetBrainsMonoFamily
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // ── Climate Card ─────────────────────────────────────────
+                    StitchCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            stringResource(R.string.map_unavailable),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error
+                            text = "CLIMATE",
+                            color = StitchColors.OnSurfaceVariant,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.6.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Inside",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
+                                )
+                                Text(
+                                    text = "${status.insideTemp?.let { "${String.format("%.1f", it)}°C" } ?: "—"}",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = JetBrainsMonoFamily
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "Outside",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
+                                )
+                                Text(
+                                    text = "${status.outsideTemp?.let { "${String.format("%.1f", it)}°C" } ?: "—"}",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = JetBrainsMonoFamily
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(
+                                    text = "Climate",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
+                                )
+                                StitchStatusChip(
+                                    text = if (status.isClimateOn) "ON" else "OFF",
+                                    status = if (status.isClimateOn) ChipStatus.ONLINE else ChipStatus.OFFLINE
+                                )
+                            }
+                        }
+                    }
+
+                    // ── Status Card ──────────────────────────────────────────
+                    StitchCard(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "STATUS",
+                            color = StitchColors.OnSurfaceVariant,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.6.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "LOCK",
+                            value = if (status.locked) "Locked" else "Unlocked"
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "SENTRY",
+                            value = if (status.sentryMode) "Active" else "Off"
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "PLUG",
+                            value = if (status.pluggedIn) "Connected" else "Disconnected"
                         )
                     }
-                } else {
-                    val (gcjLat, gcjLng) = GCJ02Converter.wgs84ToGcj02(latitude, longitude)
-                    Text(
-                        "WGS-84: %.6f, %.6f".format(latitude, longitude),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        "GCJ-02: %.6f, %.6f".format(gcjLat, gcjLng),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    if (!address.isNullOrBlank()) {
+
+                    // ── Tire Pressure Card ───────────────────────────────────
+                    StitchCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            address,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = "TIRE PRESSURE",
+                            color = StitchColors.OnSurfaceVariant,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.6.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = "FL",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
+                                )
+                                Text(
+                                    text = "${status.frontLeftPsi?.let { String.format("%.1f", it) } ?: "—"}",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = JetBrainsMonoFamily
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "FR",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
+                                )
+                                Text(
+                                    text = "${status.frontRightPsi?.let { String.format("%.1f", it) } ?: "—"}",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = JetBrainsMonoFamily
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "RL",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
+                                )
+                                Text(
+                                    text = "${status.rearLeftPsi?.let { String.format("%.1f", it) } ?: "—"}",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = JetBrainsMonoFamily
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(
+                                    text = "RR",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
+                                )
+                                Text(
+                                    text = "${status.rearRightPsi?.let { String.format("%.1f", it) } ?: "—"}",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = JetBrainsMonoFamily
+                                )
+                            }
+                        }
+                    }
+
+                    // ── Quick Navigation ─────────────────────────────────────
+                    StitchCard(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "QUICK ACCESS",
+                            color = StitchColors.OnSurfaceVariant,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.6.sp
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        StitchDataRow(
+                            label = "DRIVES",
+                            value = "→",
+                            modifier = Modifier.clickable(onClick = onNavigateToDrives)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "CHARGES",
+                            value = "→",
+                            modifier = Modifier.clickable(onClick = onNavigateToCharges)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "BATTERY",
+                            value = "→",
+                            modifier = Modifier.clickable(onClick = onNavigateToBattery)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "UPDATES",
+                            value = "→",
+                            modifier = Modifier.clickable(onClick = onNavigateToUpdates)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "STATISTICS",
+                            value = "→",
+                            modifier = Modifier.clickable(onClick = onNavigateToStatistics)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        StitchDataRow(
+                            label = "EFFICIENCY",
+                            value = "→",
+                            modifier = Modifier.clickable(onClick = onNavigateToEfficiency)
                         )
                     }
+
+                    // Bottom spacing
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
-            } else {
-                Text(
-                    stringResource(R.string.no_location_data),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }
-}
-
-@Composable
-private fun QuickNavChip(
-    label: String,
-    onClick: () -> Unit
-) {
-    AssistChip(
-        onClick = onClick,
-        label = { Text(label) }
-    )
 }

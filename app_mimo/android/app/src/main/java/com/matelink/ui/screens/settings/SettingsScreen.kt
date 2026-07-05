@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
@@ -618,10 +619,10 @@ private fun SettingsContent(
                 onDismissRequest = { currencyDropdownExpanded = false },
                 modifier = Modifier.fillMaxWidth(0.9f)
             ) {
-                Currency.ALL.forEach { currency ->
+                com.matelink.data.model.Currency.entries.forEach { currency ->
                     DropdownMenuItem(
                         text = {
-                            Text("${currency.symbol} ${currency.code} - ${currency.name}")
+                            Text("${currency.symbol} ${currency.code}")
                         },
                         onClick = {
                             onCurrencyChange(currency.code)
@@ -663,7 +664,7 @@ private fun SettingsContent(
                     )
                 }
                 Icon(
-                    imageVector = Icons.Filled.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )

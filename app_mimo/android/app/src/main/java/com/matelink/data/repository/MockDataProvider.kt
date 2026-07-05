@@ -47,24 +47,24 @@ object MockDataProvider {
             name = "Model 3 Performance",
             carDetails = CarDetails(
                 model = "3",
-                trim_badging = "P74D",
+                trimBadging = "P74D",
                 vin = "5YJ3E1EA1LF000001",
                 efficiency = 153.0
             ),
             carExterior = CarExterior(
-                exterior_color = "Red",
-                wheel_type = "WY18P",
-                spoiler_type = "Carbon"
+                exteriorColor = "Red",
+                wheelType = "WY18P",
+                spoilerType = "Carbon"
             ),
             carSettings = CarSettings(freeSupercharging = false),
-            teslamateStats = TeslamateStats(total_charges = 247, total_drives = 892)
+            teslamateStats = TeslamateStats(totalCharges = 247, totalDrives = 892)
         )
     )
 
     fun getCarStatus(): CarStatus = CarStatus(
-        display_name = "Model 3 Performance",
+        displayName = "Model 3 Performance",
         state = "online",
-        state_since = isoPast(5),
+        stateSince = isoPast(5),
         odometer = 42350.7,
         carStatus = CarStatusDetails(
             healthy = true,
@@ -120,54 +120,54 @@ object MockDataProvider {
     fun getCharges(): List<ChargeData> = listOf(
         ChargeData(
             chargeId = 1001,
-            start_date = isoPast(1440),
-            end_date = isoPast(1380),
+            startDate = isoPast(1440),
+            endDate = isoPast(1380),
             address = "Supercharger Berlin",
-            charge_energy_added = 45.2,
-            charge_energy_used = 48.1,
+            chargeEnergyAdded = 45.2,
+            chargeEnergyUsed = 48.1,
             cost = 0.0,
-            duration_min = 60,
-            duration_str = "1h 0m",
-            battery_details = ChargeBatteryDetails(start_battery_level = 20, end_battery_level = 80),
-            range_ideal = ChargeRange(start_range = 120.0, end_range = 410.0),
-            range_rated = ChargeRange(start_range = 95.0, end_range = 320.0),
-            outside_temp_avg = 18.5,
+            durationMin = 60,
+            durationStr = "1h 0m",
+            batteryDetails = ChargeBatteryDetails(startBatteryLevel = 20, endBatteryLevel = 80),
+            rangeIdeal = ChargeRange(startRange = 120.0, endRange = 410.0),
+            rangeRated = ChargeRange(startRange = 95.0, endRange = 320.0),
+            outsideTempAvg = 18.5,
             odometer = 42000.0,
             latitude = 52.4500,
             longitude = 13.4000
         ),
         ChargeData(
             chargeId = 1002,
-            start_date = isoPast(2880),
-            end_date = isoPast(2820),
+            startDate = isoPast(2880),
+            endDate = isoPast(2820),
             address = "Home Wallbox",
-            charge_energy_added = 22.8,
-            charge_energy_used = 24.0,
+            chargeEnergyAdded = 22.8,
+            chargeEnergyUsed = 24.0,
             cost = 8.50,
-            duration_min = 180,
-            duration_str = "3h 0m",
-            battery_details = ChargeBatteryDetails(start_battery_level = 45, end_battery_level = 80),
-            range_ideal = ChargeRange(start_range = 270.0, end_range = 410.0),
-            range_rated = ChargeRange(start_range = 210.0, end_range = 320.0),
-            outside_temp_avg = 12.0,
+            durationMin = 180,
+            durationStr = "3h 0m",
+            batteryDetails = ChargeBatteryDetails(startBatteryLevel = 45, endBatteryLevel = 80),
+            rangeIdeal = ChargeRange(startRange = 270.0, endRange = 410.0),
+            rangeRated = ChargeRange(startRange = 210.0, endRange = 320.0),
+            outsideTempAvg = 12.0,
             odometer = 41500.0,
             latitude = 52.5200,
             longitude = 13.4050
         ),
         ChargeData(
             chargeId = 1003,
-            start_date = isoPast(4320),
-            end_date = isoPast(4260),
+            startDate = isoPast(4320),
+            endDate = isoPast(4260),
             address = "Supercharger Potsdam",
-            charge_energy_added = 38.5,
-            charge_energy_used = 41.0,
+            chargeEnergyAdded = 38.5,
+            chargeEnergyUsed = 41.0,
             cost = 0.0,
-            duration_min = 45,
-            duration_str = "45m",
-            battery_details = ChargeBatteryDetails(start_battery_level = 15, end_battery_level = 75),
-            range_ideal = ChargeRange(start_range = 90.0, end_range = 380.0),
-            range_rated = ChargeRange(start_range = 70.0, end_range = 300.0),
-            outside_temp_avg = 22.0,
+            durationMin = 45,
+            durationStr = "45m",
+            batteryDetails = ChargeBatteryDetails(startBatteryLevel = 15, endBatteryLevel = 75),
+            rangeIdeal = ChargeRange(startRange = 90.0, endRange = 380.0),
+            rangeRated = ChargeRange(startRange = 70.0, endRange = 300.0),
+            outsideTempAvg = 22.0,
             odometer = 41000.0,
             latitude = 52.4000,
             longitude = 13.0600
@@ -175,156 +175,156 @@ object MockDataProvider {
     )
 
     fun getChargeDetail(chargeId: Int): ChargeDetail = ChargeDetail(
-        charge_id = chargeId,
-        start_date = isoPast(1440),
-        end_date = isoPast(1380),
+        chargeId = chargeId,
+        startDate = isoPast(1440),
+        endDate = isoPast(1380),
         address = "Supercharger Berlin",
-        charge_energy_added = 45.2,
-        charge_energy_used = 48.1,
+        chargeEnergyAdded = 45.2,
+        chargeEnergyUsed = 48.1,
         cost = 0.0,
-        duration_min = 60,
-        duration_str = "1h 0m",
-        battery_details = ChargeBatteryDetails(start_battery_level = 20, end_battery_level = 80),
-        range_ideal = ChargeRange(start_range = 120.0, end_range = 410.0),
-        range_rated = ChargeRange(start_range = 95.0, end_range = 320.0),
-        outside_temp_avg = 18.5,
+        durationMin = 60,
+        durationStr = "1h 0m",
+        batteryDetails = ChargeBatteryDetails(startBatteryLevel = 20, endBatteryLevel = 80),
+        rangeIdeal = ChargeRange(startRange = 120.0, endRange = 410.0),
+        rangeRated = ChargeRange(startRange = 95.0, endRange = 320.0),
+        outsideTempAvg = 18.5,
         odometer = 42000.0,
         latitude = 52.4500,
         longitude = 13.4000,
-        charge_points = listOf(
-            ChargePoint(date = isoPast(1440), battery_level = 20, charge_energy_added = 0.0,
-                charger_details = ChargerDetails(charger_power = 150, charger_voltage = 400, charger_actual_current = 300, charger_phases = 0),
-                outside_temp = 18.0),
-            ChargePoint(date = isoPast(1410), battery_level = 45, charge_energy_added = 22.0,
-                charger_details = ChargerDetails(charger_power = 150, charger_voltage = 400, charger_actual_current = 300, charger_phases = 0),
-                outside_temp = 18.5),
-            ChargePoint(date = isoPast(1380), battery_level = 80, charge_energy_added = 45.2,
-                charger_details = ChargerDetails(charger_power = 80, charger_voltage = 390, charger_actual_current = 205, charger_phases = 0),
-                outside_temp = 19.0)
+        chargePoints = listOf(
+            ChargePoint(date = isoPast(1440), batteryLevel = 20, chargeEnergyAdded = 0.0,
+                chargerDetails = ChargerDetails(chargerPower = 150, chargerVoltage = 400, chargerActualCurrent = 300, chargerPhases = 0),
+                outsideTemp = 18.0),
+            ChargePoint(date = isoPast(1410), batteryLevel = 45, chargeEnergyAdded = 22.0,
+                chargerDetails = ChargerDetails(chargerPower = 150, chargerVoltage = 400, chargerActualCurrent = 300, chargerPhases = 0),
+                outsideTemp = 18.5),
+            ChargePoint(date = isoPast(1380), batteryLevel = 80, chargeEnergyAdded = 45.2,
+                chargerDetails = ChargerDetails(chargerPower = 80, chargerVoltage = 390, chargerActualCurrent = 205, chargerPhases = 0),
+                outsideTemp = 19.0)
         ),
-        is_charging = false
+        isCharging = false
     )
 
     fun getDrives(): List<DriveData> = listOf(
         DriveData(
-            drive_id = 2001,
-            start_date = isoPast(120),
-            end_date = isoPast(90),
-            start_address = "Home",
-            end_address = "Office",
-            odometer_details = DriveOdometerDetails(
-                odometer_start = 42300.0,
-                odometer_end = 42350.7,
+            driveId = 2001,
+            startDate = isoPast(120),
+            endDate = isoPast(90),
+            startAddress = "Home",
+            endAddress = "Office",
+            odometerDetails = DriveOdometerDetails(
+                odometerStart = 42300.0,
+                odometerEnd = 42350.7,
                 distance = 50.7
             ),
-            duration_min = 30,
-            duration_str = "30m",
-            speed_max = 135,
-            speed_avg = 45.2,
-            power_max = 210,
-            power_min = -15,
-            battery_details = DriveBatteryDetails(start_battery_level = 75, end_battery_level = 68),
-            range_ideal = DriveRange(start_range = 380.0, end_range = 330.0, range_diff = -50.0),
-            range_rated = DriveRange(start_range = 300.0, end_range = 270.0, range_diff = -30.0),
-            outside_temp_avg = 14.5,
-            inside_temp_avg = 21.0,
-            energy_consumed_net = 8.2,
-            consumption_net = 162.0
+            durationMin = 30,
+            durationStr = "30m",
+            speedMax = 135,
+            speedAvg = 45.2,
+            powerMax = 210,
+            powerMin = -15,
+            batteryDetails = DriveBatteryDetails(startBatteryLevel = 75, endBatteryLevel = 68),
+            rangeIdeal = DriveRange(startRange = 380.0, endRange = 330.0, rangeDiff = -50.0),
+            rangeRated = DriveRange(startRange = 300.0, endRange = 270.0, rangeDiff = -30.0),
+            outsideTempAvg = 14.5,
+            insideTempAvg = 21.0,
+            energyConsumedNet = 8.2,
+            consumptionNet = 162.0
         ),
         DriveData(
-            drive_id = 2002,
-            start_date = isoPast(1440),
-            end_date = isoPast(1410),
-            start_address = "Office",
-            end_address = "Home",
-            odometer_details = DriveOdometerDetails(
-                odometer_start = 42250.0,
-                odometer_end = 42300.0,
+            driveId = 2002,
+            startDate = isoPast(1440),
+            endDate = isoPast(1410),
+            startAddress = "Office",
+            endAddress = "Home",
+            odometerDetails = DriveOdometerDetails(
+                odometerStart = 42250.0,
+                odometerEnd = 42300.0,
                 distance = 50.0
             ),
-            duration_min = 35,
-            duration_str = "35m",
-            speed_max = 120,
-            speed_avg = 42.8,
-            power_max = 195,
-            power_min = -20,
-            battery_details = DriveBatteryDetails(start_battery_level = 70, end_battery_level = 63),
-            range_ideal = DriveRange(start_range = 350.0, end_range = 310.0, range_diff = -40.0),
-            range_rated = DriveRange(start_range = 275.0, end_range = 250.0, range_diff = -25.0),
-            outside_temp_avg = 16.0,
-            inside_temp_avg = 22.0,
-            energy_consumed_net = 7.8,
-            consumption_net = 156.0
+            durationMin = 35,
+            durationStr = "35m",
+            speedMax = 120,
+            speedAvg = 42.8,
+            powerMax = 195,
+            powerMin = -20,
+            batteryDetails = DriveBatteryDetails(startBatteryLevel = 70, endBatteryLevel = 63),
+            rangeIdeal = DriveRange(startRange = 350.0, endRange = 310.0, rangeDiff = -40.0),
+            rangeRated = DriveRange(startRange = 275.0, endRange = 250.0, rangeDiff = -25.0),
+            outsideTempAvg = 16.0,
+            insideTempAvg = 22.0,
+            energyConsumedNet = 7.8,
+            consumptionNet = 156.0
         )
     )
 
     fun getDriveDetail(driveId: Int): DriveDetail = DriveDetail(
-        drive_id = driveId,
-        start_date = isoPast(120),
-        end_date = isoPast(90),
-        start_address = "Home",
-        end_address = "Office",
-        odometer_details = DriveOdometerDetails(
-            odometer_start = 42300.0,
-            odometer_end = 42350.7,
+        driveId = driveId,
+        startDate = isoPast(120),
+        endDate = isoPast(90),
+        startAddress = "Home",
+        endAddress = "Office",
+        odometerDetails = DriveOdometerDetails(
+            odometerStart = 42300.0,
+            odometerEnd = 42350.7,
             distance = 50.7
         ),
-        duration_min = 30,
-        duration_str = "30m",
-        speed_max = 135,
-        speed_avg = 45.2,
-        power_max = 210,
-        power_min = -15,
-        battery_details = DriveBatteryDetails(start_battery_level = 75, end_battery_level = 68),
-        range_ideal = DriveRange(start_range = 380.0, end_range = 330.0, range_diff = -50.0),
-        range_rated = DriveRange(start_range = 300.0, end_range = 270.0, range_diff = -30.0),
-        outside_temp_avg = 14.5,
-        inside_temp_avg = 21.0,
-        energy_consumed_net = 8.2,
-        consumption_net = 162.0,
-        drive_details = listOf(
+        durationMin = 30,
+        durationStr = "30m",
+        speedMax = 135,
+        speedAvg = 45.2,
+        powerMax = 210,
+        powerMin = -15,
+        batteryDetails = DriveBatteryDetails(startBatteryLevel = 75, endBatteryLevel = 68),
+        rangeIdeal = DriveRange(startRange = 380.0, endRange = 330.0, rangeDiff = -50.0),
+        rangeRated = DriveRange(startRange = 300.0, endRange = 270.0, rangeDiff = -30.0),
+        outsideTempAvg = 14.5,
+        insideTempAvg = 21.0,
+        energyConsumedNet = 8.2,
+        consumptionNet = 162.0,
+        positions = listOf(
             DrivePosition(date = isoPast(120), latitude = 52.5200, longitude = 13.4050,
-                speed = 0, power = 0, battery_level = 75, elevation = 85),
+                speed = 0, power = 0, batteryLevel = 75, elevation = 85),
             DrivePosition(date = isoPast(110), latitude = 52.5100, longitude = 13.3900,
-                speed = 80, power = 120, battery_level = 73, elevation = 78),
+                speed = 80, power = 120, batteryLevel = 73, elevation = 78),
             DrivePosition(date = isoPast(100), latitude = 52.5000, longitude = 13.3800,
-                speed = 120, power = 180, battery_level = 71, elevation = 72),
+                speed = 120, power = 180, batteryLevel = 71, elevation = 72),
             DrivePosition(date = isoPast(90), latitude = 52.4900, longitude = 13.3700,
-                speed = 0, power = -15, battery_level = 68, elevation = 70)
+                speed = 0, power = -15, batteryLevel = 68, elevation = 70)
         )
     )
 
     fun getBatteryHealth(): BatteryHealth = BatteryHealth(
-        max_range = 450.0,
-        current_range = 430.0,
-        max_capacity = 75.0,
-        current_capacity = 72.5,
-        rated_efficiency = 153.0,
-        battery_health_percentage = 96.7
+        maxRange = 450.0,
+        currentRange = 430.0,
+        maxCapacity = 75.0,
+        currentCapacity = 72.5,
+        ratedEfficiency = 153.0,
+        batteryHealthPercentage = 96.7
     )
 
     fun getUpdates(): List<UpdateData> = listOf(
-        UpdateData(id = 1, version = "2024.38.7", start_date = isoPast(10080), end_date = isoPast(10020)),
-        UpdateData(id = 2, version = "2024.32.3", start_date = isoPast(20160), end_date = isoPast(20100)),
-        UpdateData(id = 3, version = "2024.26.1", start_date = isoPast(30240), end_date = isoPast(30180))
+        UpdateData(id = 1, version = "2024.38.7", startDate = isoPast(10080), endDate = isoPast(10020)),
+        UpdateData(id = 2, version = "2024.32.3", startDate = isoPast(20160), endDate = isoPast(20100)),
+        UpdateData(id = 3, version = "2024.26.1", startDate = isoPast(30240), endDate = isoPast(30180))
     )
 
     fun getGlobalSettings(): GlobalSettingsData = GlobalSettingsData(
         settings = com.matelink.data.api.models.GlobalSettings(
-            teslamate_urls = com.matelink.data.api.models.TeslamateUrls(
-                base_url = "http://localhost:4000",
-                grafana_url = "http://localhost:3000"
+            teslamateUrls = com.matelink.data.api.models.TeslamateUrls(
+                baseUrl = "http://localhost:4000",
+                grafanaUrl = "http://localhost:3000"
             ),
-            teslamate_units = com.matelink.data.api.models.TeslamateUnits(
-                unit_of_length = "km",
-                unit_of_temperature = "°C"
+            teslamateUnits = com.matelink.data.api.models.TeslamateUnits(
+                unitOfLength = "km",
+                unitOfTemperature = "°C"
             )
         )
     )
 
     fun getUnits(): Units = Units(
-        unit_of_length = "km",
-        unit_of_pressure = "bar",
-        unit_of_temperature = "°C"
+        unitOfLength = "km",
+        unitOfPressure = "bar",
+        unitOfTemperature = "°C"
     )
 }
