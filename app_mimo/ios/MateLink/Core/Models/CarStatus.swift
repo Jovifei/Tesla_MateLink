@@ -478,6 +478,33 @@ struct Drive: Codable, Identifiable {
             endIdealRangeKm = (try? top.decode(Double.self, forKey: .endIdealRangeKm)) ?? 0
         }
     }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: TopKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(carId, forKey: .carId)
+        try c.encode(startDate, forKey: .startDate)
+        try c.encode(endDate, forKey: .endDate)
+        try c.encode(distanceKm, forKey: .distanceKm)
+        try c.encode(durationMin, forKey: .durationMin)
+        try c.encode(efficiency, forKey: .efficiency)
+        try c.encode(startAddress, forKey: .startAddress)
+        try c.encode(endAddress, forKey: .endAddress)
+        try c.encode(startBatteryLevel, forKey: .startBatteryLevel)
+        try c.encode(endBatteryLevel, forKey: .endBatteryLevel)
+        try c.encode(startIdealRangeKm, forKey: .startIdealRangeKm)
+        try c.encode(endIdealRangeKm, forKey: .endIdealRangeKm)
+        try c.encode(outsideTempAvg, forKey: .outsideTempAvg)
+        try c.encode(speedMax, forKey: .speedMax)
+        try c.encode(powerMax, forKey: .powerMax)
+        try c.encode(powerMin, forKey: .powerMin)
+        try c.encode(elevationGain, forKey: .elevationGain)
+        try c.encode(elevationLoss, forKey: .elevationLoss)
+        try c.encode(startLatitude, forKey: .startLatitude)
+        try c.encode(startLongitude, forKey: .startLongitude)
+        try c.encode(endLatitude, forKey: .endLatitude)
+        try c.encode(endLongitude, forKey: .endLongitude)
+    }
 }
 
 // MARK: - Drive nested containers (TeslaMate API v1.24+)
@@ -617,6 +644,30 @@ struct Charge: Codable, Identifiable {
             chargingType = (phases == 0) ? "DC" : "AC"
         }
     }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: TopKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(carId, forKey: .carId)
+        try c.encode(startDate, forKey: .startDate)
+        try c.encodeIfPresent(endDate, forKey: .endDate)
+        try c.encode(chargeEnergyAdded, forKey: .chargeEnergyAdded)
+        try c.encode(startBatteryLevel, forKey: .startBatteryLevel)
+        try c.encodeIfPresent(endBatteryLevel, forKey: .endBatteryLevel)
+        try c.encode(startIdealRangeKm, forKey: .startIdealRangeKm)
+        try c.encodeIfPresent(endIdealRangeKm, forKey: .endIdealRangeKm)
+        try c.encode(startRatedRangeKm, forKey: .startRatedRangeKm)
+        try c.encodeIfPresent(endRatedRangeKm, forKey: .endRatedRangeKm)
+        try c.encode(durationMin, forKey: .durationMin)
+        try c.encodeIfPresent(cost, forKey: .cost)
+        try c.encodeIfPresent(address, forKey: .address)
+        try c.encode(latitude, forKey: .latitude)
+        try c.encode(longitude, forKey: .longitude)
+        try c.encode(chargingType, forKey: .chargingType)
+        try c.encode(powerMax, forKey: .powerMax)
+        try c.encode(powerMin, forKey: .powerMin)
+        try c.encode(outsideTempAvg, forKey: .outsideTempAvg)
+    }
 }
 
 // MARK: - Charge nested containers (TeslaMate API v1.24+)
@@ -707,6 +758,22 @@ struct BatteryHealth: Codable {
         } else {
             idealRangeKm = (try? c.decode(Double.self, forKey: .idealRangeKm)) ?? 0
         }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(carId, forKey: .carId)
+        try c.encode(date, forKey: .date)
+        try c.encode(batteryLevel, forKey: .batteryLevel)
+        try c.encode(ratedRangeKm, forKey: .ratedRangeKm)
+        try c.encode(idealRangeKm, forKey: .idealRangeKm)
+        try c.encode(odometer, forKey: .odometer)
+        try c.encode(outsideTemp, forKey: .outsideTemp)
+        try c.encode(usableBatteryLevel, forKey: .usableBatteryLevel)
+        try c.encodeIfPresent(capacityDegradationPercent, forKey: .capacityDegradationPercent)
+        try c.encodeIfPresent(originalCapacityKwh, forKey: .originalCapacityKwh)
+        try c.encodeIfPresent(currentCapacityKwh, forKey: .currentCapacityKwh)
+        try c.encodeIfPresent(history, forKey: .history)
     }
 }
 
