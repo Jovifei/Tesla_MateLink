@@ -13,7 +13,7 @@ import javax.inject.Inject
 data class EfficiencyUiState(
     val isLoading: Boolean = true,
     val avgEfficiencyWhKm: Double = 0.0,
-    val efficiencyBySpeed: List<Pair<Int, Double>> = emptyList(),
+    val efficiencyBySpeed: List<Pair<String, Double>> = emptyList(),
     val driveCount: Int = 0,
     val totalDistanceKm: Double = 0.0,
     val error: String? = null

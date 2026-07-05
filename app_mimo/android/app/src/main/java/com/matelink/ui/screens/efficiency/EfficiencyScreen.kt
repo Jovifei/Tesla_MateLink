@@ -171,7 +171,7 @@ private fun StatCard(
 
 @Composable
 private fun EfficiencyBarChart(
-    data: List<Pair<Int, Double>>,
+    data: List<Pair<String, Double>>,
     modifier: Modifier = Modifier
 ) {
     val maxEfficiency = data.maxOfOrNull { it.second } ?: 1.0

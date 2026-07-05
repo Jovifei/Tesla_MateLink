@@ -30,9 +30,13 @@ private val DcColor = Color(0xFFFF9800)   // Orange
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CostScreen(
+    carId: Int,
     onBack: () -> Unit = {},
     viewModel: CostViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(carId) {
+        viewModel.load(carId)
+    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(

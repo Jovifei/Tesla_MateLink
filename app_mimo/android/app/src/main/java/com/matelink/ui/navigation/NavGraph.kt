@@ -609,6 +609,7 @@ fun NavGraph(
         composable<Screen.Cost> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.Cost>()
             CostScreen(
+                carId = route.carId,
                 onBack = { navController.popBackStack() }
             )
         }
