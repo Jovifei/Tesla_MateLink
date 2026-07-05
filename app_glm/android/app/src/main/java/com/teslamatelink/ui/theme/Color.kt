@@ -2,7 +2,60 @@ package com.teslamatelink.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Car exterior colors ──
+// Stitch White-Minimal Palette (from shared/design-tokens.json)
+object StitchColors {
+    val Background = Color(0xFFFDF8F8)
+    val Surface = Color(0xFFFDF8F8)
+    val SurfaceDim = Color(0xFFDDD9D8)
+    val SurfaceBright = Color(0xFFFDF8F8)
+    val SurfaceContainerLowest = Color(0xFFFFFFFF)
+    val SurfaceContainerLow = Color(0xFFF7F3F2)
+    val SurfaceContainer = Color(0xFFF1EDEC)
+    val SurfaceContainerHigh = Color(0xFFEBE7E6)
+    val SurfaceContainerHighest = Color(0xFFE5E2E1)
+    val OnSurface = Color(0xFF1C1B1B)
+    val OnSurfaceVariant = Color(0xFF444748)
+    val InverseSurface = Color(0xFF313030)
+    val InverseOnSurface = Color(0xFFF4F0EF)
+    val Outline = Color(0xFF747878)
+    val OutlineVariant = Color(0xFFC4C7C7)
+    val SurfaceTint = Color(0xFF5F5E5E)
+    val Primary = Color(0xFF000000)
+    val OnPrimary = Color(0xFFFFFFFF)
+    val PrimaryContainer = Color(0xFF1C1B1B)
+    val OnPrimaryContainer = Color(0xFF858383)
+    val InversePrimary = Color(0xFFC8C6C5)
+    val Secondary = Color(0xFF895200)
+    val OnSecondary = Color(0xFFFFFFFF)
+    val SecondaryContainer = Color(0xFFFFB157)
+    val OnSecondaryContainer = Color(0xFF734400)
+    val Tertiary = Color(0xFF000000)
+    val OnTertiary = Color(0xFFFFFFFF)
+    val TertiaryContainer = Color(0xFF1C1B1A)
+    val OnTertiaryContainer = Color(0xFF868382)
+    val Error = Color(0xFFBA1A1A)
+    val OnError = Color(0xFFFFFFFF)
+    val ErrorContainer = Color(0xFFFFDAD6)
+    val OnErrorContainer = Color(0xFF93000A)
+    val Accent = Color(0xFFA16207)
+    val StatusOnline = Color(0xFF059669)
+    val StatusOnlineBg = Color(0xFFD1FAE5)
+    val StatusOffline = Color(0xFF747878)
+    val StatusOfflineBg = Color(0xFFF3F4F6)
+    val StatusCharging = Color(0xFFD97706)
+    val StatusChargingBg = Color(0xFFFEF3C7)
+    val StatusError = Color(0xFFBA1A1A)
+    val StatusErrorBg = Color(0xFFFFDAD6)
+    val Border = Color(0xFFE5E5E5)
+    val White = Color(0xFFFFFFFF)
+}
+
+// ── Legacy aliases (back-compat) ──────────────────────────────────────────────
+// Mapped onto the Stitch palette so existing call sites keep compiling while
+// screens migrate to StitchColors. Prefer StitchColors.* for new code.
+//
+// Car exterior colors (kept verbatim — they describe real Tesla paint codes
+// and have no Stitch equivalent).
 val CarDeepBlue = Color(0xFF1E3A8A)
 val CarRedMultiCoat = Color(0xFFB91C1C)
 val CarUltraRed = Color(0xFFDC2626)
@@ -13,72 +66,72 @@ val CarQuicksilver = Color(0xFF9CA3AF)
 val CarStealthGrey = Color(0xFF4B5563)
 val CarMidnightCherryRed = Color(0xFF7F1D1D)
 
-// ── Theme neutrals (cool blue-grey) ──
-// Light
-val PrimaryLight = Color(0xFF1E3A8A)
-val OnPrimaryLight = Color.White
-val PrimaryContainerLight = Color(0xFFDBEAFE)
-val OnPrimaryContainerLight = Color(0xFF1E3A5F)
-val SecondaryLight = Color(0xFF4B5563)
-val OnSecondaryLight = Color.White
-val SecondaryContainerLight = Color(0xFFE5E7EB)
-val OnSecondaryContainerLight = Color(0xFF1F2937)
-val TertiaryLight = Color(0xFF6B7280)
-val OnTertiaryLight = Color.White
-val BackgroundLight = Color(0xFFFAFAFA)
-val OnBackgroundLight = Color(0xFF1C1B1F)
-val SurfaceLight = Color(0xFFFAFAFA)
-val OnSurfaceLight = Color(0xFF1C1B1F)
-val SurfaceVariantLight = Color(0xFFE8EAEC)
-val OnSurfaceVariantLight = Color(0xFF44474A)
-val OutlineLight = Color(0xFF74777A)
-val OutlineVariantLight = Color(0xFFC4C6C8)
-val SurfaceContainerLight = Color(0xFFF0F1F3)
-val SurfaceContainerHighLight = Color(0xFFECEDEF)
-val SurfaceContainerHighestLight = Color(0xFFE6E7E9)
+// Light scheme aliases → Stitch equivalents
+val PrimaryLight get() = StitchColors.Primary
+val OnPrimaryLight get() = StitchColors.OnPrimary
+val PrimaryContainerLight get() = StitchColors.PrimaryContainer
+val OnPrimaryContainerLight get() = StitchColors.OnPrimaryContainer
+val SecondaryLight get() = StitchColors.Secondary
+val OnSecondaryLight get() = StitchColors.OnSecondary
+val SecondaryContainerLight get() = StitchColors.SecondaryContainer
+val OnSecondaryContainerLight get() = StitchColors.OnSecondaryContainer
+val TertiaryLight get() = StitchColors.Tertiary
+val OnTertiaryLight get() = StitchColors.OnTertiary
+val BackgroundLight get() = StitchColors.Background
+val OnBackgroundLight get() = StitchColors.OnSurface
+val SurfaceLight get() = StitchColors.Surface
+val OnSurfaceLight get() = StitchColors.OnSurface
+val SurfaceVariantLight get() = StitchColors.SurfaceContainerHighest
+val OnSurfaceVariantLight get() = StitchColors.OnSurfaceVariant
+val OutlineLight get() = StitchColors.Outline
+val OutlineVariantLight get() = StitchColors.OutlineVariant
+val SurfaceContainerLight get() = StitchColors.SurfaceContainer
+val SurfaceContainerHighLight get() = StitchColors.SurfaceContainerHigh
+val SurfaceContainerHighestLight get() = StitchColors.SurfaceContainerHighest
 
-// Dark
-val PrimaryDark = Color(0xFF93C5FD)
-val OnPrimaryDark = Color(0xFF1E3A5F)
-val PrimaryContainerDark = Color(0xFF1E3A8A)
-val OnPrimaryContainerDark = Color(0xFFDBEAFE)
-val SecondaryDark = Color(0xFF9CA3AF)
-val OnSecondaryDark = Color(0xFF1F2937)
-val SecondaryContainerDark = Color(0xFF374151)
-val OnSecondaryContainerDark = Color(0xFFE5E7EB)
-val TertiaryDark = Color(0xFF9CA3AF)
-val OnTertiaryDark = Color(0xFF1C1B1F)
-val BackgroundDark = Color(0xFF1C1B1F)
-val OnBackgroundDark = Color(0xFFE6E1E5)
-val SurfaceDark = Color(0xFF1C1B1F)
-val OnSurfaceDark = Color(0xFFE6E1E5)
-val SurfaceVariantDark = Color(0xFF44474A)
-val OnSurfaceVariantDark = Color(0xFFCACCCE)
-val OutlineDark = Color(0xFF8E9194)
-val OutlineVariantDark = Color(0xFF44474A)
-val SurfaceContainerDark = Color(0xFF242629)
-val SurfaceContainerHighDark = Color(0xFF2B2D31)
-val SurfaceContainerHighestDark = Color(0xFF35373B)
+// Dark scheme aliases → Stitch light palette (dark theme is being deprecated
+// in the white-minimal design; these keep old call sites compiling).
+val PrimaryDark get() = StitchColors.InversePrimary
+val OnPrimaryDark get() = StitchColors.OnPrimary
+val PrimaryContainerDark get() = StitchColors.PrimaryContainer
+val OnPrimaryContainerDark get() = StitchColors.OnPrimaryContainer
+val SecondaryDark get() = StitchColors.SecondaryContainer
+val OnSecondaryDark get() = StitchColors.OnSecondary
+val SecondaryContainerDark get() = StitchColors.SecondaryContainer
+val OnSecondaryContainerDark get() = StitchColors.OnSecondaryContainer
+val TertiaryDark get() = StitchColors.TertiaryContainer
+val OnTertiaryDark get() = StitchColors.OnTertiary
+val BackgroundDark get() = StitchColors.InverseSurface
+val OnBackgroundDark get() = StitchColors.InverseOnSurface
+val SurfaceDark get() = StitchColors.InverseSurface
+val OnSurfaceDark get() = StitchColors.InverseOnSurface
+val SurfaceVariantDark get() = StitchColors.SurfaceContainerHighest
+val OnSurfaceVariantDark get() = StitchColors.OnSurfaceVariant
+val OutlineDark get() = StitchColors.Outline
+val OutlineVariantDark get() = StitchColors.OutlineVariant
+val SurfaceContainerDark get() = StitchColors.SurfaceContainer
+val SurfaceContainerHighDark get() = StitchColors.SurfaceContainerHigh
+val SurfaceContainerHighestDark get() = StitchColors.SurfaceContainerHighest
 
-val ErrorLight = Color(0xFFDC2626)
-val OnErrorLight = Color.White
-val ErrorDark = Color(0xFFFFB4AB)
-val OnErrorDark = Color(0xFF690005)
+val ErrorLight get() = StitchColors.Error
+val OnErrorLight get() = StitchColors.OnError
+val ErrorDark get() = StitchColors.Error
+val OnErrorDark get() = StitchColors.OnError
 
-// ── State colors ──
-val StateOnline = Color(0xFF4CAF50)       // green
-val StateCharging = Color(0xFFFF9800)     // orange
-val StateDriving = Color(0xFF2196F3)      // blue
-val StateAsleep = Color(0xFFB0BEC5)       // light grey
-val StateOffline = Color(0xFF616161)       // dark grey
-val StateSuspended = Color(0xFF90A4AE)     // blue-grey
+// ── State colors (mapped onto Stitch status palette) ──
+val StateOnline get() = StitchColors.StatusOnline
+val StateCharging get() = StitchColors.StatusCharging
+val StateDriving get() = StitchColors.StatusOnline          // driving reuses online green
+val StateAsleep get() = StitchColors.StatusOffline
+val StateOffline get() = StitchColors.StatusOffline
+val StateSuspended get() = StitchColors.StatusOffline
 
 // ── Semantic colors ──
-val SuccessGreen = Color(0xFF4CAF50)
-val WarningOrange = Color(0xFFFF9800)
-val ErrorRed = Color(0xFFF44336)
-val InfoBlue = Color(0xFF2196F3)
+val SuccessGreen get() = StitchColors.StatusOnline
+val WarningOrange get() = StitchColors.StatusCharging
+val ErrorRed get() = StitchColors.StatusError
+val InfoBlue get() = StitchColors.Primary
 
 // ── Charging type colors ──
-val AcChargeGreen = Color(0xFF4CAF50)
-val DcChargeOrange = Color(0xFFFF9800)
+val AcChargeGreen get() = StitchColors.StatusOnline
+val DcChargeOrange get() = StitchColors.StatusCharging
