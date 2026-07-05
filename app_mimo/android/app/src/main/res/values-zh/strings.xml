@@ -94,4 +94,12 @@
     <string name="tariff_saves">节省</string>
     <string name="tariff_costs">费用</string>
     <string name="tariff_assume_monthly">假设月充电 %d kWh</string>
+
+    <!-- Efficiency Analysis -->
+    <string name="efficiency_title">效率分析</string>
+    <string name="efficiency_avg_label">平均效率</string>
+    <string name="efficiency_drive_count">行程数</string>
+    <string name="efficiency_total_distance">总里程</string>
+    <string name="efficiency_by_speed_title">分速效率</string>
+    <string name="efficiency_by_speed_subtitle">不同速度区间的能耗 (Wh/km)</string>
 </resources>

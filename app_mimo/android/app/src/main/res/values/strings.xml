@@ -120,4 +120,12 @@
     <string name="tariff_saves">Saves</string>
     <string name="tariff_costs">Costs</string>
     <string name="tariff_assume_monthly">Assuming %d kWh monthly charging</string>
+
+    <!-- Efficiency Analysis -->
+    <string name="efficiency_title">Efficiency Analysis</string>
+    <string name="efficiency_avg_label">Average Efficiency</string>
+    <string name="efficiency_drive_count">Drives</string>
+    <string name="efficiency_total_distance">Total Distance</string>
+    <string name="efficiency_by_speed_title">Efficiency by Speed</string>
+    <string name="efficiency_by_speed_subtitle">Wh/km at different speed ranges</string>
 </resources>
