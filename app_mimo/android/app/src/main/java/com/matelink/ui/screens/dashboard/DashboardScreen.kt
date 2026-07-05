@@ -85,21 +85,21 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Battery", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    "${status.batteryLevel}%",
+                    "${status?.batteryLevel ?: 0}%",
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text("${status.usableBatteryRangeKm} km range", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("${status?.usableBatteryRangeKm ?: 0} km range", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(8.dp))
                 LinearProgressIndicator(
-                    progress = { status.batteryLevel / 100f },
+                    progress = { (status?.batteryLevel ?: 0) / 100f },
                     modifier = Modifier.fillMaxWidth().height(8.dp),
                 )
-                if (status.chargeLimitSoc > 0) {
-                    Text("Limit: ${status.chargeLimitSoc}%", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if ((status?.chargeLimitSoc ?: 0) > 0) {
+                    Text("Limit: ${status?.chargeLimitSoc ?: 0}%", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                if (status.chargeLimitSoc > 90) {
+                if ((status?.chargeLimitSoc ?: 0) > 90) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "⚠️ High charge level - consider reducing to 80-90% for daily use",
@@ -112,43 +112,43 @@ fun DashboardScreen(
 
         // Info cards row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("Odometer", "${String.format("%,.0f", status.odometer)} km", Modifier.weight(1f))
-            InfoCard("Location", "${String.format("%.4f", status.latitude)}, ${String.format("%.4f", status.longitude)}\nElevation: ${status.elevation}m", Modifier.weight(1f))
+            InfoCard("Odometer", "${String.format("%,.0f", status?.odometer ?: 0.0)} km", Modifier.weight(1f))
+            InfoCard("Location", "${String.format("%.4f", status?.latitude ?: 0.0)}, ${String.format("%.4f", status?.longitude ?: 0.0)}\nElevation: ${status?.elevation ?: 0}m", Modifier.weight(1f))
         }
 
         // Location Map
         ElevatedCard(modifier = Modifier.fillMaxWidth()) {
             AmapPointView(
                 modifier = Modifier.fillMaxWidth().height(200.dp),
-                latitude = status.latitude,
-                longitude = status.longitude,
+                latitude = status?.latitude ?: 0.0,
+                longitude = status?.longitude ?: 0.0,
                 title = car?.name ?: "Vehicle"
             )
         }
 
         // Temperature + Status cards
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("Inside", "${status.insideTemp}°C", Modifier.weight(1f))
-            InfoCard("Outside", "${status.outsideTemp}°C", Modifier.weight(1f))
-            InfoCard("Lock", if (status.locked) "🔒 Locked" else "🔓 Unlocked", Modifier.weight(1f))
-            InfoCard("Plug", if (status.pluggedIn) "⚡ Plugged" else "Not Plugged", Modifier.weight(1f))
+            InfoCard("Inside", "${status?.insideTemp ?: 0.0}°C", Modifier.weight(1f))
+            InfoCard("Outside", "${status?.outsideTemp ?: 0.0}°C", Modifier.weight(1f))
+            InfoCard("Lock", if (status?.locked == true) "🔒 Locked" else "🔓 Unlocked", Modifier.weight(1f))
+            InfoCard("Plug", if (status?.pluggedIn == true) "⚡ Plugged" else "Not Plugged", Modifier.weight(1f))
         }
 
         // Status row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatusChip("🔒", if (status.locked) "Locked" else "Unlocked", status.locked)
-            StatusChip("⚡", if (status.pluggedIn) "Plugged" else "Unplugged", status.pluggedIn)
-            StatusChip("💨", if (status.isClimateOn) "Climate ON" else "Climate OFF", status.isClimateOn)
-            StatusChip("🛡️", if (status.sentryMode) "Sentry" else "Sentry OFF", status.sentryMode)
+            StatusChip("🔒", if (status?.locked == true) "Locked" else "Unlocked", status?.locked == true)
+            StatusChip("⚡", if (status?.pluggedIn == true) "Plugged" else "Unplugged", status?.pluggedIn == true)
+            StatusChip("💨", if (status?.isClimateOn == true) "Climate ON" else "Climate OFF", status?.isClimateOn == true)
+            StatusChip("🛡️", if (status?.sentryMode == true) "Sentry" else "Sentry OFF", status?.sentryMode == true)
         }
 
         // Tire pressure
         Text("Tire Pressure", style = MaterialTheme.typography.titleSmall)
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("FL", "${status.tirePressureFrontLeft} bar", Modifier.weight(1f))
-            InfoCard("FR", "${status.tirePressureFrontRight} bar", Modifier.weight(1f))
-            InfoCard("RL", "${status.tirePressureRearLeft} bar", Modifier.weight(1f))
-            InfoCard("RR", "${status.tirePressureRearRight} bar", Modifier.weight(1f))
+            InfoCard("FL", "${status?.tirePressureFrontLeft ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("FR", "${status?.tirePressureFrontRight ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("RL", "${status?.tirePressureRearLeft ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("RR", "${status?.tirePressureRearRight ?: 0.0} bar", Modifier.weight(1f))
         }
 
         // 7-Day Battery Trend
@@ -156,12 +156,12 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("7-Day Battery Trend", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
-                BatteryTrendChart(currentBatteryLevel = status.batteryLevel)
+                BatteryTrendChart(currentBatteryLevel = status?.batteryLevel ?: 0)
             }
         }
 
         // Charging card
-        if (status.state == "charging") {
+        if (status?.state == "charging") {
             ElevatedCard(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)

@@ -8,6 +8,7 @@ import com.matelink.data.model.CarStatus
 import com.matelink.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,6 +49,8 @@ class DashboardViewModel @Inject constructor(
                     car = car,
                     status = status
                 )
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _uiState.value = DashboardUiState(
                     isLoading = false,
@@ -66,6 +69,8 @@ class DashboardViewModel @Inject constructor(
                     val statusResponse = apiClient.api.getCarStatus(carId)
                     val status = statusResponse.body()?.data?.status
                     _uiState.value = _uiState.value.copy(status = status, error = null)
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     // Silently fail on polling errors
                 }
