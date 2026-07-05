@@ -22,6 +22,11 @@ import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Route
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -67,7 +72,12 @@ fun MoreScreen(
     onNavigateToUpdates: (carId: Int) -> Unit,
     onNavigateToSentryHistory: (carId: Int) -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToAbout: () -> Unit
+    onNavigateToAbout: () -> Unit,
+    onNavigateToEfficiency: (carId: Int) -> Unit = {},
+    onNavigateToCost: (carId: Int) -> Unit = {},
+    onNavigateToRange: (carId: Int) -> Unit = {},
+    onNavigateToVampire: (carId: Int) -> Unit = {},
+    onNavigateToTimeline: (carId: Int) -> Unit = {}
 ) {
     val palette = swissPalette()
     Scaffold(
@@ -129,6 +139,36 @@ fun MoreScreen(
                         icon = Icons.Default.History,
                         title = stringResource(R.string.more_item_trips),
                         onClick = { onNavigateToTrips(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.Analytics,
+                        title = stringResource(R.string.more_item_efficiency),
+                        onClick = { onNavigateToEfficiency(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.AttachMoney,
+                        title = stringResource(R.string.more_item_cost),
+                        onClick = { onNavigateToCost(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.Route,
+                        title = stringResource(R.string.more_item_range),
+                        onClick = { onNavigateToRange(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.Bolt,
+                        title = stringResource(R.string.more_item_vampire),
+                        onClick = { onNavigateToVampire(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.Timeline,
+                        title = stringResource(R.string.more_item_timeline),
+                        onClick = { onNavigateToTimeline(carId) }
                     )
                 }
             }
@@ -244,7 +284,12 @@ private fun MoreScreenPreview() {
             onNavigateToUpdates = {},
             onNavigateToSentryHistory = {},
             onNavigateToSettings = {},
-            onNavigateToAbout = {}
+            onNavigateToAbout = {},
+            onNavigateToEfficiency = {},
+            onNavigateToCost = {},
+            onNavigateToRange = {},
+            onNavigateToVampire = {},
+            onNavigateToTimeline = {}
         )
     }
 }

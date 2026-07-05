@@ -89,6 +89,11 @@
     <string name="more_item_trips">Trips</string>
     <string name="more_item_software_updates">Software Updates</string>
     <string name="more_item_sentry_history">Sentry History</string>
+    <string name="more_item_efficiency">Efficiency</string>
+    <string name="more_item_cost">Cost Analysis</string>
+    <string name="more_item_range">Range</string>
+    <string name="more_item_vampire">Standby Drain</string>
+    <string name="more_item_timeline">Timeline</string>
     <string name="about_tagline">Your Tesla data companion</string>
     <string name="about_tech_stack">Tech Stack</string>
     <string name="about_tech_android">Android - Kotlin - Jetpack Compose - Hilt - Room</string>

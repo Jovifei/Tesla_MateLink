@@ -41,6 +41,11 @@ import com.matelink.ui.screens.reports.AnnualReportPDFScreen
 import com.matelink.ui.screens.reports.AnnualReportScreen
 import com.matelink.ui.screens.reports.ExportScreen
 import com.matelink.ui.screens.vehicle3d.Vehicle3dScreen
+import com.matelink.ui.screens.efficiency.EfficiencyScreen
+import com.matelink.ui.screens.cost.CostScreen
+import com.matelink.ui.screens.range.RangeScreen
+import com.matelink.ui.screens.vampire.VampireScreen
+import com.matelink.ui.screens.timeline.TimelineScreen
 import com.matelink.ui.screens.stats.CountriesVisitedScreen
 import com.matelink.ui.screens.stats.RegionsVisitedScreen
 import com.matelink.ui.screens.stats.StatsScreen
@@ -51,6 +56,8 @@ import com.matelink.ui.screens.trips.TripsScreen
 import com.matelink.ui.screens.updates.SoftwareVersionsScreen
 import com.matelink.ui.screens.wherewasi.WhereWasIScreen
 import com.matelink.domain.model.YearFilter
+import com.matelink.ui.theme.CarColorPalettes
+import androidx.compose.foundation.isSystemInDarkTheme
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -151,6 +158,22 @@ sealed interface Screen {
 
     @Serializable
     data class Vehicle3d(val carId: Int) : Screen
+
+    /** L2 analysis pages — reachable from More. */
+    @Serializable
+    data class Efficiency(val carId: Int, val exteriorColor: String? = null) : Screen
+
+    @Serializable
+    data class Cost(val carId: Int, val exteriorColor: String? = null) : Screen
+
+    @Serializable
+    data class Range(val carId: Int, val exteriorColor: String? = null) : Screen
+
+    @Serializable
+    data class Vampire(val carId: Int, val exteriorColor: String? = null) : Screen
+
+    @Serializable
+    data class Timeline(val carId: Int, val exteriorColor: String? = null) : Screen
 }
 
 /**
@@ -575,6 +598,46 @@ fun NavGraph(
             )
         }
 
+        composable<Screen.Efficiency> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.Efficiency>()
+            EfficiencyScreen(
+                carId = route.carId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Cost> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.Cost>()
+            CostScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Range> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.Range>()
+            RangeScreen(
+                carId = route.carId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Vampire> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.Vampire>()
+            VampireScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.Timeline> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.Timeline>()
+            val isDarkTheme = isSystemInDarkTheme()
+            val palette = CarColorPalettes.forExteriorColor(route.exteriorColor, isDarkTheme)
+            TimelineScreen(
+                onNavigateBack = { navController.popBackStack() },
+                palette = palette
+            )
+        }
+
         composable<Screen.More> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.More>()
             MoreScreen(
@@ -586,7 +649,12 @@ fun NavGraph(
                 onNavigateToUpdates = { navController.navigate(Screen.Updates(it, route.exteriorColor)) },
                 onNavigateToSentryHistory = { navController.navigate(Screen.SentryHistory(it, route.exteriorColor)) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings) },
-                onNavigateToAbout = { navController.navigate(Screen.About) }
+                onNavigateToAbout = { navController.navigate(Screen.About) },
+                onNavigateToEfficiency = { navController.navigate(Screen.Efficiency(it, route.exteriorColor)) },
+                onNavigateToCost = { navController.navigate(Screen.Cost(it, route.exteriorColor)) },
+                onNavigateToRange = { navController.navigate(Screen.Range(it, route.exteriorColor)) },
+                onNavigateToVampire = { navController.navigate(Screen.Vampire(it, route.exteriorColor)) },
+                onNavigateToTimeline = { navController.navigate(Screen.Timeline(it, route.exteriorColor)) }
             )
         }
 
