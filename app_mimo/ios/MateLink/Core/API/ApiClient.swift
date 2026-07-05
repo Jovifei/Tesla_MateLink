@@ -80,7 +80,7 @@ actor TeslaMateAPI {
     }
 
     func getBatteryHealth(_ carId: Int) async throws -> BatteryHealth {
-        return try await fetch("/api/v1/cars/\(carId)/battery")
+        return try await fetch("/api/v1/cars/\(carId)/battery-health")
     }
 
     func getUpdates(_ carId: Int) async throws -> [UpdateItem] {
@@ -88,7 +88,7 @@ actor TeslaMateAPI {
     }
 
     func getGlobalSettings() async throws -> GlobalSettings {
-        return try await fetch("/api/v1/settings")
+        return try await fetch("/api/v1/globalsettings")
     }
 }
 
