@@ -216,9 +216,12 @@ fun NavGraph(
             UpdatesScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        // -- More (placeholder tab) --
+        // -- More --
         composable(Routes.MORE) {
-            MoreScreen()
+            MoreScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigate = { route -> navController.navigate(route) }
+            )
         }
 
         // -- Settings --
