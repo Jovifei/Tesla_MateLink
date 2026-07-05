@@ -99,8 +99,9 @@ struct ChargeDetailView: View {
         return nil
     }
 
-    private var efficiency: Double {
-        guard charge.chargeEnergyUsed > 0 else { return 100 }
+    private var efficiency: Double? {
+        // chargeEnergyUsed is 0 (unknown) until the iOS API exposes the real field.
+        guard charge.chargeEnergyUsed > 0 else { return nil }
         return (charge.chargeEnergyAdded / charge.chargeEnergyUsed) * 100
     }
 
@@ -141,7 +142,7 @@ struct ChargeDetailView: View {
                     .font(.title3)
                     .foregroundColor(isDC ? .orange : .blue)
 
-                Text(charge.address)
+                Text(charge.address ?? "Unknown")
                     .font(.headline)
                     .fontWeight(.bold)
                     .lineLimit(2)
@@ -192,8 +193,8 @@ struct ChargeDetailView: View {
             GridItem(.flexible(), spacing: 8)
         ], spacing: 8) {
             StatCardView(title: "Energy Added", value: "\(charge.chargeEnergyAdded, specifier: "%.1f") kWh")
-            StatCardView(title: "Cost", value: charge.cost > 0 ? "¥\(charge.cost, specifier: "%.2f")" : "Free")
-            StatCardView(title: "Efficiency", value: "\(efficiency, specifier: "%.1f")%")
+            StatCardView(title: "Cost", value: (charge.cost ?? 0) > 0 ? "¥\(charge.cost ?? 0, specifier: "%.2f")" : "Free")
+            StatCardView(title: "Efficiency", value: efficiency.map { "\($0, specifier: "%.1f")%" } ?? "—")
             StatCardView(title: "Battery", value: "\(charge.startBatteryLevel)% → \(charge.endBatteryLevel.map(String.init) ?? "?")%")
         }
     }
@@ -410,16 +411,21 @@ struct StatCardView: View {
         startDate: "2025-06-22T14:30:00.000Z",
         endDate: "2025-06-22T15:15:00.000Z",
         chargeEnergyAdded: 32.5,
-        chargeEnergyUsed: 36.2,
         startBatteryLevel: 15,
         endBatteryLevel: 72,
         startIdealRangeKm: 45,
         endIdealRangeKm: 215,
+        startRatedRangeKm: 40,
+        endRatedRangeKm: 200,
+        durationMin: 45,
         cost: 48.50,
-        chargeType: "DC",
         address: "Tesla Supercharger, Shanghai",
-        fastChargerBrand: "Tesla",
-        fastChargerType: "V3"
+        latitude: 31.2304,
+        longitude: 121.4737,
+        chargingType: "DC",
+        powerMax: 120,
+        powerMin: 30,
+        outsideTempAvg: 28.0
     )
     let appState = AppState()
     NavigationStack {

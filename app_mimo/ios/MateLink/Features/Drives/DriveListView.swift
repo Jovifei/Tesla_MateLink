@@ -33,16 +33,21 @@ struct DriveListView: View {
     }
 
     func load() async {
-        loading = true
         let carId = state.currentCarId
+        if drives.isEmpty {
+            loading = true
+        }
         // Cache-first: show stale data immediately (F‑015)
-        if let api = state.real, let cached = await api.getCachedDrives(carId: carId) { drives = cached }
+        if let api = state.real, let cached = await api.getCachedDrives(carId: carId) {
+            drives = cached
+            loading = false
+        }
         // Fetch fresh
         if state.isMockMode {
             drives = await state.mock.getDrives(carId)
         } else if let api = state.real {
             do {
-                let fresh: [Drive] = try await api.fetch("api/v1/cars/\(carId)/drives")
+                let fresh: [Drive] = try await api.fetch("/api/v1/cars/\(carId)/drives")
                 drives = fresh; await api.cacheDrives(fresh, carId: carId)
             } catch { /* stale cache stays visible */ }
         }

@@ -73,4 +73,13 @@
     <string name="loading">読み込み中...</string>
     <string name="no_data">データがありません</string>
     <string name="offline">オフライン - キャッシュデータを表示中</string>
+
+    <!-- Range Analysis -->
+    <string name="range_analysis_title">航続距離分析</string>
+    <string name="range_accuracy_title">航続予測の精度</string>
+    <string name="range_trip_count">走行回数</string>
+    <string name="range_total_distance">総走行距離</string>
+    <string name="range_trip_list_title">最近の走行 (%d)</string>
+    <string name="range_estimated">予測</string>
+    <string name="range_actual">実際</string>
 </resources>

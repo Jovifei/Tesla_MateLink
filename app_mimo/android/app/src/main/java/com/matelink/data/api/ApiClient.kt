@@ -27,9 +27,9 @@ class ApiClient @Inject constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // Cached values - updated via Flow collection, no runBlocking needed
-    private var cachedToken: String = ""
-    private var cachedBaseUrl: String = ""
-    private var cachedApi: TeslamateApi? = null
+    @Volatile private var cachedToken: String = ""
+    @Volatile private var cachedBaseUrl: String = ""
+    @Volatile private var cachedApi: TeslamateApi? = null
 
     private val _isConfigured = MutableStateFlow(false)
     val isConfigured: StateFlow<Boolean> = _isConfigured.asStateFlow()

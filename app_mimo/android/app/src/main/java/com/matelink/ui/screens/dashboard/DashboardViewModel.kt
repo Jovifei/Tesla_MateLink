@@ -8,6 +8,7 @@ import com.matelink.data.model.CarStatus
 import com.matelink.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,15 +38,19 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val carId = settingsRepository.currentCarId.first()
-                val cars = apiClient.api.getCars().data.cars
+                val carsResponse = apiClient.api.getCars()
+                val cars = carsResponse.body()?.data?.cars ?: emptyList()
                 val car = cars.find { it.carId == carId } ?: cars.firstOrNull()
-                val status = apiClient.api.getCarStatus(carId).data
+                val statusResponse = apiClient.api.getCarStatus(carId)
+                val status = statusResponse.body()?.data?.status
 
                 _uiState.value = DashboardUiState(
                     isLoading = false,
                     car = car,
                     status = status
                 )
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _uiState.value = DashboardUiState(
                     isLoading = false,
@@ -61,8 +66,11 @@ class DashboardViewModel @Inject constructor(
                 delay(5000)
                 try {
                     val carId = settingsRepository.currentCarId.first()
-                    val status = apiClient.api.getCarStatus(carId).data
+                    val statusResponse = apiClient.api.getCarStatus(carId)
+                    val status = statusResponse.body()?.data?.status
                     _uiState.value = _uiState.value.copy(status = status, error = null)
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     // Silently fail on polling errors
                 }

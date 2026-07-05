@@ -51,10 +51,10 @@ struct StatisticsView: View {
                     ProgressView("Loading statistics...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if drives.isEmpty {
-                    ContentUnavailableView(
-                        "No Drives Yet",
+                    StatisticsEmptyStateView(
+                        title: "No Drives Yet",
                         systemImage: "chart.bar.fill",
-                        description: Text("Your driving statistics will appear here.")
+                        message: "Your driving statistics will appear here."
                     )
                 } else {
                     ScrollView {
@@ -209,6 +209,28 @@ struct StatisticsView: View {
             drives = (try? await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")) ?? []
         }
         loading = false
+    }
+}
+
+private struct StatisticsEmptyStateView: View {
+    let title: String
+    let systemImage: String
+    let message: String
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.system(size: 36))
+                .foregroundColor(.secondary)
+            Text(title)
+                .font(.headline)
+            Text(message)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(24)
     }
 }
 
@@ -515,19 +537,41 @@ struct DriveRowView: View {
 }
 
 #Preview("Month Detail") {
-    let state = AppState()
-    let drives = state.mock.getDrives(1)
+    let drives = [previewDrive]
     return NavigationStack {
         MonthDetailView(drives: drives, year: 2026, month: 6)
     }
-    .environmentObject(state)
 }
 
 #Preview("Day Detail") {
-    let state = AppState()
-    let drives = state.mock.getDrives(1)
+    let drives = [previewDrive]
     return NavigationStack {
         DayDetailView(drives: drives, date: String(drives.first?.startDate.prefix(10) ?? "2026-06-01"))
     }
-    .environmentObject(state)
 }
+
+private let previewDrive = Drive(
+    id: 1,
+    carId: 1,
+    startDate: "2026-06-22T08:30:00.000Z",
+    endDate: "2026-06-22T09:10:00.000Z",
+    distanceKm: 31.2,
+    durationMin: 40,
+    efficiency: 156,
+    startAddress: "Pudong Home",
+    endAddress: "Lujiazui Office",
+    startLatitude: 31.2304,
+    startLongitude: 121.4737,
+    endLatitude: 31.2397,
+    endLongitude: 121.4998,
+    startBatteryLevel: 82,
+    endBatteryLevel: 75,
+    startIdealRangeKm: 405,
+    endIdealRangeKm: 372,
+    outsideTempAvg: 27.0,
+    speedMax: 98,
+    powerMax: 58,
+    powerMin: -12,
+    elevationGain: 18,
+    elevationLoss: 12
+)

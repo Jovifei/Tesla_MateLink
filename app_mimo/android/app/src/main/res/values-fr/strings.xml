@@ -73,4 +73,13 @@
     <string name="loading">Chargement...</string>
     <string name="no_data">Aucune donnée disponible</string>
     <string name="offline">Hors ligne - affichage des données en cache</string>
+
+    <!-- Range Analysis -->
+    <string name="range_analysis_title">Analyse d'autonomie</string>
+    <string name="range_accuracy_title">Précision de la prédiction</string>
+    <string name="range_trip_count">Trajets</string>
+    <string name="range_total_distance">Distance totale</string>
+    <string name="range_trip_list_title">Trajets récents (%d)</string>
+    <string name="range_estimated">Estimé</string>
+    <string name="range_actual">Réel</string>
 </resources>

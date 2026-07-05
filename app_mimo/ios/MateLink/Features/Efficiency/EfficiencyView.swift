@@ -126,7 +126,7 @@ struct EfficiencyView: View {
         }().filter { $0.distanceKm > 1 }
         points = drives.map { d in
             let speed = max(0, Int((d.distanceKm / Double(max(d.durationMin, 1))) * 60.0))
-            return EfficiencyPoint(speed: speed, efficiency: d.efficiency, temp: d.outsideTempAvg, date: String(d.startDate.prefix(10)))
+            return EfficiencyPoint(speed: speed, efficiency: Int(d.efficiency.rounded()), temp: d.outsideTempAvg, date: String(d.startDate.prefix(10)))
         }
 
         let zoneDefs: [(String, Int, Int)] = [

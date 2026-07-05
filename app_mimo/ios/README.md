@@ -2,11 +2,9 @@
 
 This directory contains the native SwiftUI implementation for `app_mimo`.
 
-## Current Verification Strategy
+## Verified Project Entry
 
-Windows plus an iPhone cannot directly build and deploy this native iOS app. Use Windows to maintain sources and project metadata, then use Mac plus Xcode for simulator or connected-device verification.
-
-## Generate Project On Mac
+The checked-in iOS source tree is driven by XcodeGen plus CocoaPods:
 
 ```bash
 cd app_mimo/ios
@@ -16,6 +14,37 @@ pod install
 open MateLink.xcworkspace
 ```
 
-## Minimum Launch Target
+`project.yml` is the source of truth for target generation. After `pod install`, open `MateLink.xcworkspace`.
 
-The first verification succeeds when the app reaches Onboarding or the main tab shell without requiring a live TeslaMate server.
+## Windows-Prep Scope
+
+Windows can verify source presence and project metadata, but it cannot prove a native iOS build. The current Windows-prep evidence includes:
+
+- `project.yml` app target wiring
+- `Podfile` dependency wiring
+- `Info.plist` ATS local-networking allowance
+- `NSLocalNetworkUsageDescription` for LAN access
+
+Mac plus Xcode are still required for simulator build proof, device signing, and CocoaPods workspace validation.
+
+## Minimum Launch Goal
+
+The first acceptable Mac-side proof is a successful app launch into either:
+
+- `OnboardingView`, or
+- the main 4-tab shell (`Dashboard`, `Drives`, `Charges`, `More`)
+
+Mock mode is acceptable for the first launch proof.
+
+## Widget Status
+
+Status: `deferred / source exists but target not wired`
+
+Why it is still deferred:
+
+- widget source exists at `MateLink/Widget/MateLinkWidget.swift`
+- `project.yml` has no widget extension target
+- no widget entitlements file exists in this directory
+- no App Group wiring proof is present for the `group.com.matelink` suite used in source
+
+Do not describe Widget support as active until those project-level pieces are added and verified.

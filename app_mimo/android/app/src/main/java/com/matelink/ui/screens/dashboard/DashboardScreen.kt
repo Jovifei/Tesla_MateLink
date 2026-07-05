@@ -16,6 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.matelink.ui.components.AmapPointView
+import com.matelink.ui.theme.StatusSuccess
+import com.matelink.ui.theme.StatusWarning
+import com.matelink.ui.theme.SwissInk
+import com.matelink.ui.theme.SwissMuted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,21 +89,21 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Battery", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    "${status.batteryLevel}%",
+                    "${status?.batteryLevel ?: 0}%",
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text("${status.usableBatteryRangeKm} km range", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("${status?.usableBatteryRangeKm ?: 0} km range", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(8.dp))
                 LinearProgressIndicator(
-                    progress = { status.batteryLevel / 100f },
+                    progress = { (status?.batteryLevel ?: 0) / 100f },
                     modifier = Modifier.fillMaxWidth().height(8.dp),
                 )
-                if (status.chargeLimitSoc > 0) {
-                    Text("Limit: ${status.chargeLimitSoc}%", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if ((status?.chargeLimitSoc ?: 0) > 0) {
+                    Text("Limit: ${status?.chargeLimitSoc ?: 0}%", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                if (status.chargeLimitSoc > 90) {
+                if ((status?.chargeLimitSoc ?: 0) > 90) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "⚠️ High charge level - consider reducing to 80-90% for daily use",
@@ -112,43 +116,43 @@ fun DashboardScreen(
 
         // Info cards row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("Odometer", "${String.format("%,.0f", status.odometer)} km", Modifier.weight(1f))
-            InfoCard("Location", "${String.format("%.4f", status.latitude)}, ${String.format("%.4f", status.longitude)}\nElevation: ${status.elevation}m", Modifier.weight(1f))
+            InfoCard("Odometer", "${String.format("%,.0f", status?.odometer ?: 0.0)} km", Modifier.weight(1f))
+            InfoCard("Location", "${String.format("%.4f", status?.latitude ?: 0.0)}, ${String.format("%.4f", status?.longitude ?: 0.0)}\nElevation: ${status?.elevation ?: 0}m", Modifier.weight(1f))
         }
 
         // Location Map
         ElevatedCard(modifier = Modifier.fillMaxWidth()) {
             AmapPointView(
                 modifier = Modifier.fillMaxWidth().height(200.dp),
-                latitude = status.latitude,
-                longitude = status.longitude,
+                latitude = status?.latitude ?: 0.0,
+                longitude = status?.longitude ?: 0.0,
                 title = car?.name ?: "Vehicle"
             )
         }
 
         // Temperature + Status cards
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("Inside", "${status.insideTemp}°C", Modifier.weight(1f))
-            InfoCard("Outside", "${status.outsideTemp}°C", Modifier.weight(1f))
-            InfoCard("Lock", if (status.locked) "🔒 Locked" else "🔓 Unlocked", Modifier.weight(1f))
-            InfoCard("Plug", if (status.pluggedIn) "⚡ Plugged" else "Not Plugged", Modifier.weight(1f))
+            InfoCard("Inside", "${status?.insideTemp ?: 0.0}°C", Modifier.weight(1f))
+            InfoCard("Outside", "${status?.outsideTemp ?: 0.0}°C", Modifier.weight(1f))
+            InfoCard("Lock", if (status?.locked == true) "🔒 Locked" else "🔓 Unlocked", Modifier.weight(1f))
+            InfoCard("Plug", if (status?.pluggedIn == true) "⚡ Plugged" else "Not Plugged", Modifier.weight(1f))
         }
 
         // Status row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatusChip("🔒", if (status.locked) "Locked" else "Unlocked", status.locked)
-            StatusChip("⚡", if (status.pluggedIn) "Plugged" else "Unplugged", status.pluggedIn)
-            StatusChip("💨", if (status.isClimateOn) "Climate ON" else "Climate OFF", status.isClimateOn)
-            StatusChip("🛡️", if (status.sentryMode) "Sentry" else "Sentry OFF", status.sentryMode)
+            StatusChip("🔒", if (status?.locked == true) "Locked" else "Unlocked", status?.locked == true)
+            StatusChip("⚡", if (status?.pluggedIn == true) "Plugged" else "Unplugged", status?.pluggedIn == true)
+            StatusChip("💨", if (status?.isClimateOn == true) "Climate ON" else "Climate OFF", status?.isClimateOn == true)
+            StatusChip("🛡️", if (status?.sentryMode == true) "Sentry" else "Sentry OFF", status?.sentryMode == true)
         }
 
         // Tire pressure
         Text("Tire Pressure", style = MaterialTheme.typography.titleSmall)
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("FL", "${status.tirePressureFrontLeft} bar", Modifier.weight(1f))
-            InfoCard("FR", "${status.tirePressureFrontRight} bar", Modifier.weight(1f))
-            InfoCard("RL", "${status.tirePressureRearLeft} bar", Modifier.weight(1f))
-            InfoCard("RR", "${status.tirePressureRearRight} bar", Modifier.weight(1f))
+            InfoCard("FL", "${status?.tirePressureFrontLeft ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("FR", "${status?.tirePressureFrontRight ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("RL", "${status?.tirePressureRearLeft ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("RR", "${status?.tirePressureRearRight ?: 0.0} bar", Modifier.weight(1f))
         }
 
         // 7-Day Battery Trend
@@ -156,12 +160,12 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("7-Day Battery Trend", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
-                BatteryTrendChart(currentBatteryLevel = status.batteryLevel)
+                BatteryTrendChart(currentBatteryLevel = status?.batteryLevel ?: 0)
             }
         }
 
         // Charging card
-        if (status.state == "charging") {
+        if (status?.state == "charging") {
             ElevatedCard(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
@@ -183,11 +187,11 @@ fun DashboardScreen(
 @Composable
 private fun StateBadge(state: String) {
     val (color, label) = when (state) {
-        "online" -> Color(0xFF43A047) to "Online"
-        "driving" -> Color(0xFF1E88E5) to "Driving"
-        "charging" -> Color(0xFFFB8C00) to "Charging"
-        "asleep" -> Color(0xFF9E9E9E) to "Asleep"
-        else -> Color(0xFF616161) to "Offline"
+        "online" -> StatusSuccess to "Online"
+        "driving" -> SwissInk to "Driving"
+        "charging" -> StatusWarning to "Charging"
+        "asleep" -> SwissMuted to "Asleep"
+        else -> SwissMuted to "Offline"
     }
     SuggestionChip(
         onClick = {},
@@ -250,13 +254,13 @@ private fun BatteryTrendChart(currentBatteryLevel: Int) {
             val y = height - padding - ((value - minVal) / range.toFloat()) * (height - 2 * padding)
             if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
         }
-        drawPath(path, color = Color(0xFF1E88E5), style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3f))
+        drawPath(path, color = MaterialTheme.colorScheme.primary, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3f))
 
         // Draw dots
         data.forEachIndexed { index, value ->
             val x = index * stepX
             val y = height - padding - ((value - minVal) / range.toFloat()) * (height - 2 * padding)
-            drawCircle(color = Color(0xFF1E88E5), radius = 5f, center = androidx.compose.ui.geometry.Offset(x, y))
+            drawCircle(color = MaterialTheme.colorScheme.primary, radius = 5f, center = androidx.compose.ui.geometry.Offset(x, y))
         }
     }
 

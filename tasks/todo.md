@@ -88,3 +88,81 @@ Use the configured Stitch MCP endpoint to read the `MateLink - Tesla 监控 (简
 - Target project confirmed: `projects/11493757920836657212` / `MateLink - Tesla 监控 (简约白)`.
 - Screen evidence was pulled from Stitch HTML outputs rather than inferred from existing repo docs.
 - PRD output created: `docs/PRD/MateLink_Stitch_Swiss_PRD_2026-07-05.md`.
+
+---
+
+# MateLink Stitch 1:1 App Execution - 2026-07-05
+
+## Goal
+
+Use Stitch project `MateLink - Tesla 监控 (简约白)` as the page-structure source and implement a first-pass 1:1 app shell in `app_mimo` for Android and iOS, with Claude Code handling dispatched build tasks and Codex handling orchestration and review.
+
+## Plan
+
+- [x] Load project instructions, memory, and required execution/worktree/subagent skills.
+- [x] Create isolated worktree on branch `codex/app-mimo-stitch-1to1`.
+- [x] Sync task-relevant in-flight `app_mimo` / PRD / OpenSpec files into the worktree.
+- [x] Baseline current `app_mimo` Android / iOS / web structure and produce Stitch-to-screen mapping.
+- [x] Define shared shell contract: routes, tabs, theme tokens, mock data adapters, shared page vocabulary.
+- [x] Dispatch Claude task: Android shell + navigation + shared white-minimal theme foundation.
+- [ ] Dispatch Claude task: Android dashboard + trips/charges/detail page alignment to Stitch.
+- [x] Dispatch Claude task: Android analysis/more/settings/about page alignment to Stitch.
+- [x] Review Android output for spec compliance, style drift, and maintainability.
+- [x] Dispatch Claude task: iOS contract alignment and page migration using approved Android baseline.
+- [x] Run verification checks for Android/web/iOS metadata and record remaining blockers.
+- [ ] Summarize completion state, gaps, and next-phase readiness.
+
+## Review Notes
+
+- Worktree path: `C:\Users\Admin\.config\superpowers\worktrees\tesla_master\codex-app-mimo-stitch-1to1`
+- Main workspace is dirty, so only task-relevant files were copied into the worktree.
+- `app_mimo` is not a greenfield app: Android already has native Compose screens, iOS already has SwiftUI feature views, and web contains a broad reference implementation.
+- Baseline mapping artifact created: `app_mimo/docs/STITCH_PAGE_MAPPING.md`. It is the current page-contract ledger for Stitch -> Android/iOS/Web parity checks.
+- Current environment blocker remains: Windows machine has Node.js available but no `java` / `JAVA_HOME`, so Android build verification may be limited until Java is installed.
+- Android shell pass delivered (2026-07-05): the stale `MateLinkNavHost` (which conflicted with `NavGraph`'s type-safe `Screen` and called screens without required args) is now a real entry shell – a 4-tab bottom nav (Dashboard / Drives / Charges / More) layered over the type-safe `NavGraph`, with `currentCarId` resolved from `StartDestinationViewModel` so the Drives/Charges/More tabs can route. `More` is a dedicated `MoreScreen` (groups Statistics, Battery, Mileage, Trips, Updates, Sentry, Settings, About) instead of jumping to Settings; a lightweight `AboutScreen` reuses the repo `BuildConfig.VERSION_NAME`/`GIT_SHA` pattern. Scoped Swiss-minimal theme tokens added; `MainActivity` now forwards the launch intent so the notification deep-link path is live. Build not run in this env (gradle invocation is approval-gated and `JAVA_HOME` is unset).
+- Android review-fix pass (2026-07-05): addressed five review findings on the shell pass. (1) `MateLinkNavHost.navigateToTopLevel` no longer uses `saveState`/`restoreState`, so tapping a top-level tab always re-resolves the active `carId` instead of restoring a stale car-specific back-stack entry. (2) Shell pieces (bottom bar, `MoreScreen`, `AboutScreen`) now resolve colors via a theme-aware `swissPalette()` (`SwissPalette` + dark counterparts in `Theme.kt`/`Color.kt`) so dark mode no longer forces pure white. (3) `MainActivity` overrides `onNewIntent` and holds the current intent as Compose state, and the manifest sets `launchMode="singleTop"`, so a deep link arriving while the activity is running re-fires `NavGraph`'s `LaunchedEffect(intent)` instead of being dropped. (4) `NavGraph`'s `Locale.Builder().setRegion(countryCode)` call site is wrapped in a `safeDisplayCountry` helper that falls back to the raw code on blank/malformed input. (5) Reused existing `R.string.nav_more` / `R.string.about` / `R.string.settings_title` for the most obvious shell titles; remaining new copy (section headers like "Data analysis"/"System", About body lines, bottom-nav enum labels) is still hardcoded and tracked as follow-up below.
+- iOS alignment scope for the current round: keep the approved 4-tab contract, add missing Stitch-aligned destinations from `More`, and avoid reopening the existing feature architecture while Windows can only perform static verification.
+- iOS alignment pass delivered (2026-07-05): Claude implemented dedicated `AboutView`, `MileageView`, `SentryHistoryView`, and `CurrentChargeView`, wired them into the existing SwiftUI shell, and extended the mock layer with `SentryEvent` + `MockAPI.getSentryEvents`. `SettingsView` no longer hosts the embedded About screen. `ChargeListView` now exposes a live-charge entry when the car is charging or plugged in.
+- iOS contract-fix pass (2026-07-05): reconciled the local charge model drift without redesigning the data layer. `Charge` consumers now compile against a compat extension (`chargeType`, `chargeEnergyUsed`, `fastChargerBrand`, `fastChargerType`), nil-safe `cost` / `address` handling was added to charge/cost/timeline screens, and the `ChargeDetailView` preview was rebuilt against the real `Charge` initializer.
+- Review-fix pass (2026-07-05): fixed two high-priority review findings and two medium product-flow issues. `TimelineView` no longer fabricates `1970-01-01` timestamps on parse failure, `SentryHistoryView` no longer shows mock alerts in real mode, and both `DriveListView` / `ChargeListView` now preserve cached data on refresh instead of replacing the list with a blocking spinner. `SettingsView` now reports connection success/failure instead of swallowing errors silently.
+- Verification evidence (Windows side): `node -v` returned `v24.14.0`. `java`, `swift`, `xcodegen`, and `pod` are not installed/available in this environment, so Android Gradle and native iOS compile validation remain blocked here. Static checks confirmed `app_mimo/ios/project.yml` includes `MateLink/App`, `MateLink/Core`, and `MateLink/Features`, so the newly added `About` / `Mileage` / `Sentry` / `CurrentCharge` files are within the generated Xcode project source roots.
+- Follow-up – shell i18n: extract the remaining hardcoded shell copy to `strings.xml`. Concretely: (a) refactor `TopLevelDestination.label: String` to `@StringRes labelRes: Int` and wire `nav_dashboard`/`nav_drives`/`nav_charges`/`nav_more` into `MateLinkBottomBar`; (b) add string resources for the MoreScreen section headers and row titles ("Data analysis", "System", "Statistics", "Battery health", "Mileage", "Trips", "Software updates", "Sentry history"); (c) add string resources for the AboutScreen body ("Tech stack", "Data source", "Links" sections and their lines, "Your Tesla data companion", the copyright line). Not done in this pass to avoid broadening scope into a full shell string extraction.
+- Remaining known gaps before the next phase: (1) Android dashboard / trip / charge detail parity is not finished yet; this round focused on shell, More, About, and iOS alignment. (2) No Mac/Xcode verification has been run, so iOS readiness is still "structure prepared, compile unproven". (3) A few list/grouping views still bucket ISO timestamps with string-prefix logic rather than local-calendar parsing (`DriveListView`, `MileageView`, `SentryHistoryView`, `CostView`), which can mis-bucket events around local midnight and should be tightened in the next polish pass.
+- iOS shell-alignment pass (2026-07-05, worktree `codex-app-mimo-stitch-1to1`): brought the iOS app closer to the approved Android/Stitch shell contract without redesigning the SwiftUI architecture. (1) Fixed `Charge` model drift that broke static correctness – added a compat `extension Charge` (`chargeType` alias for `chargingType`, `chargeEnergyUsed`/`fastChargerBrand`/`fastChargerType` nil/0 stubs) and unwrapped optional `cost`/`address` at the four call sites (`ChargeListView`, `ChargeDetailView`, `CostView`, `TimelineView`); rewrote the broken `ChargeDetailView` `#Preview` to use real stored fields. (2) Added the missing Stitch-aligned destinations reachable from `More`: `AboutView` (extracted to its own `Features/About/` file, Android-shell-aligned brand + tech + data-source + links), `MileageView` (`Features/Mileage/`, summary cards + monthly breakdown chart + recent highlights, reusing `Drive`+`BatteryHealth`), `SentryHistoryView` (`Features/Sentry/`, list/detail shell driven by mock `sentry_events`). (3) Added `CurrentChargeView` (`Features/Charges/`, live charge shell from `CarStatus` with derived SoC/power fallback) and gated a "Current Charge" entry at the top of `ChargeListView` on `state == .charging || pluggedIn`. (4) Wired `sentry_events` into `MockData`/`MockAPI` and added a `SentryEvent` model. (5) Reworked `MoreView` into a proper destination hub (added Mileage, Sentry History, About; grouped Settings+About under "System"). 4-tab shell (Dashboard/Drives/Charges/More) unchanged. Static correctness only – no Xcode build run on Windows.
+
+---
+
+# MateLink Review Remediation - 2026-07-05
+
+## Goal
+
+Keep the current `codex/app-mimo-stitch-1to1` worktree, preserve the shell/routing wins that are already correct, and remediate only the still-valid findings from the external review. Prioritize source correctness, startup/config viability, and honest fallback behavior before deeper Stitch visual parity work.
+
+## Plan
+
+- [x] Triage the external review against the current worktree and separate outdated findings from still-valid blockers.
+- [x] Record the remediation approach and correction lesson before implementation.
+- [x] Dispatch Claude package 1: iOS compile/start/config blockers (`Info.plist`, ATS/LAN, `AmapView`, mock schema alignment, onboarding paths, `AppState.loadCars`, `UpdatesView`, remaining source-level errors).
+- [x] Review package 1 for spec compliance and code quality; patch only tiny deterministic issues locally if needed.
+- [x] Dispatch Claude package 2: Android Stitch shell/theme alignment (global tokens, font system, L1 shell consistency, still-valid route gaps, honest placeholders).
+- [x] Review package 2 for spec compliance and code quality.
+- [x] Dispatch Claude package 3: cross-platform reconciliation (localization entry chain, Widget disposition, README/security parity, review-finding reconciliation report).
+- [x] Verify feasible outcomes on Windows and produce the final `fixed / still valid / outdated` review ledger.
+
+### Package 3 Execution Checklist
+
+- [x] Wire iOS tab labels to existing `Localizable.strings` keys.
+- [x] Wire the obvious `Settings` / `More` entry copy to existing iOS localization keys without broad key expansion.
+- [x] Update `app_mimo/README.md` to reflect the current iOS build entry (`project.yml` -> XcodeGen -> CocoaPods -> `.xcworkspace`) and the Windows-prep ATS/local-networking state.
+- [x] Update `app_mimo/ios/README.md`, `VERIFY_IOS.md`, and `IOS_SOURCE_INVENTORY.md` so Widget status is `deferred / source exists but target not wired`.
+- [x] Write a reconciliation report under `docs/superpowers/reports/` using `fixed / still valid / outdated`.
+- [x] Run Windows-feasible static verification and only then mark package 3 / review items complete.
+
+## Review Notes
+
+- External review triage result: it is directionally useful but not fully current. Several iOS findings are already outdated in this worktree (`About`/`Sentry`/`CurrentCharge` routing, some `Charge` field drift), while core infrastructure findings remain valid (`Info.plist`, ATS, `AmapView`, mock schema alignment, `UpdatesView` real-mode gap, Android global theme/font drift).
+- This remediation round must not undo the existing Android/iOS shell work unless a review finding proves that a current change is itself the blocker.
+- The acceptance bar for package 1 is "source/config corrected and no obviously fake real-mode fallback," not "Mac/Xcode-proven iOS build." That proof remains blocked by environment.
+- Package 1 worker update (2026-07-05): corrected `Info.plist` into valid plist XML with LAN/ATS keys, removed the iOS 17-only map configuration from `AmapView`, aligned `MockData` decoding with `mock_data.json` (`statuses`, `battery_health`, `software_updates`, `sentry_events`), routed onboarding through the shared `AppState.connect(...)` path, persisted real-connection state in `AppState`, and changed `UpdatesView` / `StatisticsView` to iOS 16-compatible empty states instead of `ContentUnavailableView`. Windows-side static verification passed for plist parsing and source-level API/path checks; native Xcode compile is still deferred to Mac.
+- Package 2B worker update (2026-07-05): confirmed the Android L1 shell is still unified under the existing 4-tab host (`Dashboard`, `Drives`, `Charges`, `More`), tightened top-level route matching so typed routes with path segments still resolve the active tab, and added an explicit More-screen verification note so mock/cached destinations are not presented as fully live. Theme and typography alignment remain pending in the broader package 2 scope.
+- Package 3 worker update (2026-07-05): wired the iOS tab labels plus the most obvious `Settings` / `More` entry text to existing `Localizable.strings` keys through a minimal `Localization.swift` helper, rewrote the iOS-facing README/verify/inventory docs so the build path is consistently `project.yml` -> XcodeGen -> CocoaPods -> `MateLink.xcworkspace`, and aligned Widget status to `deferred / source exists but target not wired`. Windows-feasible verification confirmed `Info.plist` parses as XML, `project.yml` still contains only the `MateLink` app target, no `.entitlements` file exists under `app_mimo/ios`, and `swift` / `xcodegen` / `pod` / `xcodebuild` are unavailable in this environment.

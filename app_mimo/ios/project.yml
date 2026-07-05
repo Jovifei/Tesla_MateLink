@@ -3,6 +3,10 @@ options:
   bundleIdPrefix: com.jovif
   deploymentTarget:
     iOS: "16.0"
+  developmentRegion: en
+  knownRegions:
+    - en
+    - zh-Hans
 settings:
   base:
     SWIFT_VERSION: "5.9"
@@ -18,6 +22,10 @@ targets:
       - path: MateLink/Features
     resources:
       - path: MateLink/Resources
+        includes:
+          - "**/*.json"
+          - "**/*.strings"
+          - "**/*.ttf"
     info:
       path: MateLink/Info.plist
     settings:
