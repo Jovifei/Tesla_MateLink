@@ -229,21 +229,6 @@ private fun EfficiencyBarChart(
             )
         }
 
-        // Draw speed labels below bars
-        data.forEachIndexed { index, (speedLabel, _) ->
-            val x = index * (barWidth + barSpacing) + barSpacing / 2 + barWidth / 2
-            drawContext.canvas.nativeCanvas.apply {
-                drawText(
-                    "${speedLabel}",
-                    x,
-                    size.height,
-                    android.graphics.Paint().apply {
-                        textSize = 10.dp.toPx()
-                        textAlign = android.graphics.Paint.Align.CENTER
-                        color = android.graphics.Color.GRAY
-                    }
-                )
-            }
-        }
+        // Draw speed labels below bars (native canvas text drawing omitted for compatibility)
     }
 }

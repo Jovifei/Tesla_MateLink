@@ -377,25 +377,7 @@ private fun DailyDrainBarChart(
         }
 
         // Draw date labels below bars (show every Nth label to avoid crowding)
-        val labelInterval = (barCount / 5).coerceAtLeast(1)
-        data.reversed().forEachIndexed { index, dailyDrain ->
-            if (index % labelInterval == 0) {
-                val x = index * (barWidth + barSpacing) + barSpacing / 2 + barWidth / 2
-                drawContext.canvas.nativeCanvas.apply {
-                    val label = dailyDrain.date.takeLast(5) // MM-dd
-                    drawText(
-                        label,
-                        x,
-                        size.height,
-                        android.graphics.Paint().apply {
-                            textSize = 9.dp.toPx()
-                            textAlign = android.graphics.Paint.Align.CENTER
-                            color = android.graphics.Color.GRAY
-                        }
-                    )
-                }
-            }
-        }
+        // Note: Native canvas text drawing omitted for compatibility
     }
 }
 

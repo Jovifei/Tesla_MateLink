@@ -12,18 +12,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 
 /**
- * Placeholder for AMap (高德地图) MapView.
+ * Placeholder for AMap route view.
  * Amap SDK requires manual AAR download from https://lbs.amap.com.
- * This placeholder is shown when the SDK is not available.
  */
 @Composable
-fun AmapComposeView(
+fun AmapRouteView(
     modifier: Modifier = Modifier,
-    latitude: Double = 31.2304,
-    longitude: Double = 121.4737,
-    zoom: Float = 15f,
-    markers: List<Pair<Double, Double>> = emptyList(),
-    polylinePoints: List<Pair<Double, Double>> = emptyList()
+    points: List<Pair<Double, Double>> = emptyList(),
+    routePoints: List<Pair<Double, Double>> = emptyList(),
+    startTitle: String = "",
+    endTitle: String = "",
+    zoom: Float = 12f
 ) {
     Box(
         modifier = modifier
@@ -32,8 +31,8 @@ fun AmapComposeView(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Map requires Amap SDK.\nDownload from lbs.amap.com",
-            style = MaterialTheme.typography.bodyMedium,
+            text = "Map requires Amap SDK",
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             color = Color.Gray
         )

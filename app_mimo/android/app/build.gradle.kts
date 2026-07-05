@@ -98,6 +98,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
     ksp(libs.moshi.codegen)
 
     // DataStore
@@ -116,12 +117,17 @@ dependencies {
     implementation(libs.hilt.work)
     ksp(libs.hilt.work.compiler)
 
+    // Glance (App Widgets)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+
     // Charts
     implementation(libs.mpandroidchart)
 
     // Maps
-    implementation(libs.amap3d)
-    implementation(libs.amaplocation)
+    // TODO: 高德 SDK 需从 https://lbs.amap.com 下载 AAR 后启用
+    // implementation(libs.amap3d)
+    // implementation(libs.amaplocation)
 
     // Testing
     testImplementation(libs.junit)

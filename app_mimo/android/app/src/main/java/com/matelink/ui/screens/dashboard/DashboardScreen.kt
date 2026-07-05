@@ -288,6 +288,7 @@ private fun BatteryTrendChart(currentBatteryLevel: Int) {
     val maxVal = data.max()
     val minVal = data.min()
     val range = (maxVal - minVal).coerceAtLeast(1)
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     Canvas(modifier = Modifier.fillMaxWidth().height(120.dp)) {
         val width = size.width
@@ -302,13 +303,13 @@ private fun BatteryTrendChart(currentBatteryLevel: Int) {
             val y = height - padding - ((value - minVal) / range.toFloat()) * (height - 2 * padding)
             if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
         }
-        drawPath(path, color = MaterialTheme.colorScheme.primary, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3f))
+        drawPath(path, color = primaryColor, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3f))
 
         // Draw dots
         data.forEachIndexed { index, value ->
             val x = index * stepX
             val y = height - padding - ((value - minVal) / range.toFloat()) * (height - 2 * padding)
-            drawCircle(color = MaterialTheme.colorScheme.primary, radius = 5f, center = androidx.compose.ui.geometry.Offset(x, y))
+            drawCircle(color = primaryColor, radius = 5f, center = androidx.compose.ui.geometry.Offset(x, y))
         }
     }
 

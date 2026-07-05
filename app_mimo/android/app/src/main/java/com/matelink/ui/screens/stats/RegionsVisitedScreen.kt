@@ -551,7 +551,7 @@ private fun CountryMapCard(
                     latitude = centerLat,
                     longitude = centerLng,
                     zoom = if (allLocations.size <= 1) 15f else 10f,
-                    markers = markers
+                    markers = markers.map { Pair(it.first, it.second) }
                 )
 
                 // Legend overlay at bottom-left
