@@ -60,7 +60,7 @@ actor TeslaMateAPI {
     // MARK: - Single-resource endpoints
 
     func getCar(_ carId: Int) async throws -> Car {
-        let resp: CarApiResponse = try await fetch("/api/v1/cars")
+        let resp: CarApiResponse = try await fetch("/api/v1/cars/\(carId)")
         guard let car = resp.data.cars.first(where: { $0.carId == carId }) ?? resp.data.cars.first else {
             throw ApiError.invalidResponse
         }
@@ -87,12 +87,25 @@ actor TeslaMateAPI {
         return try await fetch("/api/v1/cars/\(carId)/updates")
     }
 
-    func getGlobalSettings() async throws -> GlobalSettings {
-        return try await fetch("/api/v1/globalsettings")
+    func getGlobalSettings() async throws -> TeslamateUnits {
+        let resp: GlobalSettingsResponse = try await fetch("/api/v1/globalsettings")
+        return resp.data.settings.teslamateUnits
     }
 }
 
-struct GlobalSettings: Codable {
+struct GlobalSettingsResponse: Codable {
+    let data: GlobalSettingsData
+}
+struct GlobalSettingsData: Codable {
+    let settings: GlobalSettingsContainer
+}
+struct GlobalSettingsContainer: Codable {
+    let teslamateUnits: TeslamateUnits
+    enum CodingKeys: String, CodingKey {
+        case teslamateUnits = "teslamate_units"
+    }
+}
+struct TeslamateUnits: Codable {
     let unitOfLength: String?
     let unitOfPressure: String?
     let unitOfTemperature: String?

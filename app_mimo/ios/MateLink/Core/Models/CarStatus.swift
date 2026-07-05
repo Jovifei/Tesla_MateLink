@@ -563,6 +563,7 @@ struct Charge: Codable, Identifiable {
         case rangeRated = "range_rated"
         case rangeIdeal = "range_ideal"
         case chargerPhases = "charger_phases"
+        case chargingType = "charging_type"
     }
 
     init(from decoder: Decoder) throws {
@@ -608,12 +609,12 @@ struct Charge: Codable, Identifiable {
             endIdealRangeKm = try? top.decode(Double.self, forKey: .endIdealRangeKm)
         }
 
-        // Derive chargingType from charger_phases
-        let chargerPhases = (try? top.decode(Int.self, forKey: .chargerPhases)) ?? -1
-        if chargerPhases == 0 {
-            chargingType = "DC"
+        // Try explicit charging_type first, fallback to charger_phases derivation
+        if let explicitType = try? top.decode(String.self, forKey: .chargingType) {
+            chargingType = explicitType
         } else {
-            chargingType = "AC"
+            let phases = (try? top.decode(Int.self, forKey: .chargerPhases)) ?? -1
+            chargingType = (phases == 0) ? "DC" : "AC"
         }
     }
 }
