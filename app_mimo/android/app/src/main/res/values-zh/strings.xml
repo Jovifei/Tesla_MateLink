@@ -43,6 +43,18 @@
     <string name="charge_added">已充入</string>
     <string name="charge_remaining">剩余时间</string>
 
+    <!-- Timeline -->
+    <string name="timeline_title">时间线</string>
+    <string name="timeline_empty">暂无事件</string>
+    <string name="timeline_drive">行驶</string>
+    <string name="timeline_charge">充电</string>
+    <string name="timeline_distance_value">%.1f km</string>
+    <string name="timeline_battery_end">%d%%</string>
+    <string name="timeline_energy_added">%.1f kWh</string>
+    <string name="timeline_cost_value">¥%.2f</string>
+    <string name="timeline_unknown_route">未知路线</string>
+    <string name="timeline_unknown_location">未知地点</string>
+
     <!-- Drives -->
     <string name="drives_title">行程记录</string>
     <string name="drive_detail">行程详情</string>
@@ -111,4 +123,73 @@
     <string name="range_trip_list_title">最近行程 (%d)</string>
     <string name="range_estimated">预估</string>
     <string name="range_actual">实际</string>
+
+    <!-- More Menu -->
+    <string name="more_section_analysis">数据分析</string>
+    <string name="more_section_system">系统</string>
+    <string name="more_status_title">验证状态</string>
+    <string name="more_status_body">部分功能仍使用预览、模拟或缓存数据，连接 TeslaMate 后将显示实时数据。</string>
+    <string name="more_item_statistics">统计概览</string>
+    <string name="more_item_battery_health">电池健康</string>
+    <string name="more_item_mileage">里程统计</string>
+    <string name="more_item_trips">行程记录</string>
+    <string name="more_item_software_updates">软件更新</string>
+    <string name="more_item_sentry_history">哨兵历史</string>
+    <string name="more_item_efficiency">能耗效率</string>
+    <string name="more_item_cost">费用分析</string>
+    <string name="more_item_range">续航分析</string>
+    <string name="more_item_vampire">待机能耗</string>
+    <string name="more_item_timeline">时间线</string>
+
+    <!-- About -->
+    <string name="about_tagline">你的 Tesla 数据伴侣</string>
+    <string name="about_tech_stack">技术栈</string>
+    <string name="about_tech_android">Android - Kotlin - Jetpack Compose - Hilt - Room</string>
+    <string name="about_tech_ios">iOS - Swift - SwiftUI</string>
+    <string name="about_tech_web">Web - TypeScript - React - Vite</string>
+    <string name="about_data_source">数据来源</string>
+    <string name="about_data_source_self_hosted">自托管 TeslaMate + TeslaMateApi</string>
+    <string name="about_data_source_no_tesla">不连接官方 Tesla API</string>
+    <string name="about_data_source_no_collection">不收集用户数据</string>
+    <string name="about_links">相关链接</string>
+    <string name="about_link_github">GitHub: Jovifei/Tesla_MateLink</string>
+    <string name="about_link_license">许可协议: MIT</string>
+    <string name="about_footer">版权所有 2026 JoviF - 为 Tesla 车主打造</string>
+
+    <!-- Notification Permission -->
+    <string name="notification_permission_title">通知权限</string>
+    <string name="notification_permission_message">允许通知以获取充电、哨兵、胎压和软件更新提醒。</string>
+    <string name="notification_permission_grant">允许</string>
+
+    <!-- Cost Analysis -->
+    <string name="cost_title">费用分析</string>
+    <string name="cost_total">总费用</string>
+    <string name="cost_energy_added">已充电量</string>
+    <string name="cost_charges_count">%d 次充电</string>
+    <string name="cost_monthly_breakdown">月度明细</string>
+    <string name="cost_ac">交流充电</string>
+    <string name="cost_dc">直流充电</string>
+    <string name="cost_top_locations">热门充电地点</string>
+    <string name="cost_location_count">%d 次充电</string>
+
+    <!-- Vampire Drain (Standby Power Consumption) -->
+    <string name="vampire_title">待机能耗</string>
+    <string name="vampire_total_drain_label">总待机能耗</string>
+    <string name="vampire_total_drain_subtitle">所有检测到的待机耗电时段总和</string>
+    <string name="vampire_avg_power">平均功率</string>
+    <string name="vampire_idle_periods">待机时段</string>
+    <string name="vampire_daily_title">每日待机能耗</string>
+    <string name="vampire_daily_subtitle">停放期间（无行驶）的电池损耗百分比</string>
+    <string name="vampire_recent_title">近期待机时段</string>
+    <string name="vampire_tips_title">优化建议</string>
+    <string name="vampire_tip_sentry_title">哨兵模式</string>
+    <string name="vampire_tip_sentry_desc">哨兵模式功耗约 250-300W。在安全地点停放时关闭可显著降低待机能耗。</string>
+    <string name="vampire_tip_cabin_overheat_title">车内过热保护</string>
+    <string name="vampire_tip_cabin_overheat_desc">该功能会运行空调以保持车内温度低于阈值。如无需此功能，可在炎热天气设为「关闭」或「仅通风」。</string>
+    <string name="vampire_tip_climate_title">远程空调</string>
+    <string name="vampire_tip_climate_desc">预热/预冷功耗约 3-5 kW。长时间停放时避免反复开启远程空调。</string>
+    <string name="vampire_tip_updates_title">软件更新</string>
+    <string name="vampire_tip_updates_desc">OTA 更新和定期检查会导致短暂唤醒。建议在插枪充电期间安排更新。</string>
+    <string name="vampire_how_title">工作原理</string>
+    <string name="vampire_how_desc">待机能耗通过分析充电间隔来计算。当电池电量下降但期间无行驶记录时，能量损失归因于待机功耗。估算的平均功率基于 75 kWh 电池容量。</string>
 </resources>
