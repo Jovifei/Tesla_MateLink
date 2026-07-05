@@ -5,7 +5,6 @@ struct DashboardView: View {
     @State private var status: CarStatus?
     @State private var showCarSwitcher = false
     @State private var isRefreshing = false
-    @State private var refreshTimer: Timer?
 
     var body: some View {
         NavigationStack {
@@ -95,14 +94,8 @@ struct DashboardView: View {
             }
             .navigationBarHidden(true)
             .refreshable { await refresh() }
-            .onAppear {
-                refreshTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
-                    Task { await refresh() }
-                }
-            }
-            .onDisappear {
-                refreshTimer?.invalidate()
-                refreshTimer = nil
+            .onReceive(Timer.publish(every: 5, on: .main, in: .common).autoconnect()) { _ in
+                Task { await refresh() }
             }
             .task { await refresh() }
             .sheet(isPresented: $showCarSwitcher) { CarSwitcherView() }
