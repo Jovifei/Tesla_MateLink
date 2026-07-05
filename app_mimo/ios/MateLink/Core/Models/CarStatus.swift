@@ -392,17 +392,130 @@ struct Drive: Codable, Identifiable {
     /// 行程能耗 (kWh) = 距离(km) × 效率(Wh/km) / 1000
     var consumptionKwh: Double { distanceKm * efficiency / 1000.0 }
 
-    enum CodingKeys: String, CodingKey {
-        case id; case carId = "car_id"; case startDate = "start_date"; case endDate = "end_date"
+    /// Memberwise init for Previews / mocks.
+    init(
+        id: Int, carId: Int, startDate: String, endDate: String,
+        distanceKm: Double, durationMin: Int, efficiency: Double,
+        startAddress: String, endAddress: String,
+        startLatitude: Double, startLongitude: Double,
+        endLatitude: Double, endLongitude: Double,
+        startBatteryLevel: Int, endBatteryLevel: Int,
+        startIdealRangeKm: Double, endIdealRangeKm: Double,
+        outsideTempAvg: Double, speedMax: Double, powerMax: Double, powerMin: Double,
+        elevationGain: Double, elevationLoss: Double
+    ) {
+        self.id = id; self.carId = carId; self.startDate = startDate; self.endDate = endDate
+        self.distanceKm = distanceKm; self.durationMin = durationMin; self.efficiency = efficiency
+        self.startAddress = startAddress; self.endAddress = endAddress
+        self.startLatitude = startLatitude; self.startLongitude = startLongitude
+        self.endLatitude = endLatitude; self.endLongitude = endLongitude
+        self.startBatteryLevel = startBatteryLevel; self.endBatteryLevel = endBatteryLevel
+        self.startIdealRangeKm = startIdealRangeKm; self.endIdealRangeKm = endIdealRangeKm
+        self.outsideTempAvg = outsideTempAvg; self.speedMax = speedMax
+        self.powerMax = powerMax; self.powerMin = powerMin
+        self.elevationGain = elevationGain; self.elevationLoss = elevationLoss
+    }
+
+    private enum TopKeys: String, CodingKey {
+        case id; case carId = "car_id"
+        case startDate = "start_date"; case endDate = "end_date"
         case distanceKm = "distance_km"; case durationMin = "duration_min"; case efficiency
         case startAddress = "start_address"; case endAddress = "end_address"
         case startLatitude = "start_latitude"; case startLongitude = "start_longitude"
         case endLatitude = "end_latitude"; case endLongitude = "end_longitude"
-        case startBatteryLevel = "start_battery_level"; case endBatteryLevel = "end_battery_level"
-        case startIdealRangeKm = "start_ideal_range_km"; case endIdealRangeKm = "end_ideal_range_km"
         case outsideTempAvg = "outside_temp_avg"; case speedMax = "speed_max"
         case powerMax = "power_max"; case powerMin = "power_min"
         case elevationGain = "elevation_gain"; case elevationLoss = "elevation_loss"
+        // Nested containers (TeslaMate API v1.24+)
+        case odometerDetails = "odometer_details"
+        case batteryDetails = "battery_details"
+        case rangeRated = "range_rated"
+    }
+
+    init(from decoder: Decoder) throws {
+        let top = try decoder.container(keyedBy: TopKeys.self)
+        id = try top.decode(Int.self, forKey: .id)
+        carId = try top.decode(Int.self, forKey: .carId)
+        startDate = (try? top.decode(String.self, forKey: .startDate)) ?? ""
+        endDate = (try? top.decode(String.self, forKey: .endDate)) ?? ""
+        durationMin = (try? top.decode(Int.self, forKey: .durationMin)) ?? 0
+        efficiency = (try? top.decode(Double.self, forKey: .efficiency)) ?? 0
+        startAddress = (try? top.decode(String.self, forKey: .startAddress)) ?? ""
+        endAddress = (try? top.decode(String.self, forKey: .endAddress)) ?? ""
+        startLatitude = (try? top.decode(Double.self, forKey: .startLatitude)) ?? 0
+        startLongitude = (try? top.decode(Double.self, forKey: .startLongitude)) ?? 0
+        endLatitude = (try? top.decode(Double.self, forKey: .endLatitude)) ?? 0
+        endLongitude = (try? top.decode(Double.self, forKey: .endLongitude)) ?? 0
+        outsideTempAvg = (try? top.decode(Double.self, forKey: .outsideTempAvg)) ?? 0
+        speedMax = (try? top.decode(Double.self, forKey: .speedMax)) ?? 0
+        powerMax = (try? top.decode(Double.self, forKey: .powerMax)) ?? 0
+        powerMin = (try? top.decode(Double.self, forKey: .powerMin)) ?? 0
+        elevationGain = (try? top.decode(Double.self, forKey: .elevationGain)) ?? 0
+        elevationLoss = (try? top.decode(Double.self, forKey: .elevationLoss)) ?? 0
+
+        // Nested: odometer_details.distance
+        if let odometerDetails = try? top.decode(DriveOdometerDetails.self, forKey: .odometerDetails) {
+            distanceKm = odometerDetails.distance
+        } else {
+            distanceKm = (try? top.decode(Double.self, forKey: .distanceKm)) ?? 0
+        }
+
+        // Nested: battery_details.start/end_battery_level
+        if let batteryDetails = try? top.decode(DriveBatteryDetails.self, forKey: .batteryDetails) {
+            startBatteryLevel = batteryDetails.startBatteryLevel
+            endBatteryLevel = batteryDetails.endBatteryLevel
+        } else {
+            startBatteryLevel = (try? top.decode(Int.self, forKey: .startBatteryLevel)) ?? 0
+            endBatteryLevel = (try? top.decode(Int.self, forKey: .endBatteryLevel)) ?? 0
+        }
+
+        // Nested: range_rated.start/end range
+        if let rangeDetails = try? top.decode(DriveRangeDetails.self, forKey: .rangeRated) {
+            startIdealRangeKm = rangeDetails.startRange
+            endIdealRangeKm = rangeDetails.endRange
+        } else {
+            startIdealRangeKm = (try? top.decode(Double.self, forKey: .startIdealRangeKm)) ?? 0
+            endIdealRangeKm = (try? top.decode(Double.self, forKey: .endIdealRangeKm)) ?? 0
+        }
+    }
+}
+
+// MARK: - Drive nested containers (TeslaMate API v1.24+)
+
+private struct DriveOdometerDetails: Decodable {
+    let distance: Double
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        distance = (try? c.decode(Double.self, forKey: .distance)) ?? 0
+    }
+    private enum CodingKeys: String, CodingKey { case distance }
+}
+
+private struct DriveBatteryDetails: Decodable {
+    let startBatteryLevel: Int
+    let endBatteryLevel: Int
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        startBatteryLevel = (try? c.decode(Int.self, forKey: .startBatteryLevel)) ?? 0
+        endBatteryLevel = (try? c.decode(Int.self, forKey: .endBatteryLevel)) ?? 0
+    }
+    private enum CodingKeys: String, CodingKey {
+        case startBatteryLevel = "start_battery_level"
+        case endBatteryLevel = "end_battery_level"
+    }
+}
+
+private struct DriveRangeDetails: Decodable {
+    let startRange: Double
+    let endRange: Double
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        startRange = (try? c.decode(Double.self, forKey: .startRange)) ?? 0
+        endRange = (try? c.decode(Double.self, forKey: .endRange)) ?? 0
+    }
+    private enum CodingKeys: String, CodingKey {
+        case startRange = "start_range"
+        case endRange = "end_range"
     }
 }
 
@@ -416,16 +529,122 @@ struct Charge: Codable, Identifiable {
     let chargingType: String; let powerMax: Double; let powerMin: Double
     let outsideTempAvg: Double
 
-    enum CodingKeys: String, CodingKey {
-        case id; case carId = "car_id"; case startDate = "start_date"; case endDate = "end_date"
+    /// Memberwise init for Previews / mocks.
+    init(
+        id: Int, carId: Int, startDate: String, endDate: String? = nil,
+        chargeEnergyAdded: Double, startBatteryLevel: Int, endBatteryLevel: Int? = nil,
+        startIdealRangeKm: Double, endIdealRangeKm: Double? = nil,
+        startRatedRangeKm: Double, endRatedRangeKm: Double? = nil,
+        durationMin: Int, cost: Double? = nil, address: String? = nil,
+        latitude: Double, longitude: Double,
+        chargingType: String, powerMax: Double, powerMin: Double,
+        outsideTempAvg: Double
+    ) {
+        self.id = id; self.carId = carId; self.startDate = startDate; self.endDate = endDate
+        self.chargeEnergyAdded = chargeEnergyAdded; self.startBatteryLevel = startBatteryLevel; self.endBatteryLevel = endBatteryLevel
+        self.startIdealRangeKm = startIdealRangeKm; self.endIdealRangeKm = endIdealRangeKm
+        self.startRatedRangeKm = startRatedRangeKm; self.endRatedRangeKm = endRatedRangeKm
+        self.durationMin = durationMin; self.cost = cost; self.address = address
+        self.latitude = latitude; self.longitude = longitude
+        self.chargingType = chargingType; self.powerMax = powerMax; self.powerMin = powerMin
+        self.outsideTempAvg = outsideTempAvg
+    }
+
+    private enum TopKeys: String, CodingKey {
+        case id; case carId = "car_id"
+        case startDate = "start_date"; case endDate = "end_date"
         case chargeEnergyAdded = "charge_energy_added"
-        case startBatteryLevel = "start_battery_level"; case endBatteryLevel = "end_battery_level"
-        case startIdealRangeKm = "start_ideal_range_km"; case endIdealRangeKm = "end_ideal_range_km"
-        case startRatedRangeKm = "start_rated_range_km"; case endRatedRangeKm = "end_rated_range_km"
         case durationMin = "duration_min"; case cost; case address
-        case latitude, longitude; case chargingType = "charging_type"
+        case latitude, longitude
         case powerMax = "power_max"; case powerMin = "power_min"
         case outsideTempAvg = "outside_temp_avg"
+        // Nested containers (TeslaMate API v1.24+)
+        case batteryDetails = "battery_details"
+        case rangeRated = "range_rated"
+        case rangeIdeal = "range_ideal"
+        case chargerPhases = "charger_phases"
+    }
+
+    init(from decoder: Decoder) throws {
+        let top = try decoder.container(keyedBy: TopKeys.self)
+        id = try top.decode(Int.self, forKey: .id)
+        carId = try top.decode(Int.self, forKey: .carId)
+        startDate = (try? top.decode(String.self, forKey: .startDate)) ?? ""
+        endDate = try? top.decode(String.self, forKey: .endDate)
+        chargeEnergyAdded = (try? top.decode(Double.self, forKey: .chargeEnergyAdded)) ?? 0
+        durationMin = (try? top.decode(Int.self, forKey: .durationMin)) ?? 0
+        cost = try? top.decode(Double.self, forKey: .cost)
+        address = try? top.decode(String.self, forKey: .address)
+        latitude = (try? top.decode(Double.self, forKey: .latitude)) ?? 0
+        longitude = (try? top.decode(Double.self, forKey: .longitude)) ?? 0
+        powerMax = (try? top.decode(Double.self, forKey: .powerMax)) ?? 0
+        powerMin = (try? top.decode(Double.self, forKey: .powerMin)) ?? 0
+        outsideTempAvg = (try? top.decode(Double.self, forKey: .outsideTempAvg)) ?? 0
+
+        // Nested: battery_details
+        if let batteryDetails = try? top.decode(ChargeBatteryDetails.self, forKey: .batteryDetails) {
+            startBatteryLevel = batteryDetails.startBatteryLevel
+            endBatteryLevel = batteryDetails.endBatteryLevel
+        } else {
+            startBatteryLevel = (try? top.decode(Int.self, forKey: .startBatteryLevel)) ?? 0
+            endBatteryLevel = try? top.decode(Int.self, forKey: .endBatteryLevel)
+        }
+
+        // Nested: range_rated → start/end ideal range
+        if let rangeRated = try? top.decode(ChargeRangeDetails.self, forKey: .rangeRated) {
+            startIdealRangeKm = rangeRated.startRange
+            endIdealRangeKm = rangeRated.endRange
+        } else {
+            startIdealRangeKm = (try? top.decode(Double.self, forKey: .startIdealRangeKm)) ?? 0
+            endIdealRangeKm = try? top.decode(Double.self, forKey: .endIdealRangeKm)
+        }
+
+        // Nested: range_ideal → start/end rated range
+        if let rangeIdeal = try? top.decode(ChargeRangeDetails.self, forKey: .rangeIdeal) {
+            startRatedRangeKm = rangeIdeal.startRange
+            endRatedRangeKm = rangeIdeal.endRange
+        } else {
+            startRatedRangeKm = (try? top.decode(Double.self, forKey: .startRatedRangeKm)) ?? 0
+            endRatedRangeKm = try? top.decode(Double.self, forKey: .endRatedRangeKm)
+        }
+
+        // Derive chargingType from charger_phases
+        let chargerPhases = (try? top.decode(Int.self, forKey: .chargerPhases)) ?? -1
+        if chargerPhases == 0 {
+            chargingType = "DC"
+        } else {
+            chargingType = "AC"
+        }
+    }
+}
+
+// MARK: - Charge nested containers (TeslaMate API v1.24+)
+
+private struct ChargeBatteryDetails: Decodable {
+    let startBatteryLevel: Int
+    let endBatteryLevel: Int?
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        startBatteryLevel = (try? c.decode(Int.self, forKey: .startBatteryLevel)) ?? 0
+        endBatteryLevel = try? c.decode(Int.self, forKey: .endBatteryLevel)
+    }
+    private enum CodingKeys: String, CodingKey {
+        case startBatteryLevel = "start_battery_level"
+        case endBatteryLevel = "end_battery_level"
+    }
+}
+
+private struct ChargeRangeDetails: Decodable {
+    let startRange: Double
+    let endRange: Double?
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        startRange = (try? c.decode(Double.self, forKey: .startRange)) ?? 0
+        endRange = try? c.decode(Double.self, forKey: .endRange)
+    }
+    private enum CodingKeys: String, CodingKey {
+        case startRange = "start_range"
+        case endRange = "end_range"
     }
 }
 
@@ -456,6 +675,37 @@ struct BatteryHealth: Codable {
         case originalCapacityKwh = "original_capacity_kwh"
         case currentCapacityKwh = "current_capacity_kwh"
         case history
+
+        // TeslaMate API v1.24+ alternate keys
+        case maxRange = "max_range"
+        case currentRange = "current_range"
+        case healthPercentage = "battery_health_percentage"
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        carId = (try? c.decode(Int.self, forKey: .carId)) ?? 0
+        date = (try? c.decode(String.self, forKey: .date)) ?? ""
+        batteryLevel = (try? c.decode(Int.self, forKey: .batteryLevel)) ?? 0
+        odometer = (try? c.decode(Double.self, forKey: .odometer)) ?? 0
+        outsideTemp = (try? c.decode(Double.self, forKey: .outsideTemp)) ?? 0
+        usableBatteryLevel = (try? c.decode(Int.self, forKey: .usableBatteryLevel)) ?? 0
+        capacityDegradationPercent = try? c.decode(Double.self, forKey: .capacityDegradationPercent)
+        originalCapacityKwh = try? c.decode(Double.self, forKey: .originalCapacityKwh)
+        currentCapacityKwh = try? c.decode(Double.self, forKey: .currentCapacityKwh)
+        history = try? c.decode([BatteryHealthPoint].self, forKey: .history)
+
+        // TeslaMate API v1.24+: max_range → ratedRangeKm, current_range → idealRangeKm
+        if let maxRange = try? c.decode(Double.self, forKey: .maxRange) {
+            ratedRangeKm = maxRange
+        } else {
+            ratedRangeKm = (try? c.decode(Double.self, forKey: .ratedRangeKm)) ?? 0
+        }
+        if let currentRange = try? c.decode(Double.self, forKey: .currentRange) {
+            idealRangeKm = currentRange
+        } else {
+            idealRangeKm = (try? c.decode(Double.self, forKey: .idealRangeKm)) ?? 0
+        }
     }
 }
 
