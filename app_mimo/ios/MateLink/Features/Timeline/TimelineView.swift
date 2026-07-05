@@ -55,13 +55,32 @@ private let dateTimeFormatter: DateFormatter = {
 final class TimelineViewModel: ObservableObject {
     @Published var events: [TimelineEvent] = []
     @Published var isLoading = true
+    @Published var errorMessage: String? = nil
 
-    func load(mock: MockAPI, carId: Int) async {
+    func load(state: AppState) async {
         isLoading = true
+        errorMessage = nil
         defer { isLoading = false }
 
-        let drives = await mock.getDrives(carId)
-        let charges = await mock.getCharges(carId)
+        let carId = state.currentCarId
+        let drives: [Drive]
+        let charges: [Charge]
+
+        if state.isMockMode {
+            drives = await state.mock.getDrives(carId)
+            charges = await state.mock.getCharges(carId)
+        } else if let api = state.real {
+            do {
+                drives = try await api.fetch("/api/v1/cars/\(carId)/drives")
+                charges = try await api.fetch("/api/v1/cars/\(carId)/charges")
+            } catch {
+                errorMessage = error.localizedDescription
+                return
+            }
+        } else {
+            errorMessage = "No API connection configured. Please set up your TeslaMate server in Settings."
+            return
+        }
 
         var merged: [TimelineEvent] = []
 
@@ -149,11 +168,17 @@ struct TimelineView: View {
             if vm.isLoading {
                 ProgressView("Loading timeline\u{2026}")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let error = vm.errorMessage {
+                EmptyStateView(
+                    "Unable to Load Timeline",
+                    systemImage: "exclamationmark.triangle",
+                    message: error
+                )
             } else if vm.events.isEmpty {
-                ContentUnavailableView(
+                EmptyStateView(
                     "No Events",
                     systemImage: "clock.badge.questionmark",
-                    description: Text("Drive and charge events will appear here.")
+                    message: "Drive and charge events will appear here."
                 )
             } else {
                 timelineContent
@@ -161,7 +186,7 @@ struct TimelineView: View {
         }
         .navigationTitle("Timeline")
         .navigationBarTitleDisplayMode(.large)
-        .task { await vm.load(mock: state.mock, carId: state.currentCarId) }
+        .task { await vm.load(state: state) }
     }
 
     // MARK: - Timeline Content

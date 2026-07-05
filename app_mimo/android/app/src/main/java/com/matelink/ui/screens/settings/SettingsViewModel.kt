@@ -17,6 +17,7 @@ import com.matelink.R
 import com.matelink.data.local.SettingsDataStore
 import com.matelink.data.local.TirePosition
 import com.matelink.data.repository.ApiResult
+import com.matelink.data.repository.SettingsRepository
 import com.matelink.data.repository.TeslamateRepository
 import com.matelink.data.repository.SentryStateRepository
 import com.matelink.data.repository.TpmsStateRepository
@@ -43,6 +44,7 @@ data class SettingsUiState(
     val currencyCode: String = "EUR",
     val showShortDrivesCharges: Boolean = false,
     val languageCode: String = "",
+    val mockMode: Boolean = false,
     val isLoading: Boolean = true,
     val isTesting: Boolean = false,
     val isSaving: Boolean = false,
@@ -80,6 +82,7 @@ data class TestResult(
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settingsDataStore: SettingsDataStore,
+    private val settingsRepository: SettingsRepository,
     private val repository: TeslamateRepository,
     private val syncManager: SyncManager,
     private val tpmsStateRepository: TpmsStateRepository,
@@ -97,6 +100,7 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         viewModelScope.launch {
             val settings = settingsDataStore.settings.first()
+            val mockMode = settingsRepository.mockMode.first()
             _uiState.value = _uiState.value.copy(
                 serverUrl = settings.serverUrl,
                 secondaryServerUrl = settings.secondaryServerUrl,
@@ -107,6 +111,7 @@ class SettingsViewModel @Inject constructor(
                 currencyCode = settings.currencyCode,
                 showShortDrivesCharges = settings.showShortDrivesCharges,
                 languageCode = settings.languageCode,
+                mockMode = mockMode,
                 isLoading = false
             )
         }
@@ -188,6 +193,13 @@ class SettingsViewModel @Inject constructor(
             settingsDataStore.saveLanguageCode(languageCode)
             // Apply the locale change immediately
             com.matelink.locale.LocaleHelper.applyLocale(context, languageCode)
+        }
+    }
+
+    fun updateMockMode(enabled: Boolean) {
+        _uiState.value = _uiState.value.copy(mockMode = enabled)
+        viewModelScope.launch {
+            settingsRepository.setMockMode(enabled)
         }
     }
 

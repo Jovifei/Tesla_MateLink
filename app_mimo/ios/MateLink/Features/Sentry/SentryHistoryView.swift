@@ -15,16 +15,16 @@ struct SentryHistoryView: View {
                 if loading {
                     ProgressView("Loading...").padding(40)
                 } else if endpointUnavailable {
-                    ContentUnavailableView(
+                    EmptyStateView(
                         "Sentry Endpoint Unavailable",
                         systemImage: "shield.slash",
-                        description: Text("iOS real-data sentry history is not wired yet. Switch to Mock Mode to preview the shell.")
+                        message: "iOS real-data sentry history is not wired yet. Switch to Mock Mode to preview the shell."
                     )
                 } else if events.isEmpty {
-                    ContentUnavailableView(
+                    EmptyStateView(
                         "No Sentry Events",
                         systemImage: "shield.slash",
-                        description: Text("Sentry alerts will appear here when triggered.")
+                        message: "Sentry alerts will appear here when triggered."
                     )
                 } else {
                     listContent

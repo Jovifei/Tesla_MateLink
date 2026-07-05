@@ -47,9 +47,9 @@ struct DestinationsView: View {
 
                     // Destination List
                     if sorted.isEmpty {
-                        ContentUnavailableView("No Destinations",
+                        EmptyStateView("No Destinations",
                             systemImage: "mappin.slash",
-                            description: Text("Complete drives to build your destination history."))
+                            message: "Complete drives to build your destination history.")
                             .padding(.top, 60)
                     } else {
                         VStack(spacing: 0) {

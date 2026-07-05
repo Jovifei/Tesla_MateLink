@@ -59,9 +59,9 @@ struct VampireView: View {
                     }
 
                     if drains.isEmpty {
-                        ContentUnavailableView("No Drain Data",
+                        EmptyStateView("No Drain Data",
                             systemImage: "bolt.slash",
-                            description: Text("No parking periods with significant drain found."))
+                            message: "No parking periods with significant drain found.")
                             .padding(.top, 40)
                     }
                 }

@@ -30,7 +30,6 @@ import com.matelink.ui.screens.charges.ChargeDetailScreen
 import com.matelink.ui.screens.charges.ChargesScreen
 import com.matelink.ui.screens.charges.CurrentChargeScreen
 import com.matelink.ui.screens.dashboard.DashboardScreen
-import com.matelink.ui.screens.demo.PalettePreviewScreen
 import com.matelink.ui.screens.drives.DriveDetailScreen
 import com.matelink.ui.screens.drives.DrivesScreen
 import com.matelink.ui.screens.mileage.MileageScreen
@@ -78,9 +77,6 @@ sealed interface Screen {
 
     @Serializable
     data object Dashboard : Screen
-
-    @Serializable
-    data object PalettePreview : Screen
 
     /**
      * L1 "More" hub — fourth bottom-nav tab. Hosted by [com.matelink.ui.screens.more.MoreScreen].
@@ -276,9 +272,6 @@ fun NavGraph(
                         popUpTo<Screen.Settings> { inclusive = true }
                     }
                 },
-                onNavigateToPalettePreview = {
-                    navController.navigate(Screen.PalettePreview)
-                },
                 onNavigateToTariffConfig = {
                     navController.navigate(Screen.TariffConfig)
                 }
@@ -417,12 +410,6 @@ fun NavGraph(
             SoftwareVersionsScreen(
                 carId = route.carId,
                 exteriorColor = route.exteriorColor,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable<Screen.PalettePreview> {
-            PalettePreviewScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

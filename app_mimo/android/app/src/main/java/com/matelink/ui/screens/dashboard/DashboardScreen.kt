@@ -1,5 +1,6 @@
 package com.matelink.ui.screens.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -57,6 +58,9 @@ fun DashboardScreen(
         return
     }
 
+    val carId = car?.carId ?: 1
+    val exteriorColor = car?.carExterior?.exteriorColor
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,12 +75,12 @@ fun DashboardScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = car?.name ?: "My Tesla",
+                text = car?.displayName ?: "My Tesla",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                StateBadge(status.state)
+                StateBadge(status.state ?: "offline")
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(onClick = { viewModel.refresh() }) {
                     Icon(Icons.Default.Refresh, "Refresh")
@@ -85,25 +89,31 @@ fun DashboardScreen(
         }
 
         // Battery card
-        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onNavigateToBattery(carId, car?.carDetails?.efficiency, exteriorColor)
+                }
+        ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Battery", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    "${status?.batteryLevel ?: 0}%",
+                    "${status.batteryLevel ?: 0}%",
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text("${status?.usableBatteryRangeKm ?: 0} km range", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("${(status.ratedBatteryRangeKm ?: status.idealBatteryRangeKm ?: status.estBatteryRangeKm ?: 0.0).toInt()} km range", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(8.dp))
                 LinearProgressIndicator(
-                    progress = { (status?.batteryLevel ?: 0) / 100f },
+                    progress = { (status.batteryLevel ?: 0) / 100f },
                     modifier = Modifier.fillMaxWidth().height(8.dp),
                 )
-                if ((status?.chargeLimitSoc ?: 0) > 0) {
-                    Text("Limit: ${status?.chargeLimitSoc ?: 0}%", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if ((status.chargeLimitSoc ?: 0) > 0) {
+                    Text("Limit: ${status.chargeLimitSoc ?: 0}%", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                if ((status?.chargeLimitSoc ?: 0) > 90) {
+                if ((status.chargeLimitSoc ?: 0) > 90) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "⚠️ High charge level - consider reducing to 80-90% for daily use",
@@ -116,67 +126,96 @@ fun DashboardScreen(
 
         // Info cards row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("Odometer", "${String.format("%,.0f", status?.odometer ?: 0.0)} km", Modifier.weight(1f))
-            InfoCard("Location", "${String.format("%.4f", status?.latitude ?: 0.0)}, ${String.format("%.4f", status?.longitude ?: 0.0)}\nElevation: ${status?.elevation ?: 0}m", Modifier.weight(1f))
+            InfoCard(
+                title = "Odometer",
+                value = "${String.format("%,.0f", status.odometer ?: 0.0)} km",
+                modifier = Modifier.weight(1f),
+                onClick = { onNavigateToMileage(carId, exteriorColor) }
+            )
+            InfoCard(
+                title = "Location",
+                value = "${String.format("%.4f", status.latitude ?: 0.0)}, ${String.format("%.4f", status.longitude ?: 0.0)}\nElevation: ${status.elevation ?: 0}m",
+                modifier = Modifier.weight(1f),
+                onClick = { onNavigateToDrives(carId, exteriorColor) }
+            )
         }
 
         // Location Map
-        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val ts = status.stateSince
+                    if (!ts.isNullOrBlank()) {
+                        onNavigateToWhereWasI(carId, ts, exteriorColor)
+                    }
+                }
+        ) {
             AmapPointView(
                 modifier = Modifier.fillMaxWidth().height(200.dp),
-                latitude = status?.latitude ?: 0.0,
-                longitude = status?.longitude ?: 0.0,
-                title = car?.name ?: "Vehicle"
+                latitude = status.latitude ?: 0.0,
+                longitude = status.longitude ?: 0.0,
+                title = car?.displayName ?: "Vehicle"
             )
         }
 
         // Temperature + Status cards
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("Inside", "${status?.insideTemp ?: 0.0}°C", Modifier.weight(1f))
-            InfoCard("Outside", "${status?.outsideTemp ?: 0.0}°C", Modifier.weight(1f))
-            InfoCard("Lock", if (status?.locked == true) "🔒 Locked" else "🔓 Unlocked", Modifier.weight(1f))
-            InfoCard("Plug", if (status?.pluggedIn == true) "⚡ Plugged" else "Not Plugged", Modifier.weight(1f))
+            InfoCard("Inside", "${status.insideTemp ?: 0.0}°C", Modifier.weight(1f))
+            InfoCard("Outside", "${status.outsideTemp ?: 0.0}°C", Modifier.weight(1f))
+            InfoCard("Lock", if (status.locked == true) "🔒 Locked" else "🔓 Unlocked", Modifier.weight(1f))
+            InfoCard("Plug", if (status.pluggedIn == true) "⚡ Plugged" else "Not Plugged", Modifier.weight(1f))
         }
 
         // Status row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatusChip("🔒", if (status?.locked == true) "Locked" else "Unlocked", status?.locked == true)
-            StatusChip("⚡", if (status?.pluggedIn == true) "Plugged" else "Unplugged", status?.pluggedIn == true)
-            StatusChip("💨", if (status?.isClimateOn == true) "Climate ON" else "Climate OFF", status?.isClimateOn == true)
-            StatusChip("🛡️", if (status?.sentryMode == true) "Sentry" else "Sentry OFF", status?.sentryMode == true)
+            StatusChip("🔒", if (status.locked == true) "Locked" else "Unlocked", status.locked == true)
+            StatusChip("⚡", if (status.pluggedIn == true) "Plugged" else "Unplugged", status.pluggedIn == true)
+            StatusChip("💨", if (status.isClimateOn == true) "Climate ON" else "Climate OFF", status.isClimateOn == true)
+            StatusChip("🛡️", if (status.sentryMode == true) "Sentry" else "Sentry OFF", status.sentryMode == true)
         }
 
         // Tire pressure
         Text("Tire Pressure", style = MaterialTheme.typography.titleSmall)
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            InfoCard("FL", "${status?.tirePressureFrontLeft ?: 0.0} bar", Modifier.weight(1f))
-            InfoCard("FR", "${status?.tirePressureFrontRight ?: 0.0} bar", Modifier.weight(1f))
-            InfoCard("RL", "${status?.tirePressureRearLeft ?: 0.0} bar", Modifier.weight(1f))
-            InfoCard("RR", "${status?.tirePressureRearRight ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("FL", "${status.tpmsDetails?.pressureFl ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("FR", "${status.tpmsDetails?.pressureFr ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("RL", "${status.tpmsDetails?.pressureRl ?: 0.0} bar", Modifier.weight(1f))
+            InfoCard("RR", "${status.tpmsDetails?.pressureRr ?: 0.0} bar", Modifier.weight(1f))
         }
 
         // 7-Day Battery Trend
-        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onNavigateToStats(carId, exteriorColor)
+                }
+        ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("7-Day Battery Trend", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
-                BatteryTrendChart(currentBatteryLevel = status?.batteryLevel ?: 0)
+                BatteryTrendChart(currentBatteryLevel = status.batteryLevel ?: 0)
             }
         }
 
         // Charging card
-        if (status?.state == "charging") {
+        if (status.isCharging) {
             ElevatedCard(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onNavigateToCurrentCharge(carId, exteriorColor)
+                    },
                 colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("⚡ Charging", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Column { Text("Power"); Text("${status.chargerPower} kW", fontWeight = FontWeight.Bold) }
-                        Column { Text("Added"); Text("${status.chargeEnergyAdded} kWh", fontWeight = FontWeight.Bold) }
-                        Column { Text("Remaining"); Text("${status.timeToFullCharge}h", fontWeight = FontWeight.Bold) }
+                        Column { Text("Power"); Text("${status.chargerPower ?: 0} kW", fontWeight = FontWeight.Bold) }
+                        Column { Text("Added"); Text("${status.chargeEnergyAdded ?: 0.0} kWh", fontWeight = FontWeight.Bold) }
+                        Column { Text("Remaining"); Text("${status.timeToFullCharge ?: 0.0}h", fontWeight = FontWeight.Bold) }
                     }
                 }
             }
@@ -201,8 +240,17 @@ private fun StateBadge(state: String) {
 }
 
 @Composable
-private fun InfoCard(title: String, value: String, modifier: Modifier = Modifier) {
-    ElevatedCard(modifier = modifier) {
+private fun InfoCard(
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    ElevatedCard(
+        modifier = modifier.then(
+            if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
+        )
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)

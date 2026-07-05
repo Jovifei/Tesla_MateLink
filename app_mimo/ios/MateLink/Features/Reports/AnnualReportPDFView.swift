@@ -58,10 +58,10 @@ struct AnnualReportPDFView: View {
                 ProgressView("Loading report data...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if yearDrives.isEmpty && yearCharges.isEmpty {
-                ContentUnavailableView(
+                EmptyStateView(
                     "No Data for \(selectedYear)",
                     systemImage: "doc.richtext",
-                    description: Text("Drive and charge data is needed to generate a report.")
+                    message: "Drive and charge data is needed to generate a report."
                 )
             } else {
                 ScrollView {

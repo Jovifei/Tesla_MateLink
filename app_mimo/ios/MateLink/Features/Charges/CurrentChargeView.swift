@@ -24,10 +24,10 @@ struct CurrentChargeView: View {
                 } else if let s = status, s.state == .charging || s.pluggedIn {
                     content(for: s)
                 } else {
-                    ContentUnavailableView(
+                    EmptyStateView(
                         "Not Charging",
                         systemImage: "bolt.slash",
-                        description: Text("Live charge data appears here when the vehicle is charging or plugged in.")
+                        message: "Live charge data appears here when the vehicle is charging or plugged in."
                     )
                 }
             }

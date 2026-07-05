@@ -132,6 +132,7 @@ fun SettingsScreen(
                 onLanguageChange = viewModel::updateLanguage,
                 onCurrencyChange = viewModel::updateCurrency,
                 onShowShortDrivesChargesChange = viewModel::updateShowShortDrivesCharges,
+                onMockModeChange = viewModel::updateMockMode,
                 onTestConnection = viewModel::testConnection,
                 onSave = {
                     viewModel.saveSettings(onNavigateToDashboard)
@@ -217,6 +218,7 @@ private fun SettingsContent(
     onLanguageChange: (String) -> Unit = {},
     onCurrencyChange: (String) -> Unit,
     onShowShortDrivesChargesChange: (Boolean) -> Unit,
+    onMockModeChange: (Boolean) -> Unit = {},
     onTestConnection: () -> Unit,
     onSave: () -> Unit,
     onPalettePreview: () -> Unit = {},
@@ -670,9 +672,31 @@ private fun SettingsContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // TODO(parity): iOS SettingsView has a mock mode toggle (isMockMode) for development/testing.
-        //  Android has no equivalent toggle; mock mode is controlled only via build config.
-        //  Ref: app_mimo/ios/MateLink/Features/Settings/SettingsView.swift
+        // Mock mode toggle
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Mock Mode",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "Use mock data instead of live server",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = uiState.mockMode,
+                onCheckedChange = onMockModeChange
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // === Extra Settings (Collapsed by default) ===
         HorizontalDivider()

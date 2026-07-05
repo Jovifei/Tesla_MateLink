@@ -8,7 +8,7 @@ struct DriveListView: View {
         NavigationStack {
             Group {
                 if loading { ProgressView("Loading...").padding() }
-                else if drives.isEmpty { ContentUnavailableView("No Drives Yet", systemImage: "road.lanes", description: Text("Go for a drive!")).padding() }
+                else if drives.isEmpty { EmptyStateView("No Drives Yet", systemImage: "road.lanes", message: "Go for a drive!").padding() }
                 else {
                     List {
                         ForEach(groupedKeys(), id: \.self) { label in

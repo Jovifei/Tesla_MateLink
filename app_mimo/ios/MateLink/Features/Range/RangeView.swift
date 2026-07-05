@@ -10,7 +10,7 @@ struct RangeTrip: Identifiable {
     let temp: Double
 }
 
-struct RangePageView: View {
+struct RangeView: View {
     @EnvironmentObject var state: AppState
     @State private var trips: [RangeTrip] = []
 
@@ -73,9 +73,9 @@ struct RangePageView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
                     } else {
-                        ContentUnavailableView("No Trip Data",
+                        EmptyStateView("No Trip Data",
                             systemImage: "chart.xyaxis.line",
-                            description: Text("Complete at least one drive to see range comparison."))
+                            message: "Complete at least one drive to see range comparison.")
                             .padding(.top, 40)
                     }
                 }
