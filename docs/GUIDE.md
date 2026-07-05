@@ -10,7 +10,20 @@
 
 ## 各变体构建
 
-### Android（以 app_glm 为例）
+### Android（app_mimo）
+
+```bash
+cd app_mimo/android
+# Windows 需指定 Android Studio 自带的 JDK
+JAVA_HOME="D:/Program Files/Android/Android Studio/jbr" ./gradlew assembleDebug
+# 或直接在 Android Studio 中点击 ▶ Run
+```
+
+APK 输出: `app_mimo/android/app/build/outputs/apk/debug/app-debug.apk`
+
+> **注意**: 高德地图功能需要手动下载 SDK（见 TODO-mimo.md A-7）。
+
+### Android（app_glm）
 
 ```bash
 cd app_glm/android

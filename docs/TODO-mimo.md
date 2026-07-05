@@ -1,6 +1,6 @@
 # TODO-mimo — app_mimo 工程待完成与优化清单
 
-> 最后更新: 2026-06-30
+> 最后更新: 2026-07-06
 > 基于 opus 需求符合性审核结果整理
 > 审核覆盖范围：app_mimo/ 全部（iOS + Android + Web）
 
@@ -23,6 +23,15 @@
 | 11 | 多语言 ja/de/fr（Android + iOS，57 keys × 6 文件） | fc4ba90 |
 | 12 | Android Manifest 注册（BootReceiver/ChargingMonitorService/CarWidget） | b835bdf |
 | 13 | Gradle wrapper 补全 | 5aecd48 |
+| 14 | Android 编译修复：添加 NominatimApi/OpenMeteoApi 接口 | a6d029e |
+| 15 | Android 编译修复：添加 SyncRepository/GeocodeWorker | a6d029e |
+| 16 | Android 编译修复：添加 Currency 模型类 | a6d029e |
+| 17 | Android 编译修复：添加 Glance/Moshi-Kotlin 依赖 | a6d029e |
+| 18 | Android 编译修复：修复 MockDataProvider 参数名映射 | a6d029e |
+| 19 | Android 编译修复：添加 200+ 缺失字符串资源 | a6d029e |
+| 20 | Android 编译修复：添加 drawable/layout/mipmap 资源 | a6d029e |
+| 21 | Android 编译修复：修复 Compose API 兼容性问题 | a6d029e |
+| 22 | Android 编译修复：重命名字体文件为小写下划线格式 | a6d029e |
 
 ---
 
@@ -55,6 +64,11 @@
 | ~~A-4~~ | ~~Mock 模式数据层未实现~~ | ~~API~~ | ~~中~~ | ✅ 154c765 |
 | A-5 | 年度报告缺"常用路线"分析 | Reports | 中 | 需地理聚合 |
 | A-6 | 导出缺 Excel 格式（仅 CSV/JSON） | Reports | 中 | 需 Excel 库 |
+| A-7 | 高德地图 SDK 未接入（当前为 placeholder） | Map | 大 | 需从 lbs.amap.com 下载 AAR |
+
+> **注意**: Android 编译已通过 (2026-07-06)，但高德地图功能需要手动下载 SDK。
+> 下载地址: https://lbs.amap.com → 3D 地图 SDK + 定位 SDK
+> 下载后将 AAR 文件放入 `app_mimo/android/app/libs/` 并取消 `build.gradle.kts` 中的注释。
 
 ### Web
 
