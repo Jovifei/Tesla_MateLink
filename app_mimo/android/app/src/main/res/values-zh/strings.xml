@@ -102,4 +102,13 @@
     <string name="efficiency_total_distance">总里程</string>
     <string name="efficiency_by_speed_title">分速效率</string>
     <string name="efficiency_by_speed_subtitle">不同速度区间的能耗 (Wh/km)</string>
+
+    <!-- Range Analysis -->
+    <string name="range_analysis_title">续航分析</string>
+    <string name="range_accuracy_title">续航预测准确度</string>
+    <string name="range_trip_count">行程数</string>
+    <string name="range_total_distance">总里程</string>
+    <string name="range_trip_list_title">最近行程 (%d)</string>
+    <string name="range_estimated">预估</string>
+    <string name="range_actual">实际</string>
 </resources>

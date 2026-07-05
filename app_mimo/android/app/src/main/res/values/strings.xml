@@ -139,4 +139,13 @@
     <string name="cost_dc">DC Charging</string>
     <string name="cost_top_locations">Top Locations</string>
     <string name="cost_location_count">%d charges</string>
+
+    <!-- Range Analysis -->
+    <string name="range_analysis_title">Range Analysis</string>
+    <string name="range_accuracy_title">Range Prediction Accuracy</string>
+    <string name="range_trip_count">Trips</string>
+    <string name="range_total_distance">Total Distance</string>
+    <string name="range_trip_list_title">Recent Trips (%d)</string>
+    <string name="range_estimated">Estimated</string>
+    <string name="range_actual">Actual</string>
 </resources>

@@ -73,4 +73,13 @@
     <string name="loading">Wird geladen...</string>
     <string name="no_data">Keine Daten verfügbar</string>
     <string name="offline">Offline - zeige zwischengespeicherte Daten</string>
+
+    <!-- Range Analysis -->
+    <string name="range_analysis_title">Reichweitenanalyse</string>
+    <string name="range_accuracy_title">Reichweitenprognose Genauigkeit</string>
+    <string name="range_trip_count">Fahrten</string>
+    <string name="range_total_distance">Gesamtstrecke</string>
+    <string name="range_trip_list_title">Letzte Fahrten (%d)</string>
+    <string name="range_estimated">Geschätzt</string>
+    <string name="range_actual">Tatsächlich</string>
 </resources>
