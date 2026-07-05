@@ -37,9 +37,11 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val carId = settingsRepository.currentCarId.first()
-                val cars = apiClient.api.getCars().data.cars
+                val carsResponse = apiClient.api.getCars()
+                val cars = carsResponse.body()?.data?.cars ?: emptyList()
                 val car = cars.find { it.carId == carId } ?: cars.firstOrNull()
-                val status = apiClient.api.getCarStatus(carId).data
+                val statusResponse = apiClient.api.getCarStatus(carId)
+                val status = statusResponse.body()?.data?.status
 
                 _uiState.value = DashboardUiState(
                     isLoading = false,
@@ -61,7 +63,8 @@ class DashboardViewModel @Inject constructor(
                 delay(5000)
                 try {
                     val carId = settingsRepository.currentCarId.first()
-                    val status = apiClient.api.getCarStatus(carId).data
+                    val statusResponse = apiClient.api.getCarStatus(carId)
+                    val status = statusResponse.body()?.data?.status
                     _uiState.value = _uiState.value.copy(status = status, error = null)
                 } catch (e: Exception) {
                     // Silently fail on polling errors
