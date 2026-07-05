@@ -148,4 +148,25 @@
     <string name="range_trip_list_title">Recent Trips (%d)</string>
     <string name="range_estimated">Estimated</string>
     <string name="range_actual">Actual</string>
+
+    <!-- Vampire Drain (Standby Power Consumption) -->
+    <string name="vampire_title">Standby Power Drain</string>
+    <string name="vampire_total_drain_label">Total Idle Drain</string>
+    <string name="vampire_total_drain_subtitle">Sum of all detected idle drain periods</string>
+    <string name="vampire_avg_power">Avg Power</string>
+    <string name="vampire_idle_periods">Idle Periods</string>
+    <string name="vampire_daily_title">Daily Drain</string>
+    <string name="vampire_daily_subtitle">Battery % lost while parked (no driving)</string>
+    <string name="vampire_recent_title">Recent Idle Periods</string>
+    <string name="vampire_tips_title">Optimization Tips</string>
+    <string name="vampire_tip_sentry_title">Sentry Mode</string>
+    <string name="vampire_tip_sentry_desc">Sentry mode consumes 250-300W. Disable when parked in safe locations to reduce standby drain significantly.</string>
+    <string name="vampire_tip_cabin_overheat_title">Cabin Overheat Protection</string>
+    <string name="vampire_tip_cabin_overheat_desc">This feature runs the AC to keep cabin temperature below threshold. Set to 'Off' or 'No A/C' in hot weather if not needed.</string>
+    <string name="vampire_tip_climate_title">Remote Climate</string>
+    <string name="vampire_tip_climate_desc">Preconditioning draws ~3-5 kW. Avoid repeated remote climate activations when the car is parked for extended periods.</string>
+    <string name="vampire_tip_updates_title">Software Updates</string>
+    <string name="vampire_tip_updates_desc">OTA updates and periodic check-ins cause brief wake-ups. Schedule updates during periods when the car will be plugged in.</string>
+    <string name="vampire_how_title">How This Works</string>
+    <string name="vampire_how_desc">Vampire drain is calculated by analyzing gaps between charge sessions. When the battery level drops without any recorded drive in between, the energy loss is attributed to standby power consumption. The estimated average power draw assumes a 75 kWh battery capacity.</string>
 </resources>
