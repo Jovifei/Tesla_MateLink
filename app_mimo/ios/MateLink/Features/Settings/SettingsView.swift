@@ -8,6 +8,9 @@ struct SettingsView: View {
     var body: some View {
         List {
             Section(L10n.string("connection")) {
+                NavigationLink("Add Instance") {
+                    AddInstanceView()
+                }
                 TextField(L10n.string("server_url"), text: $state.serverURL)
                 SecureField(L10n.string("api_token"), text: $state.apiToken)
                 Button {
