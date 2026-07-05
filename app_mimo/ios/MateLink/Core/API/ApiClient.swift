@@ -1,7 +1,7 @@
 import Foundation
 
 enum ApiError: LocalizedError {
-    case networkUnreachable(String), unauthorized, serverError(Int, String), timeout, decodingError(String)
+    case networkUnreachable(String), unauthorized, serverError(Int, String), timeout, decodingError(String), invalidResponse
     var errorDescription: String? {
         switch self {
         case .networkUnreachable(let msg): return "Cannot reach server: \(msg)"
@@ -9,18 +9,10 @@ enum ApiError: LocalizedError {
         case .serverError(let code, let body): return "Server error \(code): \(body)"
         case .timeout: return "Connection timeout"
         case .decodingError(let msg): return "Data error: \(msg)"
+        case .invalidResponse: return "Invalid or empty response from server"
         }
     }
 }
-
-// TODO(D6): iOS is missing 7 endpoints that Android has:
-//   - GET /api/v1/cars/{carId}                (single car detail)
-//   - GET /api/v1/cars/{carId}/charges/{chargeId}  (charge detail)
-//   - GET /api/v1/cars/{carId}/charges/current     (current charge)
-//   - GET /api/v1/cars/{carId}/drives/{driveId}    (drive detail)
-//   - GET /api/v1/cars/{carId}/battery-health      (battery health)
-//   - GET /api/v1/cars/{carId}/updates             (firmware updates)
-//   - GET /api/v1/globalsettings                   (global settings)
 
 actor TeslaMateAPI {
     private let baseURL: String; private let token: String?
@@ -29,6 +21,9 @@ actor TeslaMateAPI {
     init(baseURL: String, token: String?) {
         self.baseURL = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
         self.token = token
+        if let error = UrlSecurity.validate(baseURL, token: token) {
+            print("[UrlSecurity] \(error)")
+        }
         let config = URLSessionConfiguration.default; config.timeoutIntervalForRequest = 10
         self.session = URLSession(configuration: config)
     }
@@ -60,6 +55,51 @@ actor TeslaMateAPI {
         } catch let e as ApiError { throw e }
         catch let e as URLError where e.code == .timedOut { throw ApiError.timeout }
         catch { throw ApiError.networkUnreachable(error.localizedDescription) }
+    }
+
+    // MARK: - Single-resource endpoints
+
+    func getCar(_ carId: Int) async throws -> Car {
+        let resp: CarApiResponse = try await fetch("/api/v1/cars")
+        guard let car = resp.data.cars.first(where: { $0.carId == carId }) ?? resp.data.cars.first else {
+            throw ApiError.invalidResponse
+        }
+        return Car(from: car)
+    }
+
+    func getCurrentCharge(_ carId: Int) async throws -> Charge? {
+        return try? await fetch("/api/v1/cars/\(carId)/charges/current")
+    }
+
+    func getChargeDetail(_ carId: Int, chargeId: Int) async throws -> Charge {
+        return try await fetch("/api/v1/cars/\(carId)/charges/\(chargeId)")
+    }
+
+    func getDriveDetail(_ carId: Int, driveId: Int) async throws -> Drive {
+        return try await fetch("/api/v1/cars/\(carId)/drives/\(driveId)")
+    }
+
+    func getBatteryHealth(_ carId: Int) async throws -> BatteryHealth {
+        return try await fetch("/api/v1/cars/\(carId)/battery")
+    }
+
+    func getUpdates(_ carId: Int) async throws -> [UpdateItem] {
+        return try await fetch("/api/v1/cars/\(carId)/updates")
+    }
+
+    func getGlobalSettings() async throws -> GlobalSettings {
+        return try await fetch("/api/v1/settings")
+    }
+}
+
+struct GlobalSettings: Codable {
+    let unitOfLength: String?
+    let unitOfPressure: String?
+    let unitOfTemperature: String?
+    enum CodingKeys: String, CodingKey {
+        case unitOfLength = "unit_of_length"
+        case unitOfPressure = "unit_of_pressure"
+        case unitOfTemperature = "unit_of_temperature"
     }
 }
 
