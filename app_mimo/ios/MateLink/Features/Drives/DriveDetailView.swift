@@ -128,7 +128,7 @@ struct DriveDetailView: View {
         let avgSpeed: Int = drive.durationMin > 0
             ? Int((drive.distanceKm / Double(drive.durationMin)) * 60)
             : 0
-        let maxSpeed: Int = Int(Double(avgSpeed) * 1.5)
+        let maxSpeed: Int = Int(drive.speedMax)
 
         let stats: [(label: String, value: String, icon: String, color: Color)] = [
             ("Distance", String(format: "%.1f km", drive.distanceKm), "road.lanes", .blue),

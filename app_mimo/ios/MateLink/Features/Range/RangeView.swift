@@ -25,10 +25,13 @@ struct RangePageView: View {
     }
 
     var accuracy: Double {
-        let totalDiff = trips.map { abs($0.diff) }.reduce(0, +)
-        let totalRange = trips.map { abs(Double($0.estimated - $0.actual)) }.reduce(0, +)
-        guard totalRange > 0 else { return 100 }
-        return (1 - totalDiff / totalRange) * 100
+        let validTrips = trips.filter { $0.estimated > 0 }
+        guard !validTrips.isEmpty else { return 100 }
+        let accuracies = validTrips.map { trip -> Double in
+            let error = abs(Double(trip.actual) - Double(trip.estimated)) / Double(trip.estimated)
+            return (1 - error) * 100
+        }
+        return accuracies.reduce(0, +) / Double(accuracies.count)
     }
 
     var body: some View {

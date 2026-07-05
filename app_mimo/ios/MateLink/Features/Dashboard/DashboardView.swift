@@ -5,7 +5,7 @@ struct DashboardView: View {
     @State private var status: CarStatus?
     @State private var showCarSwitcher = false
     @State private var isRefreshing = false
-    let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
+    @State private var refreshTimer: Timer?
 
     var body: some View {
         NavigationStack {
@@ -95,7 +95,15 @@ struct DashboardView: View {
             }
             .navigationBarHidden(true)
             .refreshable { await refresh() }
-            .onReceive(timer) { _ in Task { await refresh() } }
+            .onAppear {
+                refreshTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
+                    Task { await refresh() }
+                }
+            }
+            .onDisappear {
+                refreshTimer?.invalidate()
+                refreshTimer = nil
+            }
             .task { await refresh() }
             .sheet(isPresented: $showCarSwitcher) { CarSwitcherView() }
         }
@@ -113,7 +121,7 @@ struct DashboardView: View {
         // Write widget data to AppGroup UserDefaults
         if let s = status, let defaults = UserDefaults(suiteName: "group.com.matelink") {
             defaults.set(Int(s.batteryLevel), forKey: "widget_battery")
-            defaults.set(s.usableBatteryRangeKm, forKey: "widget_range")
+            defaults.set(Int(s.usableBatteryRangeKm), forKey: "widget_range")
             defaults.set(s.state.rawValue, forKey: "widget_state")
         }
     }
@@ -188,13 +196,20 @@ struct CarImageView: View { // F‑004
     }
 }
 
+// MARK: - Demo Data (hardcoded battery trend for UI preview)
 struct BatteryTrendCard: View {
-    let data: [Int] = [75, 72, 68, 70, 73, 76, 78]
+    let data: [Int] = [75, 72, 68, 70, 73, 76, 78] // Demo data — not live
     let labels: [String] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("7-Day Battery Trend").font(.caption).foregroundColor(.secondary)
+            HStack {
+                Text("7-Day Battery Trend").font(.caption).foregroundColor(.secondary)
+                Spacer()
+                Text("Demo").font(.system(size: 8, weight: .semibold)).foregroundColor(.orange)
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(Color.orange.opacity(0.1)).clipShape(Capsule())
+            }
             HStack(alignment: .bottom, spacing: 8) {
                 ForEach(Array(data.enumerated()), id: \.offset) { index, value in
                     VStack(spacing: 4) {
