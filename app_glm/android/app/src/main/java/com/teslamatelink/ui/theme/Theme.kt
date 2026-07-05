@@ -14,9 +14,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.teslamatelink.R
 
 /**
  * Legacy accent palette -- kept for backward compatibility.
@@ -52,16 +54,12 @@ val LocalCarAccent = staticCompositionLocalOf {
 // ── Stitch typography tokens ──────────────────────────────────────────────────
 // Inter is the default sans family on Android; we reference it via the system
 // default FontFamily so we don't need to bundle Inter ourselves (it ships with
-// the OS / Google Sans stack). JetBrains Mono is loaded from R.font.* once
-// Task 3 lands the font files.
+// the OS / Google Sans stack). JetBrains Mono is loaded from R.font.*.
 
-// Fallback until Task 3 adds font files
-val JetBrainsMonoFamily: FontFamily = FontFamily.Monospace
-// TODO: Task 3 - replace with:
-// val JetBrainsMonoFamily = FontFamily(
-//     Font(R.font.jetbrains_mono_regular, FontWeight.Normal),
-//     Font(R.font.jetbrains_mono_medium, FontWeight.Medium)
-// )
+val JetBrainsMonoFamily = FontFamily(
+    Font(R.font.jetbrains_mono_regular, FontWeight.Normal),
+    Font(R.font.jetbrains_mono_medium, FontWeight.Medium)
+)
 
 private val InterFamily: FontFamily = FontFamily.Default
 
