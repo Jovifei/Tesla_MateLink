@@ -29,7 +29,7 @@ struct RangePageView: View {
         guard !validTrips.isEmpty else { return 100 }
         let accuracies = validTrips.map { trip -> Double in
             let error = abs(Double(trip.actual) - Double(trip.estimated)) / Double(trip.estimated)
-            return (1 - error) * 100
+            return max(0, (1 - error) * 100)
         }
         return accuracies.reduce(0, +) / Double(accuracies.count)
     }
@@ -40,14 +40,14 @@ struct RangePageView: View {
                 VStack(spacing: 16) {
                     // Header
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Projected Range").font(.title2).bold()
-                        Text("Estimated vs actual battery consumption per trip")
+                        Text("Range Accuracy").font(.title2).bold()
+                        Text("Rated range vs actual distance per trip")
                             .font(.caption).foregroundColor(.secondary)
                     }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal)
 
                     // Summary Cards
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
-                        MiniStatCard(title: "Avg Diff", value: "\(avgDiff.formatted(.number.precision(.fractionLength(1))))%")
+                        MiniStatCard(title: "Avg Diff", value: "\(avgDiff.formatted(.number.precision(.fractionLength(1)))) km")
                         MiniStatCard(title: "Trips", value: "\(trips.count)")
                         MiniStatCard(title: "Avg Temp", value: "\(Int(avgTemp))\u{00B0}C")
                         MiniStatCard(title: "Accuracy", value: "\(Int(accuracy))%")
@@ -59,12 +59,12 @@ struct RangePageView: View {
                             Text("Est vs Actual per Trip")
                                 .font(.subheadline.weight(.medium)).foregroundColor(.secondary)
                             Chart(trips) { t in
-                                LineMark(x: .value("Date", t.date), y: .value("Battery %", t.estimated))
+                                LineMark(x: .value("Date", t.date), y: .value("Rated (km)", t.estimated))
                                     .foregroundStyle(.blue).lineStyle(StrokeStyle(lineWidth: 2))
-                                LineMark(x: .value("Date", t.date), y: .value("Battery %", t.actual))
+                                LineMark(x: .value("Date", t.date), y: .value("Actual (km)", t.actual))
                                     .foregroundStyle(.green).lineStyle(StrokeStyle(lineWidth: 2))
                             }
-                            .chartForegroundStyleScale(["Est %": .blue, "Actual %": .green])
+                            .chartForegroundStyleScale(["Est km": .blue, "Actual km": .green])
                             .frame(height: 280)
                             .padding(.top, 4)
                         }
@@ -96,12 +96,13 @@ struct RangePageView: View {
             return []
         }().filter { $0.distanceKm > 5 }.suffix(30)
         trips = drives.map { d in
-            let diff = Double(d.startBatteryLevel - d.endBatteryLevel)
+            let estimated = Int(d.startIdealRangeKm - d.endIdealRangeKm)  // rated range consumed
+            let actual = Int(d.distanceKm)                                  // actual distance driven
             return RangeTrip(
                 date: String(d.startDate.prefix(10)),
-                estimated: d.startBatteryLevel,
-                actual: d.endBatteryLevel,
-                diff: diff,
+                estimated: estimated,
+                actual: actual,
+                diff: d.outsideTempAvg,
                 temp: d.outsideTempAvg
             )
         }
