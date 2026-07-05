@@ -42,7 +42,7 @@ class ApiClient @Inject constructor(
                 .distinctUntilChanged()
                 .collect { url ->
                     cachedBaseUrl = url
-                    cachedApi = null // Force recreate
+                    synchronized(this@ApiClient) { cachedApi = null } // Force recreate
                     _isConfigured.value = url.isNotBlank()
                 }
         }
@@ -57,11 +57,11 @@ class ApiClient @Inject constructor(
     }
 
     val api: TeslamateApi
-        get() {
+        get() = synchronized(this) {
             if (cachedApi == null) {
                 cachedApi = createApi(cachedBaseUrl)
             }
-            return cachedApi!!
+            cachedApi!!
         }
 
     private fun createApi(baseUrl: String): TeslamateApi {

@@ -59,7 +59,7 @@ fun CostScreen(
     ) { padding ->
         if (uiState.loading) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
