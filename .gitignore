@@ -62,6 +62,7 @@ GoogleService-Info.plist
 .DS_Store
 ehthumbs.db
 desktop.ini
+nul
 
 # ===== Logs / temp =====
 *.log
