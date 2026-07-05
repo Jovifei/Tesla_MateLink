@@ -43,6 +43,18 @@
     <string name="charge_added">Added</string>
     <string name="charge_remaining">Remaining</string>
 
+    <!-- Timeline -->
+    <string name="timeline_title">时间线</string>
+    <string name="timeline_empty">暂无事件</string>
+    <string name="timeline_drive">行驶</string>
+    <string name="timeline_charge">充电</string>
+    <string name="timeline_distance_value">%.1f km</string>
+    <string name="timeline_battery_end">%d%%</string>
+    <string name="timeline_energy_added">%.1f kWh</string>
+    <string name="timeline_cost_value">¥%.2f</string>
+    <string name="timeline_unknown_route">未知路线</string>
+    <string name="timeline_unknown_location">未知地点</string>
+
     <!-- Drives -->
     <string name="drives_title">Drive History</string>
     <string name="drive_detail">Drive Detail</string>
