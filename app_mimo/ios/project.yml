@@ -22,6 +22,10 @@ targets:
       - path: MateLink/Features
     resources:
       - path: MateLink/Resources
+        includes:
+          - "**/*.json"
+          - "**/*.strings"
+          - "**/*.ttf"
     info:
       path: MateLink/Info.plist
     settings:

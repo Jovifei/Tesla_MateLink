@@ -1,5 +1,29 @@
 import SwiftUI
 
+// MARK: - Font Helpers
+
+struct StitchFont {
+    static func inter(_ weight: Font.Weight = .regular, size: CGFloat) -> Font {
+        let name: String
+        switch weight {
+        case .medium: name = "Inter-Medium"
+        case .semibold: name = "Inter-SemiBold"
+        case .bold: name = "Inter-Bold"
+        default: name = "Inter-Regular"
+        }
+        return .custom(name, size: size)
+    }
+
+    static func jetBrainsMono(_ weight: Font.Weight = .regular, size: CGFloat) -> Font {
+        let name: String
+        switch weight {
+        case .medium: name = "JetBrainsMono-Medium"
+        default: name = "JetBrainsMono-Regular"
+        }
+        return .custom(name, size: size)
+    }
+}
+
 struct StitchColors {
     static let primary = Color(red: 0x17/255, green: 0x17/255, blue: 0x17/255)      // #171717
     static let accent = Color(red: 0xA1/255, green: 0x62/255, blue: 0x07/255)       // #A16207

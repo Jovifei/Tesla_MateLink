@@ -150,7 +150,7 @@ struct StatCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title).font(.caption).foregroundColor(.secondary)
-            Text(value).font(.largeTitle).bold().foregroundColor(.primary)
+            Text(value).font(.largeTitle).bold().foregroundColor(.primary).monospacedDigit()
             Text(subtitle).font(.caption2).foregroundColor(.secondary)
         }.frame(maxWidth: .infinity, alignment: .leading).padding().background(StitchColors.surface).stitchCard()
     }
@@ -162,7 +162,7 @@ struct MiniCard: View {
         VStack(spacing: 6) {
             Image(systemName: icon).font(.title3).foregroundColor(active ? StitchColors.online : .secondary)
             Text(label).font(.caption2).foregroundColor(.secondary)
-            Text(value).font(.caption).bold()
+            Text(value).font(.caption).bold().monospacedDigit()
         }.frame(maxWidth: .infinity).padding(.vertical, 12).background(StitchColors.surface).stitchCard()
             .overlay(active ? RoundedRectangle(cornerRadius: 8).stroke(StitchColors.online.opacity(0.4), lineWidth: 1) : nil)
     }
@@ -174,11 +174,11 @@ struct ChargingCard: View {
         VStack(spacing: 10) {
             Label("Charging in Progress", systemImage: "bolt.fill").font(.headline).foregroundColor(StitchColors.warning)
             HStack {
-                VStack { Text("Power").font(.caption2).foregroundColor(.secondary); Text("\(String(format:"%.1f",status.chargerPower)) kW").font(.title3).bold() }
+                VStack { Text("Power").font(.caption2).foregroundColor(.secondary); Text("\(String(format:"%.1f",status.chargerPower)) kW").font(.title3).bold().monospacedDigit() }
                 Spacer()
-                VStack { Text("Added").font(.caption2).foregroundColor(.secondary); Text("\(String(format:"%.1f",status.chargeEnergyAdded)) kWh").font(.title3).bold() }
+                VStack { Text("Added").font(.caption2).foregroundColor(.secondary); Text("\(String(format:"%.1f",status.chargeEnergyAdded)) kWh").font(.title3).bold().monospacedDigit() }
                 Spacer()
-                VStack { Text("Remaining").font(.caption2).foregroundColor(.secondary); Text("\(Int(status.timeToFullCharge*60)) min").font(.title3).bold() }
+                VStack { Text("Remaining").font(.caption2).foregroundColor(.secondary); Text("\(Int(status.timeToFullCharge*60)) min").font(.title3).bold().monospacedDigit() }
             }
         }.padding().background(StitchColors.warning.opacity(0.1)).stitchCard()
     }
