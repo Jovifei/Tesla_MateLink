@@ -10,64 +10,136 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
-                    // Header
-                    HStack {
-                        Button(action: { showCarSwitcher.toggle() }) {
-                            HStack(spacing: 6) {
-                                Text(state.currentCar?.name ?? "Tesla")
-                                    .font(.title2).bold().foregroundColor(.primary)
-                                Image(systemName: "chevron.down").font(.caption).foregroundColor(.secondary)
+                VStack(spacing: 24) {
+                    // ── Header ─────────────────────────────────────────
+                    headerBar
+
+                    if let s = status {
+                        // ── Battery Card ───────────────────────────────────
+                        StitchCard {
+                            StitchLabel("BATTERY")
+                            HStack(alignment: .bottom) {
+                                Text("\(s.batteryLevel)%")
+                                    .font(StitchFont.dataLg())
+                                    .foregroundColor(StitchColors.onSurface)
+                                Spacer()
+                                Text("\(s.estBatteryRangeKm) km")
+                                    .font(StitchFont.dataMd())
+                                    .foregroundColor(StitchColors.onSurfaceVariant)
+                            }
+                            Spacer(minLength: 12)
+                            // Progress bar
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    Capsule()
+                                        .fill(StitchColors.border)
+                                        .frame(height: 4)
+                                    Capsule()
+                                        .fill(StitchColors.onSurface)
+                                        .frame(width: geo.size.width * CGFloat(s.batteryLevel) / 100, height: 4)
+                                }
+                            }
+                            .frame(height: 4)
+                            Spacer(minLength: 8)
+                            HStack {
+                                Text("Limit: \(s.chargeLimitSoc)%")
+                                    .font(StitchFont.labelCaps())
+                                    .foregroundColor(StitchColors.onSurfaceVariant)
+                                Spacer()
+                                Text("\(s.odometer) km")
+                                    .font(StitchFont.labelCaps())
+                                    .foregroundColor(StitchColors.onSurfaceVariant)
                             }
                         }
-                        Spacer()
-                        if let s = status {
-                            Text(StateColor.label(s.state)).font(.caption).fontWeight(.medium)
-                                .padding(.horizontal, 10).padding(.vertical, 4)
-                                .background(StateColor.forState(s.state)).foregroundColor(.white).clipShape(Capsule())
-                        }
-                    }.padding(.horizontal)
 
-                    // Car image (F‑004)
-                    CarImageView(color: state.carAccent, model: state.currentCar?.model ?? "")
-
-                    // Location map (TG-05)
-                    locationMapCard
-
-                    // Battery + Range
-                    if let s = status {
-                        HStack(spacing: 12) {
-                            StatCard(title: "Battery", value: "\(Int(s.batteryLevel))%", subtitle: "\(s.estBatteryRangeKm) km range", color: .blue)
-                            StatCard(title: "Odometer", value: "\(s.odometer.formatted()) km", subtitle: "Total mileage", color: .secondary)
-                        }.padding(.horizontal)
-
-                        // Charging card
+                        // ── Charging Card (conditional) ────────────────────
                         if s.state == .charging {
-                            ChargingCard(status: s).padding(.horizontal)
+                            StitchCard {
+                                StitchLabel("CHARGING", color: StitchColors.statusCharging)
+                                Spacer(minLength: 12)
+                                HStack {
+                                    StitchDataColumn(label: "Power", value: "\(Int(s.chargerPower)) kW")
+                                    Spacer()
+                                    StitchDataColumn(label: "Added", value: String(format: "%.1f kWh", s.chargeEnergyAdded), alignment: .center)
+                                    Spacer()
+                                    StitchDataColumn(label: "Remaining", value: String(format: "%.1fh", s.timeToFullCharge), alignment: .trailing)
+                                }
+                            }
                         }
 
-                        // Climate + Sentry + Lock
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
-                            MiniCard(icon: "thermometer.medium", label: "Inside", value: "\(Int(s.insideTemp))°C")
-                            MiniCard(icon: "sun.max", label: "Outside", value: "\(Int(s.outsideTemp))°C")
-                            MiniCard(icon: "fanblades", label: "Climate", value: s.isClimateOn ? "ON" : "OFF", active: s.isClimateOn)
-                            MiniCard(icon: "shield.checkered", label: "Sentry", value: s.sentryMode ? "ARMED" : "OFF", active: s.sentryMode)
-                        }.padding(.horizontal)
+                        // ── Climate Card ───────────────────────────────────
+                        StitchCard {
+                            StitchLabel("CLIMATE")
+                            Spacer(minLength: 12)
+                            HStack {
+                                StitchDataColumn(label: "Inside", value: String(format: "%.1f°C", s.insideTemp))
+                                Spacer()
+                                StitchDataColumn(label: "Outside", value: String(format: "%.1f°C", s.outsideTemp), alignment: .center)
+                                Spacer()
+                                StitchDataColumn(label: "Climate", value: s.isClimateOn ? "ON" : "OFF", alignment: .trailing)
+                            }
+                        }
 
-                        // Tire pressure
+                        // ── Status Card ────────────────────────────────────
+                        StitchCard {
+                            StitchLabel("STATUS")
+                            Spacer(minLength: 12)
+                            StitchDataRow(label: "LOCK", value: s.locked ? "Locked" : "Unlocked")
+                            Spacer(minLength: 12)
+                            StitchDataRow(label: "SENTRY", value: s.sentryMode ? "Active" : "Off")
+                            Spacer(minLength: 12)
+                            StitchDataRow(label: "PLUG", value: s.chargePortDoorOpen ? "Connected" : "Disconnected")
+                        }
+
+                        // ── Tire Pressure Card ─────────────────────────────
                         if let t = s.tirePressure {
-                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
-                                MiniCard(icon: "circle.circle", label: "FL", value: "\(String(format:"%.1f",t.frontLeft)) bar")
-                                MiniCard(icon: "circle.circle", label: "FR", value: "\(String(format:"%.1f",t.frontRight)) bar")
-                                MiniCard(icon: "circle.circle", label: "RL", value: "\(String(format:"%.1f",t.rearLeft)) bar")
-                                MiniCard(icon: "circle.circle", label: "RR", value: "\(String(format:"%.1f",t.rearRight)) bar")
-                            }.padding(.horizontal)
+                            StitchCard {
+                                StitchLabel("TIRE PRESSURE")
+                                Spacer(minLength: 12)
+                                HStack {
+                                    StitchDataColumn(label: "FL", value: String(format: "%.1f", t.frontLeft))
+                                    Spacer()
+                                    StitchDataColumn(label: "FR", value: String(format: "%.1f", t.frontRight), alignment: .center)
+                                    Spacer()
+                                    StitchDataColumn(label: "RL", value: String(format: "%.1f", t.rearLeft), alignment: .center)
+                                    Spacer()
+                                    StitchDataColumn(label: "RR", value: String(format: "%.1f", t.rearRight), alignment: .trailing)
+                                }
+                            }
+                        }
+
+                        // ── Location Map Card ──────────────────────────────
+                        locationMapCard
+
+                        // ── Quick Access Card ──────────────────────────────
+                        StitchCard {
+                            StitchLabel("QUICK ACCESS")
+                            Spacer(minLength: 16)
+                            StitchDataRow(label: "DRIVES", value: "→")
+                            Spacer(minLength: 12)
+                            StitchDataRow(label: "CHARGES", value: "→")
+                            Spacer(minLength: 12)
+                            StitchDataRow(label: "BATTERY", value: "→")
                         }
                     } else {
-                        ProgressView("Loading...").padding(40)
+                        // Loading state
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .tint(StitchColors.onSurface)
+                            Text("Loading...")
+                                .font(StitchFont.bodySm())
+                                .foregroundColor(StitchColors.onSurfaceVariant)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(60)
                     }
-                }.padding(.vertical)
+
+                    // Bottom spacing
+                    Spacer(minLength: 24)
+                }
+                .padding(.horizontal, 24)
             }
+            .background(StitchColors.background)
             .navigationBarHidden(true)
             .refreshable { await refresh() }
             .onReceive(timer) { _ in Task { await refresh() } }
@@ -75,6 +147,58 @@ struct DashboardView: View {
             .sheet(isPresented: $showCarSwitcher) { CarSwitcherView() }
         }
     }
+
+    // MARK: - Header Bar
+
+    private var headerBar: some View {
+        HStack(alignment: .center) {
+            Button(action: { showCarSwitcher.toggle() }) {
+                HStack(spacing: 4) {
+                    Text(state.currentCar?.name ?? "Tesla")
+                        .font(StitchFont.headlineMd())
+                        .foregroundColor(StitchColors.onSurface)
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(StitchColors.onSurfaceVariant)
+                }
+            }
+            Spacer()
+            if let s = status {
+                StitchStatusChip(
+                    text: StateColor.label(s.state).uppercased(),
+                    isOnline: s.state == .online,
+                    isCharging: s.state == .charging
+                )
+            }
+            Button(action: { /* settings navigation handled by tab */ }) {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 20))
+                    .foregroundColor(StitchColors.onSurface)
+            }
+        }
+        .padding(.top, 8)
+    }
+
+    // MARK: - Location Map Card
+
+    private var locationMapCard: some View {
+        StitchCard {
+            StitchLabel("LOCATION")
+            Spacer(minLength: 12)
+            if let s = status {
+                AmapView(latitude: s.latitude, longitude: s.longitude, title: "Current Location")
+                    .frame(height: 150)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else {
+                Text("Loading map...")
+                    .font(StitchFont.bodySm())
+                    .foregroundColor(StitchColors.onSurfaceVariant)
+                    .frame(maxWidth: .infinity, minHeight: 150)
+            }
+        }
+    }
+
+    // MARK: - Refresh
 
     func refresh() async {
         guard !isRefreshing else { return }
@@ -96,7 +220,6 @@ struct DashboardView: View {
 
     private func writeWidgetData() {
         guard let s = status, let defaults = UserDefaults(suiteName: "group.com.teslamatelink") else { return }
-        // Car image as base64 JPEG
         let renderer = ImageRenderer(content: CarImageView(color: state.carAccent, model: state.currentCar?.model ?? ""))
         if let uiImage = renderer.uiImage, let jpegData = uiImage.jpegData(compressionQuality: 0.5) {
             defaults.set(jpegData.base64EncodedString(), forKey: "carImageData")
@@ -114,76 +237,129 @@ struct DashboardView: View {
         defaults.set(s.chargePhases, forKey: "widget_chargePhases")
         defaults.set(s.chargeLimitSoc, forKey: "widget_chargeLimitSoc")
     }
+}
 
-    // MARK: - Location Map Card (TG-05)
-    private var locationMapCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("📍 Location").font(.caption).foregroundColor(.secondary)
-            if let s = status {
-                AmapView(latitude: s.latitude, longitude: s.longitude, title: "Current Location")
-                    .frame(height: 150)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            } else {
-                Text("Loading map...").font(.caption).foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 150)
-            }
+// MARK: - Stitch Card
+
+private struct StitchCard<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            content
         }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(24)
+        .background(StitchColors.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(StitchColors.border, lineWidth: 1)
+        )
     }
 }
 
-struct StatCard: View {
-    let title: String; let value: String; let subtitle: String; let color: Color
+// MARK: - Stitch Label (section header)
+
+private struct StitchLabel: View {
+    let text: String
+    let color: Color
+
+    init(_ text: String, color: Color = StitchColors.onSurfaceVariant) {
+        self.text = text
+        self.color = color
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.caption).foregroundColor(.secondary)
-            Text(value).font(.largeTitle).bold().foregroundColor(.primary)
-            Text(subtitle).font(.caption2).foregroundColor(.secondary)
-        }.frame(maxWidth: .infinity, alignment: .leading).padding().background(.regularMaterial).clipShape(RoundedRectangle(cornerRadius: 16))
+        Text(text)
+            .font(StitchFont.labelCaps())
+            .foregroundColor(color)
     }
 }
 
-struct MiniCard: View {
-    let icon: String; let label: String; let value: String; var active: Bool = false
+// MARK: - Stitch Data Column
+
+private struct StitchDataColumn: View {
+    let label: String
+    let value: String
+    var alignment: HorizontalAlignment = .leading
+
     var body: some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon).font(.title3).foregroundColor(active ? .green : .secondary)
-            Text(label).font(.caption2).foregroundColor(.secondary)
-            Text(value).font(.caption).bold()
-        }.frame(maxWidth: .infinity).padding(.vertical, 12).background(.regularMaterial).clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(active ? RoundedRectangle(cornerRadius: 12).stroke(Color.green.opacity(0.4), lineWidth: 1) : nil)
+        VStack(alignment: alignment, spacing: 4) {
+            Text(label)
+                .font(StitchFont.labelCaps())
+                .foregroundColor(StitchColors.onSurfaceVariant)
+            Text(value)
+                .font(StitchFont.dataMd())
+                .foregroundColor(StitchColors.onSurface)
+        }
     }
 }
 
-struct ChargingCard: View {
-    let status: CarStatus
+// MARK: - Stitch Data Row
+
+private struct StitchDataRow: View {
+    let label: String
+    let value: String
+
     var body: some View {
-        VStack(spacing: 10) {
-            Label("Charging in Progress", systemImage: "bolt.fill").font(.headline).foregroundColor(.orange)
-            HStack {
-                VStack { Text("Power").font(.caption2).foregroundColor(.secondary); Text("\(String(format:"%.1f",status.chargerPower)) kW").font(.title3).bold() }
-                Spacer()
-                VStack { Text("Added").font(.caption2).foregroundColor(.secondary); Text("\(String(format:"%.1f",status.chargeEnergyAdded)) kWh").font(.title3).bold() }
-                Spacer()
-                VStack { Text("Remaining").font(.caption2).foregroundColor(.secondary); Text("\(Int(status.timeToFullCharge*60)) min").font(.title3).bold() }
-            }
-        }.padding().background(.orange.opacity(0.1)).clipShape(RoundedRectangle(cornerRadius: 16))
+        HStack {
+            Text(label)
+                .font(StitchFont.labelCaps())
+                .foregroundColor(StitchColors.onSurfaceVariant)
+            Spacer()
+            Text(value)
+                .font(StitchFont.bodyLg())
+                .foregroundColor(StitchColors.onSurface)
+        }
     }
 }
 
-struct CarImageView: View { // F‑004
+// MARK: - Stitch Status Chip
+
+private struct StitchStatusChip: View {
+    let text: String
+    var isOnline: Bool = false
+    var isCharging: Bool = false
+
+    private var backgroundColor: Color {
+        if isOnline { return StitchColors.statusOnlineBg }
+        if isCharging { return StitchColors.statusChargingBg }
+        return StitchColors.statusOfflineBg
+    }
+
+    private var textColor: Color {
+        if isOnline { return StitchColors.statusOnline }
+        if isCharging { return StitchColors.statusCharging }
+        return StitchColors.statusOffline
+    }
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: 11, weight: .bold))
+            .foregroundColor(textColor)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(backgroundColor)
+            .clipShape(Capsule())
+    }
+}
+
+// MARK: - CarImageView (preserved)
+
+struct CarImageView: View {
     let color: Color; let model: String
     var body: some View {
         VStack(spacing: 4) {
             Image(systemName: "car.fill")
                 .font(.system(size: 64)).foregroundColor(color)
                 .frame(height: 100)
-            Text(model).font(.caption).foregroundColor(.secondary)
+            Text(model).font(StitchFont.bodySm()).foregroundColor(StitchColors.onSurfaceVariant)
         }.frame(maxWidth: .infinity).padding(.vertical, 8)
     }
 }
+
+// MARK: - CarSwitcherView (Stitch styled)
 
 struct CarSwitcherView: View {
     @EnvironmentObject var state: AppState; @Environment(\.dismiss) var dismiss
@@ -192,12 +368,26 @@ struct CarSwitcherView: View {
             List(state.cars) { car in
                 Button(action: { state.currentCarId = car.id; dismiss() }) {
                     HStack {
-                        VStack(alignment: .leading) { Text(car.name).font(.headline); Text("\(car.model) · \(car.totalDrives) drives").font(.caption).foregroundColor(.secondary) }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(car.name)
+                                .font(StitchFont.bodyLg())
+                                .foregroundColor(StitchColors.onSurface)
+                            Text("\(car.model) · \(car.totalDrives) drives")
+                                .font(StitchFont.bodySm())
+                                .foregroundColor(StitchColors.onSurfaceVariant)
+                        }
                         Spacer()
-                        if car.id == state.currentCarId { Image(systemName: "checkmark").foregroundColor(.blue) }
+                        if car.id == state.currentCarId {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(StitchColors.accent)
+                        }
                     }
                 }
-            }.navigationTitle("Select Vehicle").navigationBarTitleDisplayMode(.inline)
+            }
+            .scrollContentBackground(.hidden)
+            .background(StitchColors.background)
+            .navigationTitle("Select Vehicle")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
