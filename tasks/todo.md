@@ -166,3 +166,62 @@ Keep the current `codex/app-mimo-stitch-1to1` worktree, preserve the shell/routi
 - Package 1 worker update (2026-07-05): corrected `Info.plist` into valid plist XML with LAN/ATS keys, removed the iOS 17-only map configuration from `AmapView`, aligned `MockData` decoding with `mock_data.json` (`statuses`, `battery_health`, `software_updates`, `sentry_events`), routed onboarding through the shared `AppState.connect(...)` path, persisted real-connection state in `AppState`, and changed `UpdatesView` / `StatisticsView` to iOS 16-compatible empty states instead of `ContentUnavailableView`. Windows-side static verification passed for plist parsing and source-level API/path checks; native Xcode compile is still deferred to Mac.
 - Package 2B worker update (2026-07-05): confirmed the Android L1 shell is still unified under the existing 4-tab host (`Dashboard`, `Drives`, `Charges`, `More`), tightened top-level route matching so typed routes with path segments still resolve the active tab, and added an explicit More-screen verification note so mock/cached destinations are not presented as fully live. Theme and typography alignment remain pending in the broader package 2 scope.
 - Package 3 worker update (2026-07-05): wired the iOS tab labels plus the most obvious `Settings` / `More` entry text to existing `Localizable.strings` keys through a minimal `Localization.swift` helper, rewrote the iOS-facing README/verify/inventory docs so the build path is consistently `project.yml` -> XcodeGen -> CocoaPods -> `MateLink.xcworkspace`, and aligned Widget status to `deferred / source exists but target not wired`. Windows-feasible verification confirmed `Info.plist` parses as XML, `project.yml` still contains only the `MateLink` app target, no `.entitlements` file exists under `app_mimo/ios`, and `swift` / `xcodegen` / `pod` / `xcodebuild` are unavailable in this environment.
+
+---
+
+# MateLink Stitch Implementation Audit Before Debug - 2026-07-05
+
+## Goal
+
+Audit the AI-completed `app_mimo` implementation before Jovi starts hands-on debugging. Verify whether the Stitch project `MateLink - Tesla 监控 (简约白)` has been faithfully converted into Android and iOS app surfaces, identify bugs/regressions, and produce a fix order.
+
+## Plan
+
+- [x] Persist the parent-Codex / child-Claude delegation route in memory with secret redaction.
+- [x] Dispatch review team: Android implementation and compile-risk audit.
+- [x] Dispatch review team: iOS implementation and compile-risk audit.
+- [x] Dispatch review team: Stitch/page mapping, mock-real boundary, and documentation consistency audit.
+- [x] Locally validate high-risk findings from the review team.
+- [x] Produce a clear verdict: complete enough to debug, must-fix bugs, deferred items, and recommended next dispatch package.
+
+## Review Notes
+
+- User explicitly wants Codex to orchestrate and audit while child Claude/team agents perform delegable review/execution work.
+- Do not modify `docs/git_ref`; it remains reference only.
+- Audit should treat current output as implementation under review, not automatically accepted as complete.
+- Review team result (2026-07-05): not ready to call complete. Android has a compile blocker because `NavGraph.kt` imports/routes to missing `PalettePreviewScreen`; iOS has compile blockers because `MoreView.swift` calls `RangeView()` while the implementation is `RangePageView`, and the iOS 16 target still uses iOS 17-only `ContentUnavailableView` in multiple app-target files.
+- Local validation result (2026-07-05): confirmed the Android missing `PalettePreviewScreen` reference with `rg`; confirmed iOS `RangeView`/`RangePageView` mismatch and `ContentUnavailableView` usages; confirmed `project.yml` and `Podfile` both target iOS 16.0. Toolchain proof is blocked on this Windows machine because `java`, `xcodebuild`, and `xcodegen` are unavailable.
+- Recommended next package: dispatch child Claude to fix only P0 compile blockers first, then re-run static checks; after that dispatch package 2 for mock/real data honesty and dashboard navigation wiring, then package 3 for documentation/page mapping reconciliation.
+
+---
+
+# MateLink P0/P1 Child-Claude Fix Round - 2026-07-05
+
+## Goal
+
+Use child-Claude with the `mimo-1m` profile for bounded fixes, while Codex reviews each package before moving to the next one. Bring `app_mimo` to a state where Android/iOS source is no longer blocked by known P0 compile issues and mock/real data boundaries are honest enough for debugging.
+
+## Plan
+
+- [x] Create a local `mimo-1m` child-Claude profile without changing the existing `mimo` profile.
+- [x] Dispatch package 1: Android P0 `PalettePreviewScreen` route/import cleanup.
+- [x] Review package 1 with static searches and source inspection.
+- [x] Dispatch package 2: iOS P0 `RangeView` mismatch and iOS 16 empty-state replacement.
+- [x] Review package 2 with static searches and source inspection.
+- [x] Dispatch package 3: Android P1 repository/mock-mode/dashboard navigation repairs.
+- [x] Review package 3 with static searches and source inspection.
+- [x] Dispatch package 4: iOS P1 Timeline mock/real split and error/empty-state honesty.
+- [x] Review package 4 with static searches and source inspection.
+- [x] Dispatch package 5: docs reconciliation for current debug readiness.
+- [x] Run Windows-feasible final verification and summarize remaining Mac/Java-gated proof.
+
+## Review Notes
+
+- `docs/git_ref` remains read-only reference material.
+- Native Android/iOS compile proof may remain blocked on this Windows machine if Java/Xcode tooling is unavailable.
+- Package 1 result: child-Claude removed the missing `PalettePreviewScreen` import, `Screen.PalettePreview`, settings navigation callback, and remaining composable block from `NavGraph.kt`. Static check `rg "PalettePreviewScreen|Screen\\.PalettePreview|data object PalettePreview" app_mimo/android/app/src/main/java/com/matelink/ui/navigation/NavGraph.kt` returned no matches.
+- Package 2 result: child-Claude renamed `RangePageView` to `RangeView` and replaced iOS 17-only empty states with a shared `EmptyStateView`. Codex removed the unused Mirror/Text compatibility helper from the new component so P0 remains simple and iOS 16-safe.
+- Package 3 result: child-Claude moved `DashboardViewModel` from direct `ApiClient` calls to `TeslamateRepository` / `ApiResult`, added a real Android mock-mode switch backed by `SettingsRepository.setMockMode`, and wired Dashboard cards into existing navigation callbacks. Codex adjusted the charging card condition to use the API model's `isCharging` accessor.
+- Package 4 result: child-Claude changed iOS `TimelineViewModel` to branch on `AppState.isMockMode`, use `state.real.fetch(...)` for real drives/charges, and show an explicit error empty state instead of silently falling back to mock.
+- Package 5 result: child-Claude did not complete the docs update within its turn budget, so Codex performed a bounded reconciliation in `app_mimo/docs/STITCH_PAGE_MAPPING.md`. The document now records the current 4-tab/More state, P0/P1 fixes, iOS Widget deferred status, and Java/Mac verification limits. `docs/git_ref` remained untouched.
+- Final Windows-feasible verification: P0/P1 static searches passed; `git diff --check -- app_mimo tasks/todo.md` passed; native Android build remains blocked because `java` is unavailable; native iOS build remains Mac/Xcode-gated.
