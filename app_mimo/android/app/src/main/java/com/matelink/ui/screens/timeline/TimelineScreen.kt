@@ -19,9 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.matelink.R
 import com.matelink.ui.theme.CarColorPalette
+import com.matelink.ui.theme.SwissOutline
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -55,7 +58,7 @@ fun TimelineScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                    containerColor = Color.White
                 )
             )
         },
@@ -134,6 +137,8 @@ private fun DateHeader(date: String, palette: CarColorPalette) {
 private fun TimelineEventCard(event: TimelineEvent, palette: CarColorPalette) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, SwissOutline),
         colors = CardDefaults.cardColors(containerColor = palette.surface)
     ) {
         Row(

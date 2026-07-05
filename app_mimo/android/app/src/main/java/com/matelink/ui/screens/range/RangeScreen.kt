@@ -49,15 +49,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.matelink.R
 import com.matelink.ui.components.MateLinkLoadingPlaceholder
+import com.matelink.ui.theme.SwissOutline
+import com.matelink.ui.theme.StatusSuccess
+import com.matelink.ui.theme.StatusWarning
+import com.matelink.ui.theme.StatusError
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-private val AccuracyGreen = Color(0xFF4CAF50)
-private val AccuracyYellow = Color(0xFFFFC107)
-private val AccuracyRed = Color(0xFFEF5350)
+private val AccuracyGreen = StatusSuccess
+private val AccuracyYellow = StatusWarning
+private val AccuracyRed = StatusError
 private val EstimatedBlue = Color(0xFF42A5F5)
 private val ActualGreen = Color(0xFF66BB6A)
 
@@ -95,7 +100,7 @@ fun RangeScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                    containerColor = Color.White
                 )
             )
         },
@@ -173,8 +178,10 @@ private fun AccuracySummaryCard(uiState: RangeUiState) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, SwissOutline),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = Color.White
         )
     ) {
         Column(
@@ -286,8 +293,10 @@ private fun RangeTripCard(trip: RangeTrip) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, SwissOutline),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Color.White
         )
     ) {
         Column(

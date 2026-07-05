@@ -17,9 +17,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.matelink.R
+import com.matelink.ui.theme.SwissOutline
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +85,12 @@ fun EfficiencyScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Summary card - Average Efficiency
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, SwissOutline),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.efficiency_avg_label),
@@ -117,7 +125,12 @@ fun EfficiencyScreen(
 
             // Efficiency by Speed Chart
             if (uiState.efficiencyBySpeed.isNotEmpty()) {
-                ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, SwissOutline),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = stringResource(R.string.efficiency_by_speed_title),
@@ -153,7 +166,12 @@ private fun StatCard(
     label: String,
     value: String
 ) {
-    ElevatedCard(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, SwissOutline),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = label,

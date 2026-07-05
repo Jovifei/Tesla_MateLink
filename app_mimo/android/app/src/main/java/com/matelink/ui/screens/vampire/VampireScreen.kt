@@ -17,9 +17,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.matelink.R
+import com.matelink.ui.theme.SwissOutline
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
@@ -83,7 +86,12 @@ fun VampireScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Summary card - Total drain
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, SwissOutline),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.vampire_total_drain_label),
@@ -124,7 +132,12 @@ fun VampireScreen(
 
             // Daily drain chart
             if (uiState.dailyDrains.isNotEmpty()) {
-                ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, SwissOutline),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = stringResource(R.string.vampire_daily_title),
@@ -152,7 +165,12 @@ fun VampireScreen(
 
             // Recent idle periods list
             if (uiState.idlePeriods.isNotEmpty()) {
-                ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, SwissOutline),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = stringResource(R.string.vampire_recent_title),
@@ -172,7 +190,12 @@ fun VampireScreen(
             }
 
             // Optimization tips
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, SwissOutline),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.vampire_tips_title),
@@ -201,7 +224,12 @@ fun VampireScreen(
             }
 
             // Explanation
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, SwissOutline),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.vampire_how_title),
@@ -226,7 +254,12 @@ private fun VampireStatCard(
     label: String,
     value: String
 ) {
-    ElevatedCard(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, SwissOutline),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = label,
