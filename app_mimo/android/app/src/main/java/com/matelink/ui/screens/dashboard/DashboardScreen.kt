@@ -16,6 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.matelink.ui.components.AmapPointView
+import com.matelink.ui.theme.StatusSuccess
+import com.matelink.ui.theme.StatusWarning
+import com.matelink.ui.theme.SwissInk
+import com.matelink.ui.theme.SwissMuted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -183,11 +187,11 @@ fun DashboardScreen(
 @Composable
 private fun StateBadge(state: String) {
     val (color, label) = when (state) {
-        "online" -> Color(0xFF43A047) to "Online"
-        "driving" -> Color(0xFF1E88E5) to "Driving"
-        "charging" -> Color(0xFFFB8C00) to "Charging"
-        "asleep" -> Color(0xFF9E9E9E) to "Asleep"
-        else -> Color(0xFF616161) to "Offline"
+        "online" -> StatusSuccess to "Online"
+        "driving" -> SwissInk to "Driving"
+        "charging" -> StatusWarning to "Charging"
+        "asleep" -> SwissMuted to "Asleep"
+        else -> SwissMuted to "Offline"
     }
     SuggestionChip(
         onClick = {},
@@ -250,13 +254,13 @@ private fun BatteryTrendChart(currentBatteryLevel: Int) {
             val y = height - padding - ((value - minVal) / range.toFloat()) * (height - 2 * padding)
             if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
         }
-        drawPath(path, color = Color(0xFF1E88E5), style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3f))
+        drawPath(path, color = MaterialTheme.colorScheme.primary, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3f))
 
         // Draw dots
         data.forEachIndexed { index, value ->
             val x = index * stepX
             val y = height - padding - ((value - minVal) / range.toFloat()) * (height - 2 * padding)
-            drawCircle(color = Color(0xFF1E88E5), radius = 5f, center = androidx.compose.ui.geometry.Offset(x, y))
+            drawCircle(color = MaterialTheme.colorScheme.primary, radius = 5f, center = androidx.compose.ui.geometry.Offset(x, y))
         }
     }
 
