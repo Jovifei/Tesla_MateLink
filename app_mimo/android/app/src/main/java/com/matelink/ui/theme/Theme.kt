@@ -61,7 +61,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun MateLinkTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Disabled dynamic colors - we use car-based palettes instead
+    // Keep a stable neutral palette instead of device-provided accents.
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
