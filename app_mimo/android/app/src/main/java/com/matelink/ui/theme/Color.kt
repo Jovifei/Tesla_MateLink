@@ -7,9 +7,9 @@ val NeutralPrimary = Color(0xFF171717)
 val NeutralDark = Color(0xFF0F1115)
 
 // Status colors (semantic - always fixed)
-val StatusSuccess = Color(0xFF4CAF50)
-val StatusWarning = Color(0xFFFF9800)
-val StatusError = Color(0xFFF44336)
+val StatusSuccess = Color(0xFF059669)
+val StatusWarning = Color(0xFFF59E0B)
+val StatusError = Color(0xFFDC2626)
 
 // Light theme colors - white surface, near-black type, restrained grey dividers.
 val PrimaryLight = Color(0xFF171717)
@@ -28,7 +28,7 @@ val SurfaceLight = Color(0xFFFFFFFF)
 val OnSurfaceLight = Color(0xFF111315)
 val SurfaceVariantLight = Color(0xFFF7F7F8)
 val OnSurfaceVariantLight = Color(0xFF5F6368)
-val OutlineLight = Color(0xFFD9DDE3)
+val OutlineLight = Color(0xFFE5E5E5)
 val OutlineVariantLight = Color(0xFFE9EDF2)
 val SurfaceContainerLight = Color(0xFFF9F9FA)
 val SurfaceContainerHighLight = Color(0xFFF4F5F6)
@@ -62,7 +62,7 @@ val ErrorDark = Color(0xFFFFB4AB)
 val OnErrorDark = Color(0xFF690005)
 
 // Other colors
-val BoundaryColor = Color(0xFF4CAF50)
+val BoundaryColor = Color(0xFF059669)
 
 // Stitch "Precision Minimalist" (white-minimal Swiss) shell accents.
 // Scoped to shell-level pieces (bottom navigation bar, More hub, About) so the
