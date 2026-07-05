@@ -590,22 +590,22 @@ struct Charge: Codable, Identifiable {
             endBatteryLevel = try? top.decode(Int.self, forKey: .endBatteryLevel)
         }
 
-        // Nested: range_rated → start/end ideal range
+        // Nested: range_rated → start/end rated range
         if let rangeRated = try? top.decode(ChargeRangeDetails.self, forKey: .rangeRated) {
-            startIdealRangeKm = rangeRated.startRange
-            endIdealRangeKm = rangeRated.endRange
-        } else {
-            startIdealRangeKm = (try? top.decode(Double.self, forKey: .startIdealRangeKm)) ?? 0
-            endIdealRangeKm = try? top.decode(Double.self, forKey: .endIdealRangeKm)
-        }
-
-        // Nested: range_ideal → start/end rated range
-        if let rangeIdeal = try? top.decode(ChargeRangeDetails.self, forKey: .rangeIdeal) {
-            startRatedRangeKm = rangeIdeal.startRange
-            endRatedRangeKm = rangeIdeal.endRange
+            startRatedRangeKm = rangeRated.startRange
+            endRatedRangeKm = rangeRated.endRange
         } else {
             startRatedRangeKm = (try? top.decode(Double.self, forKey: .startRatedRangeKm)) ?? 0
             endRatedRangeKm = try? top.decode(Double.self, forKey: .endRatedRangeKm)
+        }
+
+        // Nested: range_ideal → start/end ideal range
+        if let rangeIdeal = try? top.decode(ChargeRangeDetails.self, forKey: .rangeIdeal) {
+            startIdealRangeKm = rangeIdeal.startRange
+            endIdealRangeKm = rangeIdeal.endRange
+        } else {
+            startIdealRangeKm = (try? top.decode(Double.self, forKey: .startIdealRangeKm)) ?? 0
+            endIdealRangeKm = try? top.decode(Double.self, forKey: .endIdealRangeKm)
         }
 
         // Derive chargingType from charger_phases
