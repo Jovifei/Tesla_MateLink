@@ -38,7 +38,8 @@ class StartDestinationViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val settings = settingsDataStore.settings.first()
-            _startDestination.value = if (settings.isConfigured) {
+            val mockMode = settingsRepository.mockMode.first()
+            _startDestination.value = if (settings.isConfigured || mockMode) {
                 Screen.Dashboard
             } else {
                 Screen.Settings

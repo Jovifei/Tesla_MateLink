@@ -27,6 +27,12 @@
     <string name="tire_pressure">Tire Pressure</string>
     <string name="battery_trend">7-Day Battery Trend</string>
     <string name="km_range">%d km range</string>
+    <string name="charge_limit">Limit: %s</string>
+    <string name="vehicle">Vehicle</string>
+    <string name="lock">Lock</string>
+    <string name="plug">Plug</string>
+    <string name="refresh">Refresh</string>
+    <string name="elevation_label">Elevation: %1$s%2$s</string>
 
     <!-- Status -->
     <string name="state_online">Online</string>
@@ -287,6 +293,15 @@
     <string name="trip_rename_field_label">Trip Name</string>
     <string name="trip_rename_field_hint">Enter trip name</string>
     <string name="save">Save</string>
+    <string name="language">Language</string>
+    <string name="mock_mode_hint">Use mock data instead of live server</string>
+    <string name="server_url_label">Server URL</string>
+    <string name="api_token_label">API Token</string>
+    <string name="switch_instance">Switch</string>
+    <string name="add_instance">Add Instance</string>
+    <string name="instance_name">Instance Name</string>
+    <string name="car_id">Car ID</string>
+    <string name="edit">Edit</string>
     <string name="trip_edit_delete_confirm_title">Delete Trip</string>
     <string name="trip_edit_delete_confirm_body">Are you sure you want to delete this trip?</string>
     <string name="delete">Delete</string>
@@ -763,4 +778,109 @@
     <string name="weather_time">Time</string>
     <string name="weather_unavailable">Weather unavailable</string>
     <string name="weather_weather">Weather</string>
+
+    <!-- Annual Report -->
+    <string name="annual_report_title">Annual Report %d</string>
+    <string name="annual_report_no_data">No data available for %d</string>
+    <string name="annual_report_generate_pdf">Generate PDF Report</string>
+    <string name="annual_report_summary">Annual Summary</string>
+    <string name="annual_report_monthly_trends">Monthly Trends</string>
+    <string name="annual_report_distance_km">Distance (km)</string>
+    <string name="annual_report_drives_per_month">Drives per Month</string>
+    <string name="annual_report_energy_added_kwh">Energy Added (kWh)</string>
+    <string name="annual_report_driving_habits">Driving Habits</string>
+    <string name="annual_report_avg_drive_duration">Average Drive Duration</string>
+    <string name="annual_report_unique_driving_days">Unique Driving Days</string>
+    <string name="annual_report_drives_per_day">Drives per Day</string>
+    <string name="annual_report_excellent">Excellent</string>
+    <string name="annual_report_good">Good</string>
+    <string name="annual_report_average">Average</string>
+    <string name="annual_report_high">High</string>
+    <string name="annual_report_efficiency_rating">Efficiency Rating</string>
+    <string name="annual_report_top_speed">Top Speed</string>
+    <string name="annual_report_busiest_day">Busiest Day</string>
+    <string name="annual_report_most_distance_day">Most Distance in a Day</string>
+    <string name="annual_report_na">N/A</string>
+    <string name="label_charges">Charges</string>
+    <string name="record_fastest_drive">Fastest Drive</string>
+
+    <!-- PDF Report -->
+    <string name="pdf_report_title">PDF Report %d</string>
+    <string name="pdf_report_share_title">Share Annual Report</string>
+    <string name="pdf_report_description">Generate a PDF summary of your driving and charging data for %d.</string>
+    <string name="pdf_report_vehicle_summary">MateLink Vehicle Summary</string>
+    <string name="pdf_report_total_distance">Total Distance:</string>
+    <string name="pdf_report_total_drives">Total Drives:</string>
+    <string name="pdf_report_energy_used">Energy Used:</string>
+    <string name="pdf_report_charges_label">Charges:</string>
+    <string name="pdf_report_avg_efficiency">Avg Efficiency:</string>
+    <string name="pdf_report_generate_share">Generate &amp; Share PDF</string>
+    <string name="pdf_report_energy_added_label">Energy Added:</string>
+    <string name="pdf_report_total_cost_label">Total Cost:</string>
+    <string name="pdf_report_longest_drive">Longest Drive:</string>
+    <string name="pdf_report_fastest_drive">Fastest Drive:</string>
+    <string name="pdf_report_most_efficient">Most Efficient:</string>
+    <string name="pdf_report_distance_by_month">Distance by Month (km)</string>
+    <string name="pdf_report_energy_consumed_by_month">Energy Consumed by Month (kWh)</string>
+    <string name="pdf_report_energy_added_by_month">Energy Added by Month (kWh)</string>
+    <string name="pdf_report_no_monthly_data">No monthly data available.</string>
+    <string name="pdf_report_avg_drive_duration">Avg Drive Duration:</string>
+    <string name="pdf_report_driving_days">Driving Days:</string>
+    <string name="pdf_report_top_speed_label">Top Speed:</string>
+    <string name="pdf_report_efficiency_rating_label">Efficiency Rating:</string>
+    <string name="pdf_report_generated_by">Generated by MateLink</string>
+
+    <!-- Export -->
+    <string name="export_title">Export Data</string>
+    <string name="export_format_title">Export Format</string>
+    <string name="export_data_to_export">Data to Export</string>
+    <string name="export_date_range">Date Range</string>
+    <string name="export_drives">Drives</string>
+    <string name="export_charges">Charges</string>
+    <string name="export_both">Both</string>
+    <string name="export_format_label">Format:</string>
+    <string name="export_data_label">Data:</string>
+    <string name="export_range_label">Range:</string>
+    <string name="export_drives_label">Drives:</string>
+    <string name="export_charges_label">Charges:</string>
+    <string name="export_drives_charges">Drives + Charges</string>
+    <string name="export_summary">Export Summary</string>
+    <string name="export_share">Export &amp; Share</string>
+    <string name="export_share_title">Share Export</string>
+
+    <!-- Settings extra -->
+    <string name="instances">Instances</string>
+    <string name="select_language">Select language</string>
+    <string name="edit_instance">Edit Instance</string>
+
+    <!-- 3D Vehicle -->
+    <string name="vehicle_3d_title">3D Vehicle</string>
+    <string name="vehicle_3d_gesture_hint">Pinch to zoom · Drag to rotate</string>
+    <string name="vehicle_3d_controls">Vehicle Controls</string>
+    <string name="vehicle_3d_open_doors">Open Doors</string>
+    <string name="vehicle_3d_close_doors">Close Doors</string>
+    <string name="vehicle_3d_open_port">Open Port</string>
+    <string name="vehicle_3d_close_port">Close Port</string>
+    <string name="vehicle_3d_open_frunk">Open Frunk</string>
+    <string name="vehicle_3d_close_frunk">Close Frunk</string>
+    <string name="vehicle_3d_reset_view">Reset View</string>
+
+    <!-- Trip detail extra -->
+    <string name="trip_not_found">Trip not found</string>
+    <string name="kwh_charged">kWh charged</string>
+
+    <!-- ViewModel errors -->
+    <string name="error_save_settings">Failed to save settings</string>
+    <string name="resync_started">Full resync started. All cached data cleared. Check the Stats screen for progress.</string>
+    <string name="error_resync">Failed to start resync: %1$s</string>
+    <string name="debug_tpms_simulated">Simulated TPMS warning for %1$s</string>
+    <string name="debug_sentry_simulated">Simulated sentry event #%1$d</string>
+    <string name="error_load_years">Failed to load years: %1$s</string>
+    <string name="error_load_counts">Failed to load counts: %1$s</string>
+    <string name="error_export">Export failed</string>
+    <string name="error_load_report">Failed to load report</string>
+    <string name="error_load_stats">Failed to load stats</string>
+    <string name="error_load_regions">Failed to load regions</string>
+    <string name="error_load_countries">Failed to load countries</string>
+    <string name="error_invalid_date">Invalid date</string>
 </resources>

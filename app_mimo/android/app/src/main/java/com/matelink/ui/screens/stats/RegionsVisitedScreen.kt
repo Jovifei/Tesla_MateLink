@@ -587,7 +587,7 @@ private fun CountryMapCard(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "AC",
+                                    text = stringResource(R.string.charging_ac),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = if (acSelected) palette.acColor else Color.DarkGray,
                                     fontWeight = if (acSelected) FontWeight.Bold else FontWeight.Medium
@@ -613,7 +613,7 @@ private fun CountryMapCard(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "DC",
+                                    text = stringResource(R.string.charging_dc),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = if (dcSelected) palette.dcColor else Color.DarkGray,
                                     fontWeight = if (dcSelected) FontWeight.Bold else FontWeight.Medium

@@ -51,7 +51,8 @@ data class SettingsUiState(
     val isResyncing: Boolean = false,
     val testResult: TestResult? = null,
     val error: String? = null,
-    val successMessage: String? = null
+    val successMessage: String? = null,
+    val needsRecreate: Boolean = false
 )
 
 /**
@@ -192,8 +193,16 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsDataStore.saveLanguageCode(languageCode)
             // Apply the locale change immediately
-            com.matelink.locale.LocaleHelper.applyLocale(context, languageCode)
+            val changed = com.matelink.locale.LocaleHelper.applyLocale(context, languageCode)
+            if (changed) {
+                // Signal that the activity needs to be recreated
+                _uiState.value = _uiState.value.copy(needsRecreate = true)
+            }
         }
+    }
+
+    fun clearNeedsRecreate() {
+        _uiState.value = _uiState.value.copy(needsRecreate = false)
     }
 
     fun updateMockMode(enabled: Boolean) {
@@ -327,7 +336,7 @@ class SettingsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    error = e.message ?: "Failed to save settings"
+                    error = e.message ?: context.getString(R.string.error_save_settings)
                 )
             }
         }
@@ -359,20 +368,20 @@ class SettingsViewModel @Inject constructor(
                         triggerImmediateSync()
                         _uiState.value = _uiState.value.copy(
                             isResyncing = false,
-                            successMessage = "Full resync started. All cached data cleared. Check the Stats screen for progress."
+                            successMessage = context.getString(R.string.resync_started)
                         )
                     }
                     is ApiResult.Error -> {
                         _uiState.value = _uiState.value.copy(
                             isResyncing = false,
-                            error = "Failed to start resync: ${result.message}"
+                            error = context.getString(R.string.error_resync, result.message)
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isResyncing = false,
-                    error = "Failed to start resync: ${e.message}"
+                    error = context.getString(R.string.error_resync, e.message ?: "")
                 )
             }
         }
@@ -417,7 +426,7 @@ class SettingsViewModel @Inject constructor(
             )
 
             _uiState.value = _uiState.value.copy(
-                successMessage = "Simulated TPMS warning for ${tire.name}"
+                successMessage = context.getString(R.string.debug_tpms_simulated, tire.name)
             )
         }
     }
@@ -470,7 +479,7 @@ class SettingsViewModel @Inject constructor(
             )
 
             _uiState.value = _uiState.value.copy(
-                successMessage = "Simulated sentry event #$count"
+                successMessage = context.getString(R.string.debug_sentry_simulated, count)
             )
         }
     }

@@ -60,6 +60,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
@@ -106,6 +107,15 @@ fun SettingsScreen(
         uiState.successMessage?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearSuccessMessage()
+        }
+    }
+
+    // Handle locale change - recreate activity
+    val activity = LocalContext.current as? android.app.Activity
+    LaunchedEffect(uiState.needsRecreate) {
+        if (uiState.needsRecreate) {
+            viewModel.clearNeedsRecreate()
+            activity?.recreate()
         }
     }
 
@@ -258,7 +268,7 @@ private fun SettingsContent(
         // === Instances Section ===
         if (instanceUiState.instances.isNotEmpty()) {
             Text(
-                text = "Instances",
+                text = stringResource(R.string.instances),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -299,13 +309,13 @@ private fun SettingsContent(
                         Row {
                             if (!isActive) {
                                 TextButton(onClick = { onInstanceSwitch(instance.id) }) {
-                                    Text("Switch")
+                                    Text(stringResource(R.string.switch_instance))
                                 }
                             }
                             IconButton(onClick = { onInstanceEdit(instance) }) {
                                 Icon(
                                     imageVector = Icons.Filled.Info,
-                                    contentDescription = "Edit",
+                                    contentDescription = stringResource(R.string.edit),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -320,7 +330,7 @@ private fun SettingsContent(
                 onClick = onInstanceAdd,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Add Instance")
+                Text(stringResource(R.string.add_instance))
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -562,14 +572,14 @@ private fun SettingsContent(
             OutlinedTextField(
                 value = currentLanguageName,
                 onValueChange = {},
-                label = { Text("Language") },
+                label = { Text(stringResource(R.string.language)) },
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { languageDropdownExpanded = true }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Select language"
+                            contentDescription = stringResource(R.string.select_language)
                         )
                     }
                 }
@@ -682,11 +692,11 @@ private fun SettingsContent(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Mock Mode",
+                    text = stringResource(R.string.mock_mode),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Use mock data instead of live server",
+                    text = stringResource(R.string.mock_mode_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -989,14 +999,14 @@ private fun SettingsContent(
         AlertDialog(
             onDismissRequest = onInstanceEditorClose,
             title = {
-                Text(if (editor.id == null) "Add Instance" else "Edit Instance")
+                Text(if (editor.id == null) stringResource(R.string.add_instance) else stringResource(R.string.edit_instance))
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = editor.name,
                         onValueChange = onInstanceEditorNameChange,
-                        label = { Text("Instance Name") },
+                        label = { Text(stringResource(R.string.instance_name)) },
                         placeholder = { Text("e.g., My Model 3") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
@@ -1004,7 +1014,7 @@ private fun SettingsContent(
                     OutlinedTextField(
                         value = editor.serverUrl,
                         onValueChange = onInstanceEditorUrlChange,
-                        label = { Text("Server URL") },
+                        label = { Text(stringResource(R.string.server_url_label)) },
                         placeholder = { Text("https://teslamate.local") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
@@ -1013,7 +1023,7 @@ private fun SettingsContent(
                     OutlinedTextField(
                         value = editor.apiToken,
                         onValueChange = onInstanceEditorTokenChange,
-                        label = { Text("API Token") },
+                        label = { Text(stringResource(R.string.api_token_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -1022,7 +1032,7 @@ private fun SettingsContent(
                         onValueChange = { v ->
                             v.toIntOrNull()?.let { onInstanceEditorCarIdChange(it) }
                         },
-                        label = { Text("Car ID") },
+                        label = { Text(stringResource(R.string.car_id)) },
                         placeholder = { Text("1") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -1035,7 +1045,7 @@ private fun SettingsContent(
                     onClick = onInstanceEditorSave,
                     enabled = editor.serverUrl.isNotBlank() && editor.apiToken.isNotBlank()
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             },
             dismissButton = {

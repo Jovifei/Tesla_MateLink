@@ -27,6 +27,12 @@
     <string name="tire_pressure">Pression des pneus</string>
     <string name="battery_trend">Tendance batterie 7 jours</string>
     <string name="km_range">%d km d\'autonomie</string>
+    <string name="charge_limit">Limite : %s</string>
+    <string name="vehicle">Véhicule</string>
+    <string name="lock">Verrouillage</string>
+    <string name="plug">Prise</string>
+    <string name="refresh">Actualiser</string>
+    <string name="elevation_label">Altitude : %1$s%2$s</string>
 
     <!-- Status -->
     <string name="state_online">En ligne</string>
