@@ -4,10 +4,11 @@
 
 ## 1. 预检（核实 prior change 产物可用）
 
-- [ ] 1.1 核实 `app_glm/shared/design-tokens.json` 存在且双端解析正常（Android Theme.kt / iOS AppTheme.swift）
-- [ ] 1.2 核实 Stitch 组件可用：Android `StitchCard/StitchStatusChip/StitchDataRow/StitchBottomBar`、iOS `StitchCard/StitchStatusChip/StitchDataRow`
-- [ ] 1.3 核实字体资源：Android `res/font/jetbrains_mono_*.ttf`、iOS `Resources/JetBrainsMono-*.ttf` + Info.plist 注册
-- [ ] 1.4 核实 Stitch MCP 可用（`mcp__stitch__get_screen` 测试一页）
+- [x] 1.1 核实 design-tokens.json 双端解析 — Android Theme.kt OK, iOS AppTheme.swift 有 StitchColors+StitchFont OK
+- [x] 1.2 核实 Stitch 组件 — Android components/ OK; iOS 当前是 DashboardView.swift 内 private struct 需提取
+- [ ] 1.3 iOS Stitch 组件提取到共享 Components/StitchComponents.swift (internal), 更新 L1 四视图引用
+- [ ] 1.4 iOS JetBrains Mono 字体: 从 Android res/font/ 复制 .ttf 到 iOS Resources/, Info.plist 注册, StitchFont 改用 .custom
+- [x] 1.5 核实 Stitch MCP 可用 (已读 19 页 screen 清单)
 
 ## 2. L1 校准（4页 — 对照真实 HTML 修正 prior 偏差）
 

@@ -10,5 +10,10 @@
     <array>
         <string>com.teslamatelink.statusRefresh</string>
     </array>
+    <key>UIAppFonts</key>
+    <array>
+        <string>jetbrains_mono_medium.ttf</string>
+        <string>jetbrains_mono_regular.ttf</string>
+    </array>
 </dict>
 </plist>

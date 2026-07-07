@@ -77,13 +77,12 @@ enum StitchColors {
 
 // MARK: - Stitch Typography
 
-// TODO: bundle JetBrainsMono.ttf and use .custom("JetBrainsMono-Medium", size:) once added
 struct StitchFont {
     static func displayLg() -> Font { .system(size: 32, weight: .bold) }
     static func headlineMd() -> Font { .system(size: 24, weight: .semibold) }
     static func bodyLg() -> Font { .system(size: 16, weight: .regular) }
     static func bodySm() -> Font { .system(size: 14, weight: .regular) }
     static func labelCaps() -> Font { .system(size: 12, weight: .bold) }
-    static func dataLg() -> Font { .system(size: 24, weight: .medium, design: .monospaced) }
-    static func dataMd() -> Font { .system(size: 16, weight: .medium, design: .monospaced) }
+    static func dataLg() -> Font { .custom("JetBrainsMono-Medium", size: 24) }
+    static func dataMd() -> Font { .custom("JetBrainsMono-Medium", size: 16) }
 }
