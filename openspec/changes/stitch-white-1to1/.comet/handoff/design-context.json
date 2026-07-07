@@ -1,0 +1,17 @@
+{
+  "change": "stitch-white-1to1",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "3afbddf7beb81c02c596da9435a9668997d2852133371466e46dedc0e53ee932",
+  "files": [
+    { "path": "openspec/changes/stitch-white-1to1/proposal.md", "sha256": "8cfed93d899cd6ffb1c2a68524c81d344beb8dca6804018a4297715f84215d7f" },
+    { "path": "openspec/changes/stitch-white-1to1/design.md", "sha256": "05342fb9ee9d2b698c6244854fa956f9c2aa95697d7298194045e512af401114" },
+    { "path": "openspec/changes/stitch-white-1to1/tasks.md", "sha256": "8be0393b077e46cd2fcfe70b550c0fc88ebd0a1d131d9031c391e1a71ac867d9" },
+    { "path": "openspec/changes/stitch-white-1to1/specs/stitch-analysis-pages/spec.md", "sha256": "198494585e35eb15118dc01f2cd7559d5acfc2e3ec576a4fd9e3aded7234e74a" },
+    { "path": "openspec/changes/stitch-white-1to1/specs/stitch-cost-page/spec.md", "sha256": "648f9586bb3cf89655d61f402cbb362e32f18fa126e4156ef3c8d548c0ffa6fb" },
+    { "path": "openspec/changes/stitch-white-1to1/specs/stitch-detail-pages/spec.md", "sha256": "02efbca0da2fa43b6cc0d7ca591cb424e76d0c327885e1e536df4c176672d2fc" },
+    { "path": "openspec/changes/stitch-white-1to1/specs/stitch-system-pages/spec.md", "sha256": "900a271c876fb953ee21fd7228118b345b0a00df36ef31744d53520a4e477fec" }
+  ]
+}
