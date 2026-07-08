@@ -64,6 +64,11 @@ enum StitchColors {
     // Neutral
     static let white            = Color(hex: "ffffff")
 
+    // Surface containers (Stitch design tokens)
+    static let surfaceContainerLow    = Color(hex: "F7F3F2")
+    static let surfaceContainer      = Color(hex: "F1EDEC")
+    static let surfaceContainerHigh  = Color(hex: "EBE7E6")
+
     // Status
     static let statusOnline      = Color(hex: "059669")
     static let statusOnlineBg    = Color(hex: "d1fae5")

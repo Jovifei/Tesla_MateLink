@@ -123,7 +123,7 @@ struct MoreView: View {
         case "settings":
             PlaceholderView(title: "设置")
         case "about":
-            PlaceholderView(title: "关于")
+            AboutView()
         default:
             PlaceholderView(title: route)
         }
