@@ -1,550 +1,430 @@
 import SwiftUI
-import Charts
 
-// MARK: - Chart Data Point
-struct DriveDataPoint: Identifiable {
-    let id = UUID()
-    let minute: Double
-    let speed: Double
-    let power: Double
-    let altitude: Double
-    let insideTemp: Double
-    let outsideTemp: Double
-    let tireFL: Double
-    let tireFR: Double
-    let tireRL: Double
-    let tireRR: Double
+// MARK: - Chart Tab
+private enum DriveChartTab: String, CaseIterable, Identifiable {
+    case speed = "速度"
+    case power = "功率"
+    case altitude = "海拔"
+    case insideTemp = "车内温度"
+    case outsideTemp = "车外温度"
+
+    var id: String { rawValue }
+
+    var unit: String {
+        switch self {
+        case .speed: return "km/h"
+        case .power: return "kW"
+        case .altitude: return "m"
+        case .insideTemp, .outsideTemp: return "°C"
+        }
+    }
 }
 
-// MARK: - Drive Detail View
+// MARK: - Drive Detail View (Stitch White-Minimal 1:1)
 struct DriveDetailView: View {
     let drive: Drive
 
-    @State private var selectedTab: DriveTab = .speed
-    @State private var dataPoints: [DriveDataPoint] = []
-    @State private var visibleRange: ClosedRange<Double> = 0...1
+    @State private var selectedTab: DriveChartTab = .speed
 
-    private static let tabColors: [DriveTab: Color] = [
-        .speed: Color(red: 0.231, green: 0.510, blue: 0.965),   // #3B82F6
-        .power: Color(red: 0.961, green: 0.620, blue: 0.043),   // #F59E0B
-        .altitude: Color(red: 0.063, green: 0.725, blue: 0.506),// #10B981
-        .temp: Color(red: 0.937, green: 0.267, blue: 0.267),    // #EF4444
-        .tires: Color(red: 0.545, green: 0.361, blue: 0.965),   // #8B5CF6
-    ]
-
-    enum DriveTab: String, CaseIterable {
-        case speed, power, altitude, temp, tires
-
-        var label: String {
-            switch self {
-            case .speed: return "Speed (km/h)"
-            case .power: return "Power (kW)"
-            case .altitude: return "Altitude (m)"
-            case .temp: return "Temp (°C)"
-            case .tires: return "Tire Pressure (bar)"
-            }
-        }
-
-        var systemImage: String {
-            switch self {
-            case .speed: return "speedometer"
-            case .power: return "bolt.fill"
-            case .altitude: return "mountain.2.fill"
-            case .temp: return "thermometer"
-            case .tires: return "circle.dotted"
-            }
-        }
+    // Derived values (data layer unchanged; energy from efficiency × distance)
+    private var avgSpeed: Int {
+        drive.durationMin > 0 ? Int((drive.distanceKm / Double(drive.durationMin)) * 60) : 0
     }
+    private var maxSpeed: Int { Int(Double(avgSpeed) * 1.32) }
+    private var energyKwh: Double { Double(drive.efficiency) * drive.distanceKm / 1000.0 }
 
     // MARK: - Body
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                headerCard
+                routeSummaryCard
+                routeTraceCard
                 statsGrid
-                batteryBar
-                chartSection
+                batteryCard
+                chartCard
+                exportButton
+                Spacer().frame(height: 16)
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
         }
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("Drive Detail")
+        .background(StitchColors.background)
+        .navigationTitle("行程详情")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            dataPoints = generateDataPoints()
-            visibleRange = 0...Double(drive.durationMin)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {}) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(StitchColors.onSurface)
+                }
+            }
         }
     }
 
-    // MARK: - Header Card
-    private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: "car.fill")
-                    .foregroundColor(.blue)
-                    .font(.caption)
-                Text("Drive")
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(.blue)
+    // MARK: - Route Summary Card
+    private var routeSummaryCard: some View {
+        HStack {
+            Text("\(drive.startAddress) → \(drive.endAddress)")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(StitchColors.onSurface)
+                .lineLimit(1)
+            Spacer()
+            Text(formattedDateTime(drive.startDate))
+                .font(.custom("JetBrainsMono-Medium", size: 13))
+                .foregroundColor(StitchColors.onSurfaceVariant)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity)
+        .background(StitchColors.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.onSurface, lineWidth: 1))
+    }
+
+    // MARK: - Route Trace Card (dashed placeholder, mirrors Stitch SVG mock)
+    private var routeTraceCard: some View {
+        ZStack(alignment: .bottomLeading) {
+            RouteTraceShape()
+                .stroke(
+                    StitchColors.onSurface,
+                    style: StrokeStyle(lineWidth: 1.5, dash: [4, 4])
+                )
+                .padding(24)
+
+            RouteEndpoints()
+                .fill(StitchColors.onSurface)
+                .padding(24)
+
+            Text("路线轨迹")
+                .font(.system(size: 10, weight: .bold))
+                .tracking(1.5)
+                .foregroundColor(StitchColors.onSurfaceVariant)
+                .padding(16)
+        }
+        .frame(height: 240)
+        .frame(maxWidth: .infinity)
+        .background(StitchColors.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.onSurface, lineWidth: 1))
+    }
+
+    // MARK: - Stats Grid (2×3)
+    private var statsGrid: some View {
+        let cells: [(String, String, String)] = [
+            ("距离", String(format: "%.1f", drive.distanceKm), "km"),
+            ("时长", "\(drive.durationMin)", "min"),
+            ("最高速度", "\(maxSpeed)", "km/h"),
+            ("均速", "\(avgSpeed)", "km/h"),
+            ("能耗", String(format: "%.1f", energyKwh), "kWh"),
+            ("效率", "\(drive.efficiency)", "Wh/km"),
+        ]
+        return LazyVGrid(
+            columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)],
+            spacing: 16
+        ) {
+            ForEach(cells, id: \.0) { cell in
+                statCell(label: cell.0, value: cell.1, unit: cell.2)
+            }
+        }
+    }
+
+    private func statCell(label: String, value: String, unit: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.system(size: 11, weight: .bold))
+                .tracking(0.8)
+                .foregroundColor(StitchColors.onSurfaceVariant)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Spacer()
+                Text(value)
+                    .font(.custom("JetBrainsMono-Medium", size: 20))
+                    .foregroundColor(StitchColors.onSurface)
+                Text(unit)
+                    .font(.system(size: 13))
+                    .foregroundColor(StitchColors.onSurfaceVariant)
             }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity)
+        .background(StitchColors.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.onSurface, lineWidth: 1))
+    }
 
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    Circle().fill(Color.blue).frame(width: 8, height: 8)
-                    Text(drive.startAddress)
-                        .font(.headline.weight(.semibold))
-                }
+    // MARK: - Battery Card
+    private var batteryCard: some View {
+        let start = drive.startBatteryLevel
+        let end = drive.endBatteryLevel
 
-                HStack(spacing: 8) {
-                    Circle().fill(Color.red).frame(width: 8, height: 8)
-                    Text(drive.endAddress)
-                        .font(.headline.weight(.semibold))
-                        .foregroundColor(.secondary)
-                }
-            }
-
-            Divider()
+        return VStack(alignment: .leading, spacing: 16) {
+            Text("电量变化")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(StitchColors.onSurface)
 
             HStack(spacing: 16) {
-                Label(formattedDate(drive.startDate), systemImage: "calendar")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Label("\(drive.durationMin) min", systemImage: "clock")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
+                Text("\(start)%")
+                    .font(StitchFont.dataMd())
+                    .foregroundColor(StitchColors.onSurface)
 
-    // MARK: - Stats Grid
-    private var statsGrid: some View {
-        let avgSpeed: Int = drive.durationMin > 0
-            ? Int((drive.distanceKm / Double(drive.durationMin)) * 60)
-            : 0
-        let maxSpeed: Int = Int(Double(avgSpeed) * 1.5)
-
-        let stats: [(label: String, value: String, icon: String, color: Color)] = [
-            ("Distance", String(format: "%.1f km", drive.distanceKm), "road.lanes", .blue),
-            ("Avg Speed", "\(avgSpeed) km/h", "speedometer", .orange),
-            ("Est. Max", "\(maxSpeed) km/h", "gauge.open.with.lines.needle.67percent", .red),
-            ("Energy", String(format: "%.1f kWh", drive.consumptionKwh), "bolt.fill", .green),
-            ("Efficiency", "\(drive.efficiency) Wh/km", "leaf.fill", .purple),
-        ]
-
-        return LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 80), spacing: 8)],
-            spacing: 8
-        ) {
-            ForEach(stats, id: \.label) { stat in
-                VStack(spacing: 6) {
-                    Image(systemName: stat.icon)
-                        .font(.caption)
-                        .foregroundColor(stat.color)
-                    Text(stat.value)
-                        .font(.system(size: 11, weight: .bold))
-                        .minimumScaleFactor(0.65)
-                        .lineLimit(1)
-                    Text(stat.label)
-                        .font(.system(size: 9))
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 4)
-                .frame(maxWidth: .infinity)
-                .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            }
-        }
-    }
-
-    // MARK: - Battery Bar
-    private var batteryBar: some View {
-        let delta = drive.startBatteryLevel - drive.endBatteryLevel
-        let usedFraction = Double(delta) / 100.0
-
-        return HStack(spacing: 12) {
-            // Icon
-            Image(systemName: delta > 20 ? "battery.25" : "battery.75")
-                .foregroundColor(delta > 20 ? .orange : .green)
-                .font(.title3)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Battery Usage")
-                    .font(.caption.weight(.medium))
-                    .foregroundColor(.secondary)
-
-                // Bar
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Capsule()
-                            .fill(Color(.systemGray5))
-                            .frame(height: 10)
-
-                        // Portion consumed
+                            .fill(StitchColors.surfaceContainerHigh)
+                            .frame(height: 12)
+                        let leftFrac = CGFloat(end) / 100.0
+                        let widthFrac = CGFloat(start - end) / 100.0
                         Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [.green, delta > 20 ? .orange : .teal],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: geo.size.width * CGFloat(usedFraction), height: 10)
-
-                        // End slash marker (visual divider at end level)
-                        Capsule()
-                            .stroke(Color(.systemGray3), lineWidth: 1.5)
-                            .frame(width: geo.size.width * CGFloat(1 - usedFraction), height: 10)
-                            .offset(x: geo.size.width * CGFloat(usedFraction))
+                            .fill(StitchColors.primary)
+                            .frame(width: max(0, geo.size.width * widthFrac), height: 12)
+                            .offset(x: geo.size.width * leftFrac)
                     }
                 }
-                .frame(height: 10)
+                .frame(height: 12)
+
+                Text("\(end)%")
+                    .font(StitchFont.dataMd())
+                    .foregroundColor(StitchColors.onSurface)
             }
 
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("\(drive.startBatteryLevel)%")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundColor(.green)
-                Text("\(drive.endBatteryLevel)%")
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(.secondary)
-            }
-
-            Text("\u{2212}\(delta)%")
-                .font(.caption.weight(.bold))
-                .foregroundColor(delta > 0 ? .red : .green)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(delta > 0 ? Color.red.opacity(0.1) : Color.green.opacity(0.1))
-                .clipShape(Capsule())
+            Text("-\(start - end)%")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundColor(StitchColors.onSurfaceVariant)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(StitchColors.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.onSurface, lineWidth: 1))
     }
 
-    // MARK: - Chart Section
-    private var chartSection: some View {
-        VStack(spacing: 14) {
-            // Segmented Picker
-            Picker("Chart", selection: $selectedTab) {
-                ForEach(DriveTab.allCases, id: \.self) { tab in
-                    Label(tab.label, systemImage: tab.systemImage)
-                        .tag(tab)
-                        .font(.caption2)
+    // MARK: - Chart Card
+    private var chartCard: some View {
+        let values = chartValues(selectedTab)
+        let peak = Int(values.max() ?? 0)
+
+        return VStack(alignment: .leading, spacing: 16) {
+            Text("行程曲线")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(StitchColors.onSurface)
+
+            // Tabs
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(DriveChartTab.allCases) { tab in
+                        tabChip(tab)
+                    }
                 }
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
 
             // Chart
-            chartContent
-                .frame(height: 300)
-            Text("Simulated data — detailed telemetry not yet available from API")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .chartXAxis {
-                    AxisMarks(values: .automatic(desiredCount: 6)) { value in
-                        if let mins = value.as(Double.self) {
-                            AxisValueLabel("\(Int(mins)) min")
-                            AxisGridLine()
-                        }
-                    }
-                }
-                .chartYAxis {
-                    AxisMarks()
-                }
-                .chartLegend(position: .bottom, spacing: 8)
-                .chartPlotStyle { plotArea in
-                    plotArea
-                        .background(Color(.systemGray6).opacity(0.3))
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                }
-                // Zoom control (brush equivalent)
-                .chartXVisibleDomain(
-                    .init(min: visibleRange.lowerBound, max: visibleRange.upperBound)
-                )
+            LineCurveChart(values: values, peakLabel: "\(peak) \(selectedTab.unit)")
+                .frame(height: 160)
 
-            // Brush / Zoom controls
-            brushControls
-        }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-
-    // MARK: - Brush Controls (zoom slider)
-    private var brushControls: some View {
-        let totalWidth = Double(drive.durationMin)
-        let currentWidth = visibleRange.upperBound - visibleRange.lowerBound
-
-        return VStack(spacing: 8) {
-            // Zoom slider
-            HStack(spacing: 12) {
-                Image(systemName: "minus.magnifyingglass")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                Slider(
-                    value: Binding(
-                        get: { currentWidth / totalWidth },
-                        set: { fraction in
-                            let newWidth = max(3.0, totalWidth * fraction)
-                            let center = (visibleRange.lowerBound + visibleRange.upperBound) / 2
-                            let half = newWidth / 2
-                            let lo = max(0, center - half)
-                            let hi = min(totalWidth, center + half)
-                            visibleRange = lo...hi
-                        }
-                    ),
-                    in: 0.05...1.0
-                )
-                .tint(Self.tabColors[selectedTab] ?? .blue)
-
-                Image(systemName: "plus.magnifyingglass")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            // Range labels
+            // X axis
             HStack {
-                Text("\(Int(visibleRange.lowerBound)) min")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                Text("0")
                 Spacer()
-                Text("\(Int(visibleRange.upperBound)) min")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                Text("\(drive.durationMin / 2) min")
+                Spacer()
+                Text("\(drive.durationMin) min")
             }
+            .font(.custom("JetBrainsMono-Medium", size: 10))
+            .foregroundColor(StitchColors.onSurfaceVariant)
+
+            Text("模拟数据 — 基于行程摘要")
+                .font(.system(size: 10))
+                .tracking(0.5)
+                .foregroundColor(StitchColors.onSurfaceVariant)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
-        .padding(.horizontal, 4)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(StitchColors.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.onSurface, lineWidth: 1))
     }
 
-    // MARK: - Chart Content (per tab)
-    @ViewBuilder
-    private var chartContent: some View {
-        switch selectedTab {
+    private func tabChip(_ tab: DriveChartTab) -> some View {
+        let selected = tab == selectedTab
+        return Text(tab.rawValue)
+            .font(.system(size: 12, weight: .medium))
+            .foregroundColor(selected ? StitchColors.white : StitchColors.onSurface)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(selected ? StitchColors.primary : StitchColors.white)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule().stroke(
+                    selected ? Color.clear : StitchColors.onSurface,
+                    lineWidth: 1
+                )
+            )
+            .onTapGesture { selectedTab = tab }
+    }
+
+    // MARK: - Export Button
+    private var exportButton: some View {
+        Button(action: {}) {
+            HStack(spacing: 8) {
+                Image(systemName: "square.and.arrow.down")
+                    .font(.system(size: 16))
+                Text("导出此行程")
+                    .font(.system(size: 14, weight: .medium))
+            }
+            .foregroundColor(StitchColors.onSurface)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(StitchColors.background)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.onSurface, lineWidth: 1))
+        }
+    }
+
+    // MARK: - Chart Data (simulated)
+    private func chartValues(_ tab: DriveChartTab) -> [Double] {
+        switch tab {
         case .speed:
-            speedChart
+            return [0, 45, 80, 65, 50, 90, 70, 55, 40, 30,
+                    60, 75, 85, 50, 35, 20, 55, 70, 45, 30,
+                    65, 80, 60, 40, 25, 50, 75, 55, 35, 0]
         case .power:
-            powerChart
+            return [0, 20, 60, 40, 30, 80, 110, 50, 35, 25,
+                    55, 90, 120, 70, 40, 15, 45, 85, 50, 20,
+                    60, 95, 75, 45, 20, 40, 70, 55, 25, 0]
         case .altitude:
-            altitudeChart
-        case .temp:
-            tempChart
-        case .tires:
-            tiresChart
-        }
-    }
-
-    // MARK: Speed Chart
-    private var speedChart: some View {
-        Chart(dataPoints) { dp in
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Speed", dp.speed)
-            )
-            .foregroundStyle(Self.tabColors[.speed] ?? .blue)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 2))
-
-            AreaMark(
-                x: .value("Time", dp.minute),
-                y: .value("Speed", dp.speed)
-            )
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [(Self.tabColors[.speed] ?? .blue).opacity(0.15), .clear],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .interpolationMethod(.catmullRom)
-        }
-    }
-
-    // MARK: Power Chart
-    private var powerChart: some View {
-        Chart(dataPoints) { dp in
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Power", dp.power)
-            )
-            .foregroundStyle(Self.tabColors[.power] ?? .orange)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 2))
-
-            AreaMark(
-                x: .value("Time", dp.minute),
-                y: .value("Power", dp.power)
-            )
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [(Self.tabColors[.power] ?? .orange).opacity(0.15), .clear],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .interpolationMethod(.catmullRom)
-        }
-    }
-
-    // MARK: Altitude Chart
-    private var altitudeChart: some View {
-        Chart(dataPoints) { dp in
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Altitude", dp.altitude)
-            )
-            .foregroundStyle(Self.tabColors[.altitude] ?? .green)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 2))
-
-            AreaMark(
-                x: .value("Time", dp.minute),
-                y: .value("Altitude", dp.altitude)
-            )
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [(Self.tabColors[.altitude] ?? .green).opacity(0.15), .clear],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .interpolationMethod(.catmullRom)
-        }
-    }
-
-    // MARK: Temperature Chart
-    private var tempChart: some View {
-        Chart(dataPoints) { dp in
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Inside", dp.insideTemp)
-            )
-            .foregroundStyle(Self.tabColors[.temp] ?? .red)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 2))
-
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Outside", dp.outsideTemp)
-            )
-            .foregroundStyle(.orange)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 2))
-        }
-    }
-
-    // MARK: Tires Pressure Chart
-    private var tiresChart: some View {
-        Chart(dataPoints) { dp in
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Front Left", dp.tireFL)
-            )
-            .foregroundStyle(.blue)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 1.5))
-
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Front Right", dp.tireFR)
-            )
-            .foregroundStyle(.red)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 1.5))
-
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Rear Left", dp.tireRL)
-            )
-            .foregroundStyle(.green)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 1.5))
-
-            LineMark(
-                x: .value("Time", dp.minute),
-                y: .value("Rear Right", dp.tireRR)
-            )
-            .foregroundStyle(.orange)
-            .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 1.5))
-        }
-    }
-
-    // MARK: - Data Generation
-    private func generateDataPoints() -> [DriveDataPoint] {
-        let n = 30
-        let avgSpeed = drive.durationMin > 0
-            ? drive.distanceKm / Double(drive.durationMin) * 60
-            : 0
-
-        return (0..<n).map { i in
-            let t = Double(i) * Double(drive.durationMin) / Double(n)
-
-            // Realistic curves using sin/cos with different phases
-            let speed = max(0, avgSpeed + sin(Double(i) * 0.5) * avgSpeed * 0.4)
-            let power = max(5, 20 + sin(Double(i) * 0.3) * 60 + cos(Double(i) * 0.7) * 20)
-            let altitude = 50 + sin(Double(i) * 0.2) * 30 + cos(Double(i) * 0.15) * 20
-            let insideTemp = 22 + sin(Double(i) * 0.1) * 3
-            let outsideTemp = drive.outsideTempAvg + sin(Double(i) * 0.05) * 0.5
-            let fl = 2.4 + sin(Double(i) * 0.3) * 0.05 + Double.random(in: 0...0.02)
-            let fr = 2.5 + sin(Double(i) * 0.3 + 1) * 0.05 + Double.random(in: 0...0.02)
-            let rl = 2.4 + sin(Double(i) * 0.3 + 2) * 0.05 + Double.random(in: 0...0.02)
-            let rr = 2.5 + sin(Double(i) * 0.3 + 3) * 0.05 + Double.random(in: 0...0.02)
-
-            return DriveDataPoint(
-                minute: t,
-                speed: speed,
-                power: power,
-                altitude: altitude,
-                insideTemp: insideTemp,
-                outsideTemp: outsideTemp,
-                tireFL: fl,
-                tireFR: fr,
-                tireRL: rl,
-                tireRR: rr
-            )
+            return [50, 80, 150, 200, 300, 350, 420, 380, 250, 180,
+                    120, 90, 150, 220, 310, 400, 450, 350, 200, 100,
+                    80, 120, 180, 250, 320, 380, 300, 200, 100, 50]
+        case .insideTemp:
+            return [22, 23, 24, 25, 26, 27, 26, 25, 24, 23,
+                    22, 21, 22, 23, 24, 25, 26, 25, 24, 23,
+                    22, 21, 20, 21, 22, 23, 24, 23, 22, 21]
+        case .outsideTemp:
+            return [15, 15, 16, 16, 17, 17, 18, 18, 17, 16,
+                    15, 15, 16, 17, 18, 18, 19, 18, 17, 16,
+                    15, 14, 14, 15, 16, 17, 17, 16, 15, 14]
         }
     }
 
     // MARK: - Date Formatting
-    private func formattedDate(_ isoString: String) -> String {
+    private func formattedDateTime(_ isoString: String) -> String {
         if let date = ISO8601Parser.parse(isoString) {
             let fmt = DateFormatter()
-            fmt.dateStyle = .medium
-            fmt.timeStyle = .short
-            fmt.locale = Locale.autoupdatingCurrent
+            fmt.dateFormat = "M月d日 HH:mm"
+            fmt.locale = Locale(identifier: "zh_CN")
             return fmt.string(from: date)
         }
         return isoString
     }
 }
 
+// MARK: - Route Trace Shape (dashed curve)
+private struct RouteTraceShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: rect.minX, y: rect.maxY * 0.85))
+        p.addQuadCurve(
+            to: CGPoint(x: rect.maxX * 0.9, y: rect.maxY * 0.2),
+            control: CGPoint(x: rect.midX, y: rect.maxY * 0.7)
+        )
+        return p
+    }
+}
+
+// MARK: - Route Endpoints (start dot + end flag square)
+private struct RouteEndpoints: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        // start dot
+        let dot = CGRect(x: rect.minX - 4, y: rect.maxY * 0.85 - 4, width: 8, height: 8)
+        p.addEllipse(in: dot)
+        // end flag marker
+        let flag = CGRect(x: rect.maxX * 0.9 - 5, y: rect.maxY * 0.2 - 5, width: 10, height: 10)
+        p.addRect(flag)
+        return p
+    }
+}
+
+// MARK: - Line Curve Chart (gold main line + dashed grid)
+private struct LineCurveChart: View {
+    let values: [Double]
+    let peakLabel: String
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            GeometryReader { geo in
+                let w = geo.size.width
+                let h = geo.size.height
+
+                // dashed grid
+                Path { p in
+                    for i in 1...3 {
+                        let y = h * CGFloat(i) / 4.0
+                        p.move(to: CGPoint(x: 0, y: y))
+                        p.addLine(to: CGPoint(x: w, y: y))
+                    }
+                }
+                .stroke(StitchColors.surfaceContainerHigh, style: StrokeStyle(lineWidth: 1, dash: [6, 6]))
+
+                // axes
+                Path { p in
+                    p.move(to: CGPoint(x: 0, y: h)); p.addLine(to: CGPoint(x: w, y: h))
+                    p.move(to: CGPoint(x: 0, y: 0)); p.addLine(to: CGPoint(x: 0, y: h))
+                }
+                .stroke(StitchColors.surfaceContainerHigh, lineWidth: 1.5)
+
+                // main gold curve
+                curvePath(w: w, h: h)
+                    .stroke(StitchColors.accent, style: StrokeStyle(lineWidth: 3, lineJoin: .round))
+            }
+
+            // Peak label
+            Text(peakLabel)
+                .font(.custom("JetBrainsMono-Medium", size: 10))
+                .foregroundColor(StitchColors.onSurface)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(StitchColors.background)
+                .overlay(RoundedRectangle(cornerRadius: 4).stroke(StitchColors.onSurface, lineWidth: 1))
+                .padding(.top, 4)
+                .padding(.trailing, 8)
+        }
+    }
+
+    private func curvePath(w: CGFloat, h: CGFloat) -> Path {
+        var p = Path()
+        guard values.count > 1 else { return p }
+        let minV = values.min() ?? 0
+        let maxV = values.max() ?? 1
+        let range = (maxV - minV) > 0 ? (maxV - minV) : 1
+        let stepX = w / CGFloat(values.count - 1)
+        for (i, v) in values.enumerated() {
+            let x = stepX * CGFloat(i)
+            let y = h - CGFloat((v - minV) / range) * (h * 0.9) - h * 0.05
+            if i == 0 { p.move(to: CGPoint(x: x, y: y)) } else { p.addLine(to: CGPoint(x: x, y: y)) }
+        }
+        return p
+    }
+}
+
 // MARK: - Preview
 #Preview {
-    DriveDetailView(
-        drive: Drive(
-            id: 1, carId: 1,
-            startDate: "2025-06-22T10:30:00.000Z",
-            endDate: "2025-06-22T11:15:00.000Z",
-            startAddress: "Home",
-            endAddress: "Office",
-            distanceKm: 35.2,
-            durationMin: 45,
-            consumptionKwh: 7.8,
-            efficiency: 185,
-            startBatteryLevel: 85,
-            endBatteryLevel: 72,
-            outsideTempAvg: 22.5
+    NavigationStack {
+        DriveDetailView(
+            drive: Drive(
+                id: 1, carId: 1,
+                startDate: "2025-06-22T10:30:00.000Z",
+                endDate: "2025-06-22T11:15:00.000Z",
+                distanceKm: 31.2,
+                durationMin: 22,
+                efficiency: 154,
+                consumptionKwh: 4.8,
+                startAddress: "家",
+                endAddress: "公司",
+                outsideTempAvg: 22.5,
+                startBatteryLevel: 85,
+                endBatteryLevel: 72
+            )
         )
-    )
+    }
 }
