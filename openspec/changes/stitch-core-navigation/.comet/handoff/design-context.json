@@ -1,0 +1,19 @@
+{
+  "change": "stitch-core-navigation",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "f99a209abd0f303e93f1a958a80ef28c55d269f84379478733e1bccd01f09d84",
+  "files": [
+    { "path": "openspec/changes/stitch-core-navigation/proposal.md", "sha256": "3cff6882d7be252291552ace62548f5173c254ec9e52e444f5b9e18c66b0c024" },
+    { "path": "openspec/changes/stitch-core-navigation/design.md", "sha256": "47c6c93741b6801c302bccb5ffe5c1c782c74461e85e33cb0df9a80dac74710a" },
+    { "path": "openspec/changes/stitch-core-navigation/tasks.md", "sha256": "2a5280e39bb0be04b614ea5f282a98b09e5701bdc5b0735e9b55752c94f578a8" },
+    { "path": "openspec/changes/stitch-core-navigation/specs/charge-list-stitch/spec.md", "sha256": "0fcd9b9c57ed0293f5ca23fc668944fdf3154a5ccaa9bc1613deee23323fc110" },
+    { "path": "openspec/changes/stitch-core-navigation/specs/core-navigation/spec.md", "sha256": "85fd534934506105d6f0e33c3ec7da6a590de64153e52665be49b92b31a5046c" },
+    { "path": "openspec/changes/stitch-core-navigation/specs/dashboard-stitch/spec.md", "sha256": "cff6a0250f5d1d6ca98483a7d2511340d2425c57cca16a54c8751a3d91007985" },
+    { "path": "openspec/changes/stitch-core-navigation/specs/more-menu-stitch/spec.md", "sha256": "12e4ea166920b7f92f687f702cd57991dd9abac71014351fba9c41d8b5ff2a2d" },
+    { "path": "openspec/changes/stitch-core-navigation/specs/stitch-design-system/spec.md", "sha256": "15e0f9ea0b6f0479e14951c94327f8eabbbab517fc5b0cc3b1b72ac288245a31" },
+    { "path": "openspec/changes/stitch-core-navigation/specs/trip-list-stitch/spec.md", "sha256": "67d3d555ea8401bd268ef1b38e01dec8bf29ba0d487e7f5bba6a9472dc6cbf3b" }
+  ]
+}

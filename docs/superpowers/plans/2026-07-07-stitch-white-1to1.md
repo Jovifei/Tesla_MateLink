@@ -2,6 +2,7 @@
 change: stitch-white-1to1
 design-doc: docs/superpowers/specs/2026-07-07-stitch-white-1to1-design.md
 base-ref: 5abae758d021c382d48cc9489fb4aa5abe97a6c9
+archived-with: 2026-07-08-stitch-white-1to1
 ---
 
 # Implementation Plan — stitch-white-1to1

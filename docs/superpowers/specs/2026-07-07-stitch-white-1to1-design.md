@@ -2,6 +2,8 @@
 comet_change: stitch-white-1to1
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-08-stitch-white-1to1
+status: final
 ---
 
 # Stitch White 1:1 — Technical Design
