@@ -26,7 +26,7 @@
 ## 4. L2 分析页（7页）
 
 - [ ] 4.1 续航分析 `c4bf3de8c1ee4f439751ab3bc14fb601` — 还原 Android RangeScreen + iOS RangeView（偏差+影响因素+评级+同车型对比）
-- [ ] 4.2 能耗分析 `3f828fd2e1bb462bb104b6aae0e19290` — 还原 Android EfficiencyScreen + iOS EfficiencyView（平均能耗+评级+趋势+散点+同车型+建议）
+- [x] 4.2 能耗分析 `3f828fd2e1bb462bb104b6aae0e19290` — 还原 Android EfficiencyScreen + iOS EfficiencyView（平均能耗+评级+趋势+散点+同车型+建议）
 - [ ] 4.3 电池健康 `a903f4ccfaf64988b12eebd9b6b07d5f` — 还原 Android BatteryHealthScreen + iOS BatteryHealthView（健康度+衰减+循环+温度+维护建议）
 - [ ] 4.4 待机耗电 `78dd96dc2e1d4882a30b0af4f9b83f17` — 还原 Android VampireScreen + iOS VampireView（损耗+来源+趋势+优化建议）
 - [ ] 4.5 热力图 `5ddffde05eba4fec9ba278857d5f5b24` — 还原 Android HeatmapScreen + iOS HeatmapView（24h网格+目的地+路线排行）
