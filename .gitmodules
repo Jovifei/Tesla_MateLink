@@ -1,0 +1,6 @@
+[submodule "app_glm"]
+	path = app_glm
+	url = https://github.com/Jovifei/tesla-master-glm.git
+[submodule "app_mimo"]
+	path = app_mimo
+	url = https://github.com/Jovifei/tesla-master-mimo.git
