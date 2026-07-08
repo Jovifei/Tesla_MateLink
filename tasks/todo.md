@@ -320,13 +320,19 @@ Configure `E:\project\tesla_master` as the parent GitHub repository, and make `a
 
 ## Plan
 
-- [ ] Capture current parent repository, branch, remote, and dirty state.
-- [ ] Remove global `ghfast.top` URL rewrite and credential override.
-- [ ] Configure parent remote as `https://github.com/Jovifei/Tesla_MateLink.git` and merge/push to `main`.
-- [ ] Initialize/configure `app_glm` remote as `https://github.com/Jovifei/tesla-master-glm.git` and push `main`.
-- [ ] Initialize/configure `app_mimo` remote as `https://github.com/Jovifei/tesla-master-mimo.git` and push `main`.
-- [ ] Record final repository relationship and any credential/push blockers.
+- [x] Capture current parent repository, branch, remote, and dirty state.
+- [x] Remove global `ghfast.top` URL rewrite and credential override.
+- [x] Configure parent remote as `https://github.com/Jovifei/Tesla_MateLink.git` and merge/push to `main`.
+- [x] Initialize/configure `app_glm` remote as `https://github.com/Jovifei/tesla-master-glm.git` and push `main`.
+- [x] Initialize/configure `app_mimo` remote as `https://github.com/Jovifei/tesla-master-mimo.git` and push `main`.
+- [x] Record final repository relationship and any credential/push blockers.
 
 ## Review Notes
 
-- `.kiro/skills/...` is currently untracked in the parent workspace and must not be included unless explicitly requested.
+- `ghfast.top` prompt root cause: global Git config had a URL rewrite from `https://github.com/` to `https://ghfast.top/https://github.com/`, so Git Credential Manager asked for credentials for `ghfast.top` instead of GitHub. The global rewrite and credential override were removed.
+- Parent repository is on `main`, remote `origin` is `https://github.com/Jovifei/Tesla_MateLink.git`, and remote `main` is `5fffced4bed713b84e70639a563b320691ecfc3c` before this result-record commit.
+- `app_glm` is now its own nested repository on `main`, remote `origin` is `https://github.com/Jovifei/tesla-master-glm.git`, and remote `main` is `fde4d2770d8bb5e2ed5526fa049a887450c4f41b`.
+- `app_mimo` is now its own nested repository on `main`, remote `origin` is `https://github.com/Jovifei/tesla-master-mimo.git`, and remote `main` is `7155ae608ef543e5310641b04949c6eb1fb5e81d`.
+- `app_glm` and `app_mimo` local repositories are clean after refreshing index state and locally excluding Android build artifacts (`android/.gradle/`, `.idea/`, `app/build/`, `local.properties`) via each child repo's `.git/info/exclude`.
+- `.kiro/skills/...` untracked local skill files were preserved in `stash@{0}` with message `temp: preserve untracked kiro skills before git split`; they were not pushed or deleted.
+- Final working tree status for parent, `app_glm`, and `app_mimo` is clean on `main`.
