@@ -42,7 +42,7 @@
 
 ## 6. L2 成本页（1页）
 
-- [ ] 6.1 成本分析 `cbf4541b745f447d8de3e67eacc2df50` — 还原 Android CostScreen + iOS CostView（月度成本+驾驶习惯+TOU 分时电价）
+- [x] 6.1 成本分析 `cbf4541b745f447d8de3e67eacc2df50` — 还原 Android CostScreen + iOS CostView（月度成本+驾驶习惯+TOU 分时电价）
 
 ## 7. 导航与入口接入
 
