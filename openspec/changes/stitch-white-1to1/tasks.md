@@ -20,7 +20,7 @@
 ## 3. L2 详情页（3页）
 
 - [x] 3.1 行程详情 `7262882484106971972` — 还原 Android DriveDetailScreen + iOS DriveDetailView（地图+5曲线 Tab+摘要，接行程列表跳转）
-- [ ] 3.2 充电详情 `12c4a93d5f484d1c89a16c3e385e59cb` — 还原 Android ChargeDetailScreen + iOS ChargeDetailView（4曲线+充电阶段+月度习惯，接充电列表跳转）
+- [x] 3.2 充电详情 `12c4a93d5f484d1c89a16c3e385e59cb` — 还原 Android ChargeDetailScreen + iOS ChargeDetailView（4曲线+充电阶段+月度习惯，接充电列表跳转）
 - [ ] 3.3 当前充电 `5d52c8ca82df434e9bd4a67e74290ffc` — 还原 Android CurrentChargeScreen + iOS CurrentChargeView（1s功率曲线+ETA+阶段；iOS 若缺则新建 Features/CurrentCharge/）
 
 ## 4. L2 分析页（7页）
