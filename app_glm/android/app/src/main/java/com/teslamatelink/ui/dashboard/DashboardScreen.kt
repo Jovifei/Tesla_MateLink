@@ -98,7 +98,7 @@ fun DashboardScreen(
                 actions = {
                     val isOnline = state.carStatus?.state == "online"
                     StitchStatusChip(
-                        text = if (isOnline) "ONLINE" else "OFFLINE",
+                        text = if (isOnline) "在线" else "离线",
                         status = if (isOnline) ChipStatus.ONLINE else ChipStatus.OFFLINE
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -124,7 +124,7 @@ fun DashboardScreen(
                                             fontSize = 16.sp
                                         )
                                         Text(
-                                            "${car.model} · ${car.totalDrives} drives",
+                                            "${car.model} · ${car.totalDrives} 次行程",
                                             color = StitchColors.OnSurfaceVariant,
                                             fontSize = 14.sp
                                         )
@@ -173,7 +173,7 @@ fun DashboardScreen(
                         ) {
                             Column {
                                 Text(
-                                    text = "BATTERY",
+                                    text = "电池电量",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -190,7 +190,7 @@ fun DashboardScreen(
                             }
                             Text(
                                 text = "${status.estBatteryRangeKm.toInt()} km",
-                                color = StitchColors.OnSurfaceVariant,
+                                color = StitchColors.Accent,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium,
                                 fontFamily = JetBrainsMonoFamily
@@ -213,7 +213,7 @@ fun DashboardScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Limit: ${status.chargeLimitSoc}%",
+                                text = "充电限制: ${status.chargeLimitSoc}%",
                                 color = StitchColors.OnSurfaceVariant,
                                 fontSize = 12.sp,
                                 letterSpacing = 0.6.sp
@@ -228,14 +228,14 @@ fun DashboardScreen(
                     }
 
                     // ── Charging Card (conditional) ──────────────────────────
-                    if (status.isCharging && status.chargerPower != null) {
+                    if (status.pluggedIn) {
                         StitchCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(onClick = onNavigateToCharges)
                         ) {
                             Text(
-                                text = "CHARGING",
+                                text = "充电中",
                                 color = StitchColors.StatusCharging,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
@@ -248,7 +248,7 @@ fun DashboardScreen(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Power",
+                                        text = "功率",
                                         color = StitchColors.OnSurfaceVariant,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
@@ -264,7 +264,7 @@ fun DashboardScreen(
                                 }
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
-                                        text = "Added",
+                                        text = "已充",
                                         color = StitchColors.OnSurfaceVariant,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
@@ -280,7 +280,7 @@ fun DashboardScreen(
                                 }
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text(
-                                        text = "Remaining",
+                                        text = "剩余",
                                         color = StitchColors.OnSurfaceVariant,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
@@ -301,7 +301,7 @@ fun DashboardScreen(
                     // ── Climate Card ─────────────────────────────────────────
                     StitchCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "CLIMATE",
+                            text = "温度",
                             color = StitchColors.OnSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -314,7 +314,7 @@ fun DashboardScreen(
                         ) {
                             Column {
                                 Text(
-                                    text = "Inside",
+                                    text = "车内",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -330,7 +330,7 @@ fun DashboardScreen(
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = "Outside",
+                                    text = "车外",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -346,14 +346,14 @@ fun DashboardScreen(
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = "Climate",
+                                    text = "空调",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 0.6.sp
                                 )
                                 StitchStatusChip(
-                                    text = if (status.isClimateOn) "ON" else "OFF",
+                                    text = if (status.isClimateOn) "开" else "关",
                                     status = if (status.isClimateOn) ChipStatus.ONLINE else ChipStatus.OFFLINE
                                 )
                             }
@@ -363,7 +363,7 @@ fun DashboardScreen(
                     // ── Status Card ──────────────────────────────────────────
                     StitchCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "STATUS",
+                            text = "车辆状态",
                             color = StitchColors.OnSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -371,25 +371,25 @@ fun DashboardScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "LOCK",
-                            value = if (status.locked) "Locked" else "Unlocked"
+                            label = "车锁",
+                            value = if (status.locked) "已锁" else "未锁"
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "SENTRY",
-                            value = if (status.sentryMode) "Active" else "Off"
+                            label = "哨兵",
+                            value = if (status.sentryMode) "开启" else "关闭"
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "PLUG",
-                            value = if (status.pluggedIn) "Connected" else "Disconnected"
+                            label = "充电口",
+                            value = if (status.pluggedIn) "已连接" else "未连接"
                         )
                     }
 
                     // ── Tire Pressure Card ───────────────────────────────────
                     StitchCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "TIRE PRESSURE",
+                            text = "胎压监测 (bar)",
                             color = StitchColors.OnSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -402,7 +402,7 @@ fun DashboardScreen(
                         ) {
                             Column {
                                 Text(
-                                    text = "FL",
+                                    text = "左前 (FL)",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -418,7 +418,7 @@ fun DashboardScreen(
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = "FR",
+                                    text = "右前 (FR)",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -434,7 +434,7 @@ fun DashboardScreen(
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = "RL",
+                                    text = "左后 (RL)",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -450,7 +450,7 @@ fun DashboardScreen(
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = "RR",
+                                    text = "右后 (RR)",
                                     color = StitchColors.OnSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -470,7 +470,7 @@ fun DashboardScreen(
                     // ── Quick Navigation ─────────────────────────────────────
                     StitchCard(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "QUICK ACCESS",
+                            text = "快速访问",
                             color = StitchColors.OnSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -478,37 +478,37 @@ fun DashboardScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         StitchDataRow(
-                            label = "DRIVES",
+                            label = "行程",
                             value = "→",
                             modifier = Modifier.clickable(onClick = onNavigateToDrives)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "CHARGES",
+                            label = "充电",
                             value = "→",
                             modifier = Modifier.clickable(onClick = onNavigateToCharges)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "BATTERY",
+                            label = "电池",
                             value = "→",
                             modifier = Modifier.clickable(onClick = onNavigateToBattery)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "UPDATES",
+                            label = "更新",
                             value = "→",
                             modifier = Modifier.clickable(onClick = onNavigateToUpdates)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "STATISTICS",
+                            label = "统计",
                             value = "→",
                             modifier = Modifier.clickable(onClick = onNavigateToStatistics)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         StitchDataRow(
-                            label = "EFFICIENCY",
+                            label = "效率",
                             value = "→",
                             modifier = Modifier.clickable(onClick = onNavigateToEfficiency)
                         )

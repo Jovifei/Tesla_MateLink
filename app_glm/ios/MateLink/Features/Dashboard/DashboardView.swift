@@ -17,7 +17,7 @@ struct DashboardView: View {
                     if let s = status {
                         // ── Battery Card ───────────────────────────────────
                         StitchCard {
-                            StitchLabel("BATTERY")
+                            StitchLabel("电池电量")
                             HStack(alignment: .bottom) {
                                 Text("\(s.batteryLevel)%")
                                     .font(StitchFont.dataLg())
@@ -25,7 +25,7 @@ struct DashboardView: View {
                                 Spacer()
                                 Text("\(s.estBatteryRangeKm) km")
                                     .font(StitchFont.dataMd())
-                                    .foregroundColor(StitchColors.onSurfaceVariant)
+                                    .foregroundColor(StitchColors.accent)
                             }
                             Spacer(minLength: 12)
                             // Progress bar
@@ -42,7 +42,7 @@ struct DashboardView: View {
                             .frame(height: 4)
                             Spacer(minLength: 8)
                             HStack {
-                                Text("Limit: \(s.chargeLimitSoc)%")
+                                Text("充电限制: \(s.chargeLimitSoc)%")
                                     .font(StitchFont.labelCaps())
                                     .foregroundColor(StitchColors.onSurfaceVariant)
                                 Spacer()
@@ -53,57 +53,57 @@ struct DashboardView: View {
                         }
 
                         // ── Charging Card (conditional) ────────────────────
-                        if s.state == .charging {
+                        if s.chargePortDoorOpen {
                             StitchCard {
-                                StitchLabel("CHARGING", color: StitchColors.statusCharging)
+                                StitchLabel("充电中", color: StitchColors.statusCharging)
                                 Spacer(minLength: 12)
                                 HStack {
-                                    StitchDataColumn(label: "Power", value: "\(Int(s.chargerPower)) kW")
+                                    StitchDataColumn(label: "功率", value: "\(Int(s.chargerPower)) kW")
                                     Spacer()
-                                    StitchDataColumn(label: "Added", value: String(format: "%.1f kWh", s.chargeEnergyAdded), alignment: .center)
+                                    StitchDataColumn(label: "已充", value: String(format: "%.1f kWh", s.chargeEnergyAdded), alignment: .center)
                                     Spacer()
-                                    StitchDataColumn(label: "Remaining", value: String(format: "%.1fh", s.timeToFullCharge), alignment: .trailing)
+                                    StitchDataColumn(label: "剩余", value: String(format: "%.1fh", s.timeToFullCharge), alignment: .trailing)
                                 }
                             }
                         }
 
                         // ── Climate Card ───────────────────────────────────
                         StitchCard {
-                            StitchLabel("CLIMATE")
+                            StitchLabel("温度")
                             Spacer(minLength: 12)
                             HStack {
-                                StitchDataColumn(label: "Inside", value: String(format: "%.1f°C", s.insideTemp))
+                                StitchDataColumn(label: "车内", value: String(format: "%.1f°C", s.insideTemp))
                                 Spacer()
-                                StitchDataColumn(label: "Outside", value: String(format: "%.1f°C", s.outsideTemp), alignment: .center)
+                                StitchDataColumn(label: "车外", value: String(format: "%.1f°C", s.outsideTemp), alignment: .center)
                                 Spacer()
-                                StitchDataColumn(label: "Climate", value: s.isClimateOn ? "ON" : "OFF", alignment: .trailing)
+                                StitchDataColumn(label: "空调", value: s.isClimateOn ? "开" : "关", alignment: .trailing)
                             }
                         }
 
                         // ── Status Card ────────────────────────────────────
                         StitchCard {
-                            StitchLabel("STATUS")
+                            StitchLabel("车辆状态")
                             Spacer(minLength: 12)
-                            StitchDataRow(label: "LOCK", value: s.locked ? "Locked" : "Unlocked")
+                            StitchDataRow(label: "车锁", value: s.locked ? "已锁" : "未锁")
                             Spacer(minLength: 12)
-                            StitchDataRow(label: "SENTRY", value: s.sentryMode ? "Active" : "Off")
+                            StitchDataRow(label: "哨兵", value: s.sentryMode ? "开启" : "关闭")
                             Spacer(minLength: 12)
-                            StitchDataRow(label: "PLUG", value: s.chargePortDoorOpen ? "Connected" : "Disconnected")
+                            StitchDataRow(label: "充电口", value: s.chargePortDoorOpen ? "已连接" : "未连接")
                         }
 
                         // ── Tire Pressure Card ─────────────────────────────
                         if let t = s.tirePressure {
                             StitchCard {
-                                StitchLabel("TIRE PRESSURE")
+                                StitchLabel("胎压监测 (bar)")
                                 Spacer(minLength: 12)
                                 HStack {
-                                    StitchDataColumn(label: "FL", value: String(format: "%.1f", t.frontLeft))
+                                    StitchDataColumn(label: "左前 (FL)", value: String(format: "%.1f", t.frontLeft))
                                     Spacer()
-                                    StitchDataColumn(label: "FR", value: String(format: "%.1f", t.frontRight), alignment: .center)
+                                    StitchDataColumn(label: "右前 (FR)", value: String(format: "%.1f", t.frontRight), alignment: .center)
                                     Spacer()
-                                    StitchDataColumn(label: "RL", value: String(format: "%.1f", t.rearLeft), alignment: .center)
+                                    StitchDataColumn(label: "左后 (RL)", value: String(format: "%.1f", t.rearLeft), alignment: .center)
                                     Spacer()
-                                    StitchDataColumn(label: "RR", value: String(format: "%.1f", t.rearRight), alignment: .trailing)
+                                    StitchDataColumn(label: "右后 (RR)", value: String(format: "%.1f", t.rearRight), alignment: .trailing)
                                 }
                             }
                         }
@@ -113,20 +113,20 @@ struct DashboardView: View {
 
                         // ── Quick Access Card ──────────────────────────────
                         StitchCard {
-                            StitchLabel("QUICK ACCESS")
+                            StitchLabel("快速访问")
                             Spacer(minLength: 16)
-                            StitchDataRow(label: "DRIVES", value: "→")
+                            StitchDataRow(label: "行程", value: "→")
                             Spacer(minLength: 12)
-                            StitchDataRow(label: "CHARGES", value: "→")
+                            StitchDataRow(label: "充电", value: "→")
                             Spacer(minLength: 12)
-                            StitchDataRow(label: "BATTERY", value: "→")
+                            StitchDataRow(label: "电池", value: "→")
                         }
                     } else {
                         // Loading state
                         VStack(spacing: 16) {
                             ProgressView()
                                 .tint(StitchColors.onSurface)
-                            Text("Loading...")
+                            Text("加载中...")
                                 .font(StitchFont.bodySm())
                                 .foregroundColor(StitchColors.onSurfaceVariant)
                         }
@@ -165,7 +165,7 @@ struct DashboardView: View {
             Spacer()
             if let s = status {
                 StitchStatusChip(
-                    text: StateColor.label(s.state).uppercased(),
+                    text: s.state == .online ? "在线" : "离线",
                     isOnline: s.state == .online,
                     isCharging: s.state == .charging
                 )
@@ -266,7 +266,7 @@ struct CarSwitcherView: View {
                             Text(car.name)
                                 .font(StitchFont.bodyLg())
                                 .foregroundColor(StitchColors.onSurface)
-                            Text("\(car.model) · \(car.totalDrives) drives")
+                            Text("\(car.model) · \(car.totalDrives) 次行程")
                                 .font(StitchFont.bodySm())
                                 .foregroundColor(StitchColors.onSurfaceVariant)
                         }
@@ -280,7 +280,7 @@ struct CarSwitcherView: View {
             }
             .scrollContentBackground(.hidden)
             .background(StitchColors.background)
-            .navigationTitle("Select Vehicle")
+            .navigationTitle("选择车辆")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
