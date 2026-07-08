@@ -309,3 +309,24 @@ Close visible page navigation and button-click gaps in `app_mimo` without changi
 - Deferred parity gaps from sidecar: Android lacks Heatmap/Top Destinations rows; iOS lacks Android Saved Trips entry.
 - Final static verification: Android tariff callback and visible card both match; Dashboard no-op chip search returns no matches; iOS new destination searches match; Android base strings XML parses; `git diff --check -- app_mimo tasks/todo.md` passes with line-ending warnings only.
 - Toolchain boundary: `java`, `swift`, and `xcodebuild` are unavailable on this Windows machine, so native Android/iOS compile proof remains deferred.
+
+---
+
+# Git Remote Split And Main Push - 2026-07-08
+
+## Goal
+
+Configure `E:\project\tesla_master` as the parent GitHub repository, and make `app_glm` / `app_mimo` independently pushable to their own GitHub repositories, all using official GitHub URLs instead of the `ghfast.top` rewrite.
+
+## Plan
+
+- [ ] Capture current parent repository, branch, remote, and dirty state.
+- [ ] Remove global `ghfast.top` URL rewrite and credential override.
+- [ ] Configure parent remote as `https://github.com/Jovifei/Tesla_MateLink.git` and merge/push to `main`.
+- [ ] Initialize/configure `app_glm` remote as `https://github.com/Jovifei/tesla-master-glm.git` and push `main`.
+- [ ] Initialize/configure `app_mimo` remote as `https://github.com/Jovifei/tesla-master-mimo.git` and push `main`.
+- [ ] Record final repository relationship and any credential/push blockers.
+
+## Review Notes
+
+- `.kiro/skills/...` is currently untracked in the parent workspace and must not be included unless explicitly requested.
