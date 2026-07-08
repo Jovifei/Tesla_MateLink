@@ -107,21 +107,23 @@ struct MoreView: View {
         case "efficiency":
             EfficiencyView()
         case "range":
-            RangeAnalysisView()
+            RangePageView()
         case "vampire":
-            PlaceholderView(title: "能耗分析")
+            VampireView()
         case "battery_health":
-            PlaceholderView(title: "电池健康")
+            BatteryHealthView()
         case "timeline":
-            PlaceholderView(title: "时间线")
+            TimelineView()
+        case "cost":
+            CostView()
         case "annual_report":
             PlaceholderView(title: "年度报告")
         case "data_export":
             PlaceholderView(title: "数据导出")
         case "firmware_version":
-            PlaceholderView(title: "固件版本")
+            UpdatesView()
         case "settings":
-            PlaceholderView(title: "设置")
+            SettingsView()
         case "about":
             AboutView()
         case "sentry_history":
@@ -161,6 +163,7 @@ private let analysisEntries: [MoreEntry] = [
 ]
 
 private let reportEntries: [MoreEntry] = [
+    MoreEntry("成本分析", "分时电价与充电成本", "yensign.circle", "cost"),
     MoreEntry("年度报告 PDF", "年度驾驶总结", "doc.richtext", "annual_report"),
     MoreEntry("数据导出 CSV/JSON", "导出原始数据", "square.and.arrow.down", "data_export"),
     MoreEntry("固件版本", "当前固件版本", "terminal", "firmware_version", trailingValue: "2024.26.7"),
@@ -255,12 +258,5 @@ private struct PlaceholderView: View {
     var body: some View {
         Text(title)
             .navigationTitle(title)
-    }
-}
-
-private struct RangeAnalysisView: View {
-    var body: some View {
-        Text("续航分析")
-            .navigationTitle("续航分析")
     }
 }

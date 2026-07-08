@@ -1,26 +1,5 @@
 import SwiftUI
 
-struct MoreView: View {
-    var body: some View {
-        NavigationStack {
-            List {
-                NavigationLink(destination: StatisticsView()) { Label("Statistics", systemImage: "chart.bar.fill") }
-                NavigationLink(destination: HeatmapView()) { Label("Heatmap", systemImage: "flame.fill") }
-                NavigationLink(destination: EfficiencyView()) { Label("Efficiency", systemImage: "leaf.fill") }
-                NavigationLink(destination: DestinationsView()) { Label("Destinations", systemImage: "mappin.and.ellipse") }
-                NavigationLink(destination: CostView()) { Label("Cost", systemImage: "yensign.circle.fill") }
-                NavigationLink(destination: RangePageView()) { Label("Range", systemImage: "arrow.triangle.pull") }
-                NavigationLink(destination: VampireView()) { Label("Vampire Drain", systemImage: "bolt.slash.fill") }
-                NavigationLink(destination: BatteryHealthView()) { Label("Battery Health", systemImage: "battery.75percent") }
-                NavigationLink(destination: TimelineView()) { Label("Timeline", systemImage: "clock") }
-                NavigationLink(destination: UpdatesView()) { Label("Updates", systemImage: "desktopcomputer") }
-                NavigationLink(destination: SettingsView()) { Label("Settings", systemImage: "gear") }
-                NavigationLink(destination: AboutView()) { Label("About", systemImage: "info.circle") }
-            }.navigationTitle("More")
-        }
-    }
-}
-
 // MARK: - Stitch-styled Settings
 
 private struct StitchTextField: View {
