@@ -46,14 +46,14 @@
 
 ## 7. 导航与入口接入
 
-- [ ] 7.1 Android NavGraph 核实所有 19 页路由注册 + 跳转链路（仪表盘→行程详情、充电历史→充电详情/当前充电、更多→各分析/系统页、里程钻取年→月→日）
-- [ ] 7.2 iOS MoreView/ContentView 核实所有 19 页入口 + NavigationLink 链路
-- [ ] 7.3 中文文案对齐 Stitch（Tab 标签 仪表盘/行程/充电/更多；页面标题；状态文案）
+- [x] 7.1 Android NavGraph 核实所有 19 页路由注册 + 跳转链路（仪表盘→行程详情、充电历史→充电详情/当前充电、更多→各分析/系统页、里程钻取年→月→日）
+- [x] 7.2 iOS MoreView/ContentView 核实所有 19 页入口 + NavigationLink 链路
+- [x] 7.3 中文文案对齐 Stitch（Tab 标签 仪表盘/行程/充电/更多；页面标题；状态文案）
 
 ## 8. 验证（文件结构 + 视觉 checklist）
 
-- [ ] 8.1 文件存在性：19 页 Android Composable + 19 页 iOS SwiftUI View 均存在且非空
-- [ ] 8.2 视觉 checklist：无阴影/elevation、所有卡 1px #E5E5E5 边框、8px 圆角、数字 JetBrains Mono tabular-nums、文字 Inter
-- [ ] 8.3 Stitch 截图对照：每页 Android+iOS 渲染与 Stitch screenshot 肉眼比对（关键页抽样）
-- [ ] 8.4 数据层未改核实：grep 确认无 ViewModel/Repository/Dao 改动
-- [ ] 8.5 导航链路核实：所有跳转可达，无断链
+- [x] 8.1 文件存在性：19 页 Android Composable + 19 页 iOS SwiftUI View 均存在且非空
+- [x] 8.2 视觉 checklist：无阴影/elevation、所有卡 1px #E5E5E5 边框、8px 圆角、数字 JetBrains Mono tabular-nums、文字 Inter
+- [~] 8.3 Stitch 截图对照（跳过：无渲染环境，已用视觉 checklist 替代）
+- [x] 8.4 数据层未改核实：grep 确认无 ViewModel/Repository/Dao 改动
+- [x] 8.5 导航链路核实：所有跳转可达，无断链
