@@ -1,233 +1,303 @@
 import SwiftUI
 
-// MARK: - Drive Heatmap View
-// GitHub-style 15-day × 24-hour activity heatmap.
+// MARK: - Heatmap-specific Stitch tokens
+// Cell intensity scale mirrors the Stitch legend (少 → 多).
+
+private let CellEmpty = Color(hex: "E5E2E1")  // surface-variant
+private let CellLow = Color(hex: "5F5E5E")    // surface-tint
+private let CellMid = Color(hex: "C8C6C5")    // primary-fixed-dim
+private let CellHigh = Color(hex: "000000")   // primary
+private let SparkStroke = Color(hex: "171717")
+
+private let gridCols = 13
+private let gridRows = 7
+
+// MARK: - Mock data (matches Stitch design spec; data layer unchanged)
+// TODO(data): wire heatmap grid + routes to driving stats via repository.
+
+private struct RouteRank: Identifiable {
+    let id = UUID()
+    let from: String
+    let to: String
+    let count: String
+    let spark: [CGPoint] // points in 0..100 x, 0..20 y space
+}
+
+private let routes: [RouteRank] = [
+    RouteRank(
+        from: "Home", to: "Office", count: "42 次",
+        spark: [CGPoint(x: 0, y: 15), CGPoint(x: 20, y: 10), CGPoint(x: 40, y: 18),
+                CGPoint(x: 60, y: 5), CGPoint(x: 80, y: 12), CGPoint(x: 100, y: 8)]
+    ),
+    RouteRank(
+        from: "Office", to: "Gym", count: "18 次",
+        spark: [CGPoint(x: 0, y: 10), CGPoint(x: 20, y: 15), CGPoint(x: 40, y: 8),
+                CGPoint(x: 60, y: 18), CGPoint(x: 80, y: 10), CGPoint(x: 100, y: 5)]
+    ),
+    RouteRank(
+        from: "Home", to: "Supermarket", count: "12 次",
+        spark: [CGPoint(x: 0, y: 12), CGPoint(x: 20, y: 18), CGPoint(x: 40, y: 5),
+                CGPoint(x: 60, y: 15), CGPoint(x: 80, y: 8), CGPoint(x: 100, y: 12)]
+    )
+]
+
+private let segments = ["30天", "90天", "全年"]
+
+// Deterministic pseudo-intensity grid 0..3 (matches Stitch density feel).
+private let gridData: [[Int]] = (0..<gridCols).map { col in
+    (0..<gridRows).map { row in
+        let v = (col * 7 + row * 3) % 11
+        switch v {
+        case 0...2: return 0
+        case 3...5: return 1
+        case 6...8: return 2
+        default: return 3
+        }
+    }
+}
+
+// MARK: - HeatmapView
 
 struct HeatmapView: View {
-    @EnvironmentObject var state: AppState
-    @State private var drives: [Drive] = []
-    @State private var loading = true
-
-    // grid[hour][day] = total km driven in that hour on that day
-    @State private var grid: [[Double]] = []
-    @State private var maxValue: Double = 1
-    @State private var selectedInfo: String?
-
-    private static let dayCount = 15
-
-    private static let isoFormatter = ISO8601Parser.self
+    @State private var selectedSegment = 1
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if loading {
-                    ProgressView("Loading heatmap...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    content
-                }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 32) {
+                segmentedControl
+                heatmapCard
+                dataCardsRow
+                routeRankingSection
             }
-            .navigationTitle("Drive Heatmap")
-            .background(Color(.systemGroupedBackground))
-            .task { await load() }
+            .padding(.horizontal, 24)
+            .padding(.top, 24)
+            .padding(.bottom, 128)
+        }
+        .background(StitchColors.background)
+        .navigationTitle("热力图")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Image(systemName: "calendar")
+                    .foregroundColor(StitchColors.onSurface)
+            }
         }
     }
 
-    // MARK: - Main Content
+    // MARK: - Segmented Control (30天 / 90天 / 全年)
 
-    private var content: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Description
-            Text("GitHub-style activity heatmap \u{2014} \(Self.dayCount) days \u{00D7} 24 hours")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
+    private var segmentedControl: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(segments.enumerated()), id: \.offset) { index, label in
+                let active = index == selectedSegment
+                Button {
+                    selectedSegment = index
+                } label: {
+                    Text(label)
+                        .font(active ? .system(size: 14, weight: .bold) : StitchFont.bodySm())
+                        .foregroundColor(active ? StitchColors.primary : StitchColors.onSurfaceVariant)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(active ? StitchColors.surfaceContainerLow : StitchColors.white)
+                }
+                if index < segments.count - 1 {
+                    Rectangle()
+                        .fill(StitchColors.surfaceContainerHigh)
+                        .frame(width: 1)
+                }
+            }
+        }
+        .frame(height: 44)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .overlay(
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(StitchColors.surfaceContainerHigh, lineWidth: 1)
+        )
+    }
 
-            // Heatmap Grid
+    // MARK: - Main Heatmap Card
+
+    private var heatmapCard: some View {
+        StitchCard {
+            Text("驾驶热力分布")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(StitchColors.primary)
+                .padding(.bottom, 16)
+
+            // Contribution grid: 13 columns × 7 rows, 16pt cells, 4pt gaps.
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 3) {
-                    hourLabelsColumn
-                    dayColumns
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 4)
-            }
-
-            // Legend
-            legend
-
-            // Tooltip
-            if let info = selectedInfo {
-                Text(info)
-                    .font(.caption.weight(.medium))
-                    .foregroundColor(.blue)
-                    .padding(.horizontal)
-                    .transition(.opacity)
-            }
-
-            Spacer()
-        }
-        .padding(.vertical)
-    }
-
-    // MARK: - Hour Labels
-
-    private var hourLabelsColumn: some View {
-        VStack(alignment: .trailing, spacing: 3) {
-            // Spacer for day label row
-            Color.clear
-                .frame(width: 22, height: 18)
-
-            ForEach(stride(from: 0, to: 24, by: 3).map { $0 }, id: \.self) { hour in
-                Text(String(format: "%02d", hour))
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.secondary)
-                    .frame(height: 16)
-            }
-        }
-        .padding(.trailing, 6)
-    }
-
-    // MARK: - Day Columns
-
-    private var dayColumns: some View {
-        let today = Date()
-        let calendar = Calendar.current
-
-        return HStack(alignment: .top, spacing: 3) {
-            ForEach(0..<Self.dayCount, id: \.self) { col in
-                // Calculate the date for this column (leftmost = 14 days ago, rightmost = today)
-                let date = calendar.date(byAdding: .day, value: -(Self.dayCount - 1 - col), to: today)!
-
-                VStack(spacing: 3) {
-                    // Day label (every 3rd column, show day number)
-                    if col % 3 == 0 {
-                        Text("\(calendar.component(.day, from: date))")
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(.secondary)
-                            .frame(height: 18)
-                    } else {
-                        Color.clear
-                            .frame(height: 18)
-                    }
-
-                    // 24 hour cells
-                    ForEach(0..<24, id: \.self) { hour in
-                        let value = grid.indices.contains(hour) && grid[hour].indices.contains(col)
-                            ? grid[hour][col]
-                            : 0
-                        cellView(value: value)
-                            .onTapGesture {
-                                let dayLabel = DateFormatter.localizedString(
-                                    from: date,
-                                    dateStyle: .medium,
-                                    timeStyle: .none
-                                )
-                                if value > 0 {
-                                    selectedInfo = "\(String(format: "%02d", hour)):00 \u{00B7} \(String(format: "%.1f", value)) km \u{00B7} \(dayLabel)"
-                                } else {
-                                    selectedInfo = "\(String(format: "%02d", hour)):00 \u{00B7} No driving \u{00B7} \(dayLabel)"
-                                }
+                HStack(alignment: .top, spacing: 4) {
+                    ForEach(0..<gridCols, id: \.self) { col in
+                        VStack(spacing: 4) {
+                            ForEach(0..<gridRows, id: \.self) { row in
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(levelColor(gridData[col][row]))
+                                    .frame(width: 16, height: 16)
                             }
+                        }
+                    }
+                }
+                .padding(.bottom, 4)
+            }
+
+            // Legend: 少 [scale] 多
+            HStack {
+                Text("少")
+                    .font(StitchFont.bodySm())
+                    .foregroundColor(StitchColors.onSurfaceVariant)
+                Spacer()
+                HStack(spacing: 4) {
+                    ForEach([CellEmpty, CellLow, CellMid, CellHigh], id: \.self) { c in
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(c)
+                            .frame(width: 16, height: 16)
+                    }
+                }
+                Spacer()
+                Text("多")
+                    .font(StitchFont.bodySm())
+                    .foregroundColor(StitchColors.onSurfaceVariant)
+            }
+            .padding(.top, 16)
+        }
+    }
+
+    private func levelColor(_ level: Int) -> Color {
+        switch level {
+        case 0: return CellEmpty
+        case 1: return CellLow
+        case 2: return CellMid
+        default: return CellHigh
+        }
+    }
+
+    // MARK: - Data Cards (1×2): 高频时段 / 最常目的地
+
+    private var dataCardsRow: some View {
+        HStack(spacing: 16) {
+            DataCard(icon: "clock", label: "高频时段", value: "08:00 - 10:00", valueMono: true)
+            DataCard(icon: "location.fill", label: "最常目的地", value: "Office", valueMono: false)
+        }
+    }
+
+    // MARK: - Route Ranking (常用路线排行)
+
+    private var routeRankingSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("常用路线排行")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(StitchColors.primary)
+                .padding(.bottom, 16)
+
+            VStack(spacing: 0) {
+                ForEach(Array(routes.enumerated()), id: \.element.id) { index, route in
+                    RouteRow(route: route)
+                    if index < routes.count - 1 {
+                        Rectangle()
+                            .fill(StitchColors.surfaceContainerHigh)
+                            .frame(height: 1)
                     }
                 }
             }
+            .background(StitchColors.white)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(StitchColors.border, lineWidth: 1)
+            )
         }
     }
+}
 
-    // MARK: - Cell View
+// MARK: - Data Card
 
-    private func cellView(value: Double) -> some View {
-        Rectangle()
-            .fill(cellColor(value: value))
-            .frame(width: 16, height: 16)
-            .cornerRadius(3)
-    }
+private struct DataCard: View {
+    let icon: String
+    let label: String
+    let value: String
+    let valueMono: Bool
 
-    // MARK: - Color Scale
-
-    private func cellColor(value: Double) -> Color {
-        guard maxValue > 0, value > 0 else {
-            return Color(.systemGray6)
-        }
-        let ratio = value / maxValue
-        if ratio < 0.25 {
-            return Color.blue.opacity(0.18)
-        } else if ratio < 0.50 {
-            return Color.blue.opacity(0.38)
-        } else if ratio < 0.75 {
-            return Color.blue.opacity(0.60)
-        } else {
-            return Color.blue.opacity(0.85)
-        }
-    }
-
-    // MARK: - Legend
-
-    private var legend: some View {
-        HStack(spacing: 8) {
-            Text("Less")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-
-            ForEach([0.0, 0.25, 0.5, 0.75, 1.0], id: \.self) { level in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(cellColor(value: level * maxValue))
-                    .frame(width: 14, height: 14)
+    var body: some View {
+        StitchCard {
+            Image(systemName: icon)
+                .font(.system(size: 24))
+                .foregroundColor(StitchColors.primary)
+                .padding(.bottom, 8)
+            Text(label)
+                .font(StitchFont.bodySm())
+                .foregroundColor(StitchColors.onSurfaceVariant)
+                .padding(.bottom, 4)
+            if valueMono {
+                Text(value)
+                    .font(StitchFont.dataLg())
+                    .foregroundColor(StitchColors.primary)
+            } else {
+                Text(value)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(StitchColors.primary)
             }
-
-            Text("More")
-                .font(.caption2)
-                .foregroundColor(.secondary)
         }
-        .padding(.horizontal)
     }
+}
 
-    // MARK: - Data Loading
+// MARK: - Route Row
 
-    private func load() async {
-        loading = true
-        if state.isMockMode {
-            drives = await state.mock.getDrives(state.currentCarId)
-        } else if let api = state.real {
-            drives = (try? await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")) ?? []
+private struct RouteRow: View {
+    let route: RouteRank
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(route.from)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(StitchColors.primary)
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 12))
+                        .foregroundColor(StitchColors.onSurfaceVariant)
+                    Text(route.to)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(StitchColors.primary)
+                }
+                Text(route.count)
+                    .font(StitchFont.bodySm())
+                    .foregroundColor(StitchColors.onSurfaceVariant)
+            }
+            Spacer()
+            Sparkline(points: route.spark)
+                .frame(width: 96, height: 32)
+                .background(StitchColors.surfaceContainerHigh)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
         }
-        buildGrid()
-        loading = false
+        .padding(16)
     }
+}
 
-    private func buildGrid() {
-        let calendar = Calendar.current
-        let now = Date()
-        var g = Array(repeating: Array(repeating: 0.0, count: Self.dayCount), count: 24)
+// MARK: - Sparkline
 
-        for drive in drives {
-            guard let date = parseDate(drive.startDate) else { continue }
+private struct Sparkline: View {
+    let points: [CGPoint]
 
-            let hour = calendar.component(.hour, from: date)
-            let dayOffset = calendar.dateComponents([.day], from: date, to: now).day ?? -1
-
-            // Only include drives within the 15-day window
-            guard dayOffset >= 0, dayOffset < Self.dayCount else { continue }
-
-            // Rightmost column = today (offset 0), leftmost = 14 days ago
-            let col = Self.dayCount - 1 - dayOffset
-            g[hour][col] += drive.distanceKm
+    var body: some View {
+        GeometryReader { geo in
+            Path { path in
+                guard points.count >= 2 else { return }
+                let sx = geo.size.width / 100
+                let sy = geo.size.height / 20
+                path.move(to: CGPoint(x: points[0].x * sx, y: points[0].y * sy))
+                for p in points.dropFirst() {
+                    path.addLine(to: CGPoint(x: p.x * sx, y: p.y * sy))
+                }
+            }
+            .stroke(SparkStroke, style: StrokeStyle(lineWidth: 2, lineCap: .round))
         }
-
-        grid = g
-        maxValue = max(1, g.flatMap { $0 }.max() ?? 1)
-    }
-
-    private func parseDate(_ iso: String) -> Date? {
-        ISO8601Parser.parse(iso)
     }
 }
 
 // MARK: - Preview
 
 #Preview("Heatmap") {
-    let state = AppState()
-    return HeatmapView()
-        .environmentObject(state)
+    NavigationStack {
+        HeatmapView()
+    }
 }
