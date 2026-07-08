@@ -62,7 +62,7 @@ fun DriveListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.drives),
+                        text = "行程历史",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = StitchColors.OnSurface,
@@ -163,8 +163,8 @@ fun DriveListScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             StitchDataRow(
-                                label = "能耗",
-                                value = "%.0f Wh/km".format(drive.efficiency)
+                                label = "日期",
+                                value = formatDate(drive.startDate)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             StitchDataRow(
@@ -200,4 +200,14 @@ private fun formatDuration(minutes: Int): String {
     val h = minutes / 60
     val m = minutes % 60
     return if (h > 0) "${h}h ${m}m" else "${m}m"
+}
+
+private fun formatDate(isoDate: String?): String {
+    if (isoDate.isNullOrEmpty()) return "—"
+    return try {
+        val date = ZonedDateTime.parse(isoDate).toLocalDate()
+        date.format(DateTimeFormatter.ofPattern("MM.dd", Locale.getDefault()))
+    } catch (_: Exception) {
+        "—"
+    }
 }

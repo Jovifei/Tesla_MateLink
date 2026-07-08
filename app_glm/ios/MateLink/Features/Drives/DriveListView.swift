@@ -11,7 +11,7 @@ struct DriveListView: View {
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(StitchColors.onSurface)
-                        Text("Loading...")
+                        Text("加载中...")
                             .font(StitchFont.bodySm())
                             .foregroundColor(StitchColors.onSurfaceVariant)
                     }
@@ -21,10 +21,10 @@ struct DriveListView: View {
                         Image(systemName: "road.lanes")
                             .font(.system(size: 40))
                             .foregroundColor(StitchColors.outlineVariant)
-                        Text("No Drives Yet")
+                        Text("暂无行程")
                             .font(StitchFont.headlineMd())
                             .foregroundColor(StitchColors.onSurface)
-                        Text("Go for a drive!")
+                        Text("去兜风吧！")
                             .font(StitchFont.bodySm())
                             .foregroundColor(StitchColors.onSurfaceVariant)
                     }
@@ -54,7 +54,7 @@ struct DriveListView: View {
                 }
             }
             .background(StitchColors.background)
-            .navigationTitle("Drive History")
+            .navigationTitle("行程历史")
             .navigationBarTitleDisplayMode(.large)
             .refreshable { await load() }
             .task { await load() }
@@ -96,11 +96,11 @@ struct DriveListView: View {
             }
             Spacer(minLength: 8)
             HStack {
-                Text("能耗")
+                Text("日期")
                     .font(StitchFont.labelCaps())
                     .foregroundColor(StitchColors.onSurfaceVariant)
                 Spacer()
-                Text("\(d.efficiency) Wh/km")
+                Text(formatDate(d.startDate))
                     .font(StitchFont.bodyLg())
                     .foregroundColor(StitchColors.onSurface)
             }
@@ -170,18 +170,34 @@ struct DriveListView: View {
     }
 
     func groupedKeys() -> [String] {
-        let today = ISO8601Parser.todayString()
-        return Array(Set(drives.map { String($0.startDate.prefix(10)) == today ? "Today" : String($0.startDate.prefix(10)) })).sorted(by: >)
+        let months = drives.compactMap { d -> String? in
+            let prefix = String(d.startDate.prefix(7)) // yyyy-MM
+            let parts = prefix.split(separator: "-")
+            guard parts.count == 2, let m = Int(parts[1]) else { return nil }
+            return "\(parts[0])年\(m)月"
+        }
+        return Array(Set(months)).sorted(by: >)
     }
 
     func drivesForGroup(_ label: String) -> [Drive] {
-        let today = ISO8601Parser.todayString()
-        return drives.filter { d in let k = String(d.startDate.prefix(10)); return (label == "Today" && k == today) || label == k }
+        drives.filter { d in
+            let prefix = String(d.startDate.prefix(7))
+            let parts = prefix.split(separator: "-")
+            guard parts.count == 2, let m = Int(parts[1]) else { return false }
+            return "\(parts[0])年\(m)月" == label
+        }
     }
 
     private func formatDuration(_ minutes: Int) -> String {
         let h = minutes / 60
         let m = minutes % 60
         return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+    }
+
+    private func formatDate(_ iso: String?) -> String {
+        guard let iso = iso, iso.count >= 10 else { return "—" }
+        let parts = String(iso.prefix(10)).split(separator: "-")
+        guard parts.count >= 3, let m = Int(parts[1]), let d = Int(parts[2]) else { return "—" }
+        return String(format: "%02d.%02d", m, d)
     }
 }
