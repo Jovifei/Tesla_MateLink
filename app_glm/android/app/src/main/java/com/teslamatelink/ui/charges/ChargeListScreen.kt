@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -60,6 +61,7 @@ private val TrackBg = StitchColors.SurfaceContainerHigh
 fun ChargeListScreen(
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
+    onNavigateToCurrentCharge: () -> Unit = {},
     viewModel: ChargeViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -85,6 +87,15 @@ fun ChargeListScreen(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.cd_back),
                             tint = StitchColors.OnSurface
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToCurrentCharge) {
+                        Icon(
+                            Icons.Filled.Bolt,
+                            contentDescription = "正在充电",
+                            tint = StitchColors.Accent
                         )
                     }
                 },

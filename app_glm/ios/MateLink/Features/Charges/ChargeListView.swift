@@ -82,6 +82,14 @@ struct ChargeListView: View {
             .background(StitchColors.background)
             .navigationTitle("充电历史")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(destination: CurrentChargeView()) {
+                        Image(systemName: "bolt.fill")
+                            .foregroundColor(StitchColors.accent)
+                    }
+                }
+            }
             .refreshable { await load() }
             .task { await load() }
         }

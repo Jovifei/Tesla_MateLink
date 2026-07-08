@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import com.teslamatelink.ui.battery.BatteryHealthScreen
 import com.teslamatelink.ui.charges.ChargeDetailScreen
 import com.teslamatelink.ui.charges.ChargeListScreen
+import com.teslamatelink.ui.charges.CurrentChargeScreen
 import com.teslamatelink.ui.cost.CostScreen
 import com.teslamatelink.ui.dashboard.DashboardScreen
 import com.teslamatelink.ui.destinations.DestinationsScreen
@@ -38,6 +39,7 @@ object Routes {
     const val DRIVE_DETAIL = "driveDetail/{driveId}"
     const val CHARGES = "charges"
     const val CHARGE_DETAIL = "chargeDetail/{chargeId}"
+    const val CURRENT_CHARGE = "currentCharge"
     const val BATTERY = "battery"
     const val STATISTICS = "statistics"
     const val STATISTICS_MONTH = "stats/month/{year}/{month}"
@@ -128,7 +130,15 @@ fun NavGraph(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToDetail = { chargeId ->
                     navController.navigate(Routes.chargeDetail(chargeId))
-                }
+                },
+                onNavigateToCurrentCharge = { navController.navigate(Routes.CURRENT_CHARGE) }
+            )
+        }
+
+        // -- Current Charge (real-time monitor) --
+        composable(Routes.CURRENT_CHARGE) {
+            CurrentChargeScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
         composable(
