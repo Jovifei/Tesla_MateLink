@@ -142,7 +142,7 @@ dependencies {
     implementation(libs.mmkv)
 
     // AMap SDK (高德地图)
-    implementation(libs.amap.3dmap)
+    implementation(libs.amap.`3dmap`)
     implementation(libs.amap.location)
 
     // Glance AppWidget
