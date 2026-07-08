@@ -11,3 +11,9 @@ Prevention rule: For Tesla MateLink planning and implementation, treat `docs/PRD
 Pattern: An external review bundled still-valid blockers together with findings that had already been fixed in the current worktree, which makes it easy to overreact and re-open solved issues.
 
 Prevention rule: When a user brings a correction or external audit, first cross-check each headline claim against the live worktree and current task ledger. Split the findings into `still valid`, `already fixed`, and `cannot verify here` before dispatching implementation work.
+
+## 2026-07-08 - Pull before committing
+
+Pattern: I prepared and pushed Git changes without explicitly pulling from the remote immediately before the commit step.
+
+Prevention rule: Before every future commit in `tesla_master`, run a pull step for the target repository first, preferably `git pull --rebase --autostash`, then re-check status and only commit once the local branch is based on the latest remote `main`.

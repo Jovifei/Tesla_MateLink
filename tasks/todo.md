@@ -336,3 +336,26 @@ Configure `E:\project\tesla_master` as the parent GitHub repository, and make `a
 - `app_glm` and `app_mimo` local repositories are clean after refreshing index state and locally excluding Android build artifacts (`android/.gradle/`, `.idea/`, `app/build/`, `local.properties`) via each child repo's `.git/info/exclude`.
 - `.kiro/skills/...` untracked local skill files were preserved in `stash@{0}` with message `temp: preserve untracked kiro skills before git split`; they were not pushed or deleted.
 - Final working tree status for parent, `app_glm`, and `app_mimo` is clean on `main`.
+
+---
+
+# README Bilingual Detail Pass - 2026-07-08
+
+## Goal
+
+Make the repository README documents readable in Chinese and English, with selectable language anchors and more detailed project introductions.
+
+## Plan
+
+- [x] Rewrite the parent README with bilingual navigation, repository relationship, platform overview, and contribution workflow notes.
+- [x] Rewrite `app_mimo/README.md` with bilingual product, architecture, build, and verification details.
+- [x] Clean up and rewrite `app_glm/README.md` to remove garbled text and provide bilingual project details.
+- [x] Review diffs and push updated README documents to the corresponding `main` branches.
+
+## Review Notes
+
+- This is a documentation-only pass. No app source code or `docs/git_ref` content should change.
+- Parent README now has Chinese/English sections, repository relationship, product scope, status, Git rules, and verification boundary.
+- `app_mimo/README.md` now documents the current main app track, Android/iOS/Web structure, mock/real mode, build paths, widget status, acceptance focus, and Git workflow.
+- `app_glm/README.md` was rewritten to remove garbled text and clarify that it is a parallel/reference implementation.
+- Per the updated workflow lesson, `app_mimo` and `app_glm` were pulled from `origin/main` before their README commits.

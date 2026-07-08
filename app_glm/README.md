@@ -1,201 +1,243 @@
-# tesla-master-glm
+# Tesla MateLink GLM
 
-<p align="center">
-  <img src="https://img.shields.io/badge/platform-iOS%20%7C%20Android-blue.svg" alt="Platform">
-  <img src="https://img.shields.io/badge/language-Kotlin%20%7C%20Swift-orange.svg" alt="Language">
-</p>
-
-**tesla-master-glm** is a cross-platform mobile application for Tesla vehicle monitoring via TeslaMate API. provides Bluetooth connectivity and real-time vehicle data tracking for iOS (including Watch App) and Android.
+Language / 语言: [中文](#中文) | [English](#english)
 
 ---
 
-## 📋 阶段验收状态 (2026-06-30)
+## 中文
 
-> 基于 `app_glm/` 实际文件统计 + 17 轮交叉审核 + comet 工作流归档记录
+### 项目定位
 
-### 总览
+`app_glm` 是 Tesla MateLink 的并行/参考实现仓库。它保留了较完整的 Android、iOS、Watch、Widget、共享数据模型和本地化资源，可作为 `app_mimo` 主线开发时的工程参考。
 
-| 平台 | 完成度 | 测试 | CI/CD | 关键状态 |
-|------|--------|------|-------|----------|
-| **Android** | ~75% | 5 单元测试 | ❌ 缺失 | 20 Screen 齐全，RealCarRepository 已接入 |
-| **iOS** | ~70% | 0（空目录） | ❌ 缺失 | 20 View + Watch + Widget，5 页面缺失 |
-| **Web** | N/A | — | — | 仅 i18n 资源（de/fr/ja），非 web app |
-| **Shared** | ✅ 完成 | — | — | api-types + mock + GCJ02 测试向量 |
+它不等同于当前产品主线。当前优先推进的应用是 `app_mimo`；`app_glm` 更适合用于参考以下方向：
 
-### ✅ 已完成
+- Android Clean Architecture 分层方式
+- Repository、Room、Retrofit、mock/real 切换策略
+- 后台同步、通知、Widget 和 Watch App 的工程组织
+- TeslaMate API 类型、mock 数据和中国地图坐标处理
 
-#### Android (app_glm/android)
-- **20 个 Screen** 全部实现：Dashboard / DriveList / DriveDetail / ChargeList / ChargeDetail / Battery / Cost / Destinations / Efficiency / Heatmap / Onboarding / Range / Settings / About / Statistics / DayDetail / MonthDetail / Timeline / Updates / Vampire
-- **Clean Architecture**：7 Repository + 6 ViewModel + Hilt DI + Room (15 表) + Retrofit (16 端点)
-- **RealCarRepository**（2026-06-29 归档）：Network-First + Room 缓存降级，`DelegatingCarRepository` 代理模式运行时切换 Mock/Real，`SettingsScreen` 数据源 Switch
-- **中国本地化**：高德地图 + GCJ-02 坐标转换 + TOU 分时电价
-- **后台能力**：WorkManager 同步 + 充电监控前台服务 + 3 种通知 + Glance Widget
-- **单元测试**：MappersTest / RealCarRepositoryTest / DelegatingCarRepositoryTest / UrlSecurityTest（数据层覆盖）
-- **17 轮交叉审核**：CRITICAL/HIGH 已清零
+### 功能范围
 
-#### iOS (app_glm/ios)
-- **20 个 View** + Widget + Watch App（4 文件）+ PhoneWCSessionManager
-- 主线功能完整：Dashboard / Drive / Charge / Battery / Cost / Statistics / Timeline / Heatmap / Efficiency / Vampire / Range / Destinations / Updates / Vehicle3D / Settings / Onboarding / TariffConfig / NotificationManager
-- WatchConnectivity 双向通信 + Complications
+| 功能域 | 说明 |
+| --- | --- |
+| 车辆状态 | 实时车辆摘要、电量、续航、胎压、在线状态和基础控制状态展示。 |
+| 行程 | 行程列表、行程详情、统计页、目的地和时间线。 |
+| 充电 | 充电历史、充电详情、费用、分时电价和统计分析。 |
+| 能耗分析 | 电池、效率、热力图、待机耗电、续航分析和年度/月度维度页面。 |
+| 地图与中国适配 | 高德地图接入、GCJ-02 坐标转换和本地化资源。 |
+| 扩展能力 | Android Widget、iOS Widget、watchOS Companion、通知和后台任务源码。 |
 
-#### Shared (app_glm/shared)
-- `api-types.ts` API 类型定义
-- `mock_data.json` 开发用 mock 数据
-- `gcj02_test_vectors.json` GCJ-02 转换测试向量
+### 工程结构
 
-### 🔴 待完成
-
-#### 高优先级
-| # | 问题 | 平台 | 难度 |
-|---|------|------|------|
-| G-1 | 8 个分析页硬编码 mock（Battery/Heatmap/Efficiency/Vampire/Range/Destinations/Cost/Updates）。RealCarRepository 已打通切换路径，待真实后端接入验证 | Android | 中 |
-| G-2 | iOS Drive/Charge 详情页图表用 sin()/random() 假数据 | iOS | 中 |
-| G-3 | Android CI/CD 完全缺失（无 .github/workflows） | Android | 小 |
-| G-4 | Android 上架配置缺失（play publisher/隐私政策/截图） | Android | 中 |
-| G-5 | iOS 5 个声明功能页完全缺失：CurrentCharge / Mileage / Countries / Sentry / Trips（连占位文件都没有） | iOS | 大 |
-| G-6 | iOS Settings 缺单位/时区设置 UI | iOS | 小 |
-
-#### iOS/Watch 审核遗留（需 Mac/Xcode，17 轮审核发现）
-| # | 严重级别 | 问题 |
-|---|---|---|
-| I-1 | CRITICAL | AnnualReportPDFView @State 数据竞争（Task.detached 读 @State） |
-| I-2 | CRITICAL | PhoneWCSessionManager WCSession delegate 线程不安全 |
-| I-3 | HIGH | DashboardView Timer 未取消（5s 轮询泄漏） |
-| I-4 | HIGH | writeWidgetData 每 5s 重建 ImageRenderer |
-| I-5 | HIGH | KeychainHelper.save 丢弃 SecItemAdd 返回值 |
-| I-6 | HIGH | Vehicle3DView cacheNodes() fallback 分支未调用 |
-| I-7 | HIGH | WatchConnectivityManager 缺 @MainActor |
-
-#### 工程化短板
-- **测试覆盖**：Android 仅数据层（UI/ViewModel 零测试），iOS 测试目录空壳
-- **CI/CD**：双端均无流水线
-- **Web 平台**：未启动（`web_matelink/` 仅 3 个 i18n JSON，无 app 框架）
-- **真实后端联调**：RealCarRepository 代码就位但未对真实 TeslaMate 后端验证
-
-> 完整待办清单见项目根 [`docs/TODO.md`](../docs/TODO.md)
-
----
-
-## Features
-
-### 🚗 Vehicle Monitoring
-- Real-time vehicle status tracking
-- Battery health monitoring
-- Tire pressure monitoring (TPMS)
-- Charge session tracking
-- Drive history and statistics
-
-### 💰 Cost Calculation
-- Time-of-Use (ToU) tariff support
-- Multiple pricing tiers (peak / flat / valley)
-- Charging cost estimation
-- Monthly/annual energy cost statistics
-
-### 🗺️ Navigation & Mapping
-- GCJ-02 coordinate conversion for China map compatibility
-- Drive route heatmap visualization
-- Geocoded destination tracking
-- Amap integration
-
-### 📊 Efficiency Analysis
-- Energy efficiency tracking by trip
-- Historical efficiency comparison
-- Vampire discharge monitoring ("vampire mode")
-
-### 🔔 Notifications & Widgets
-- Android 12+ widgets for vehicle status
-- iOS Widget support
-- Charging completion notifications
-- Sentry monitoring alerts
-
-### 🌐 Multi-language Support
-- English (en)
-- Simplified Chinese (zh-Hans)
-- German (de)
-- French (fr)
-- Japanese (ja)
-
-## Project Structure
-
-```
+```text
 app_glm/
-├── android/                    # Android application (Kotlin + Jetpack Compose)
-│   ├── app/
-│   │   └── src/main/
-│   │       ├── java/com/teslamatelink/
-│   │       │   ├── data/          # Data layer (API, local DB, repository)
-│   │       │   ├── domain/        # Business logic
-│   │       │   ├── ui/            # UI screens (Compose)
-│   │       │   └── notification/ # Notifications & workers
-│   │       └── res/              # Resources & localization
-│   └── build.gradle.kts
-├── ios/                        # iOS application (Swift + SwiftUI)
-│   ├── MateLink/
-│   │   ├── App/                 # App entry point
-│   │   ├── Core/                # Core models & utilities
-│   │   ├── Features/            # Feature modules
-│   │   └── Widget/              # iOS Widget
-│   └── MateLink Watch App/      # watchOS Companion App
-├── shared/                     # Shared types & mock data
-│   ├── api-types.ts             # API type definitions
-│   └── mock_data.json          # Mock data for development
-└── web_matelink/               # i18n resource directory (de/fr/ja messages, NOT a web app)
-    └── src/messages/           # localized message JSON files
+|- android/                    Android app, Kotlin, Jetpack Compose
+|  `- app/src/main/java/com/teslamatelink/
+|     |- data/                 API, Room database, repositories
+|     |- domain/               Domain models and mapping logic
+|     |- ui/                   Compose screens and view models
+|     `- notification/         Workers, services, notifications
+|- ios/                        iOS SwiftUI app
+|  |- MateLink/                iOS app source
+|  |- MateLink Watch App/      watchOS companion source
+|  `- MateLinkWidget/          iOS widget source
+|- shared/                     Shared API types, mock data, test vectors
+`- web_matelink/               Localization resources, not a complete web app
 ```
 
-## Tech Stack
+### 当前状态
 
-### Android
-- **Kotlin** + **Jetpack Compose** - Modern declarative UI
-- **Hilt** - Dependency injection
-- **Room** - Local database
-- **WorkManager** - Background sync
-- **Paging 3** - Pagination
-- **Jetpack Navigation** - In-app navigation
+| 平台 | 状态 |
+| --- | --- |
+| Android | 页面和数据层较完整，包含 Repository、Room、Retrofit、Hilt、WorkManager、通知和 Widget 相关源码。 |
+| iOS | SwiftUI、Widget、Watch App 源码存在，但最终编译、签名、Widget/Watch wiring 仍需要 Mac/Xcode 实测。 |
+| Shared | 包含 API 类型、mock 数据和 GCJ-02 测试向量。 |
+| Web | 当前主要是本地化资源目录，不是完整 Web 应用。 |
 
-### iOS
-- **Swift** + **SwiftUI** - declarative UI framework
-- **WatchConnectivity** - iOS-watchOS communication
-- **Core Location** - Location services
+### Android 开发
 
-## Architecture
+要求：
 
-Clean architecture with separation of concerns:
-- **Data Layer**: API sources, local database, repositories
-- **Domain Layer**: Use cases, business logic, models
-- **Presentation Layer**: UI, view models, state management
+- Android Studio
+- JDK 17
+- Android SDK
 
-## Building
+常用命令：
 
-### Prerequisites
-- Android: Android Studio Electric Eel+, JDK 17
-- iOS: Xcode 16+, Swift 6
-- Android `minSdk = 28`, `targetSdk = 35`
-
-### Android
-```bash
-cd android
-./gradlew assembleDebug
+```powershell
+cd E:\project\tesla_master\app_glm\android
+.\gradlew.bat :app:assembleDebug
+.\gradlew.bat :app:testDebugUnitTest
 ```
 
-### iOS
-```bash
-# Open with Xcode
-open ios/MateLink.xcodeproj
+配置提示：
+
+- 高德地图能力需要在 `local.properties` 中配置 API Key。
+- `local.properties`、`.gradle/`、`.idea/` 和 `app/build/` 属于本地生成内容，不应提交。
+
+### iOS / Watch / Widget 开发
+
+要求：
+
+- Mac
+- Xcode
+- 对应 Apple Developer 签名配置
+
+说明：
+
+- iOS、Widget 和 Watch 源码可作为产品能力参考，但必须在 Mac/Xcode 中确认 target、entitlements、App Group、WatchConnectivity 和签名配置。
+- Windows 侧只能完成源码审查，不能声明 Apple 平台构建通过。
+
+### 共享资源
+
+`shared/` 用于保存跨端参考数据：
+
+- `api-types.ts`：TeslaMate API 类型定义参考。
+- `mock_data.json`：开发与页面演示用 mock 数据。
+- `gcj02_test_vectors.json`：GCJ-02 坐标转换测试向量。
+
+### 与 app_mimo 的关系
+
+- `app_mimo` 是当前主线产品仓库。
+- `app_glm` 是参考实现，不应无差别复制到 `app_mimo`。
+- 从 `app_glm` 借鉴代码时，应先确认 `app_mimo` 的当前架构、路由、主题和 mock/real 数据边界。
+
+### Git
+
+当前远端：
+
+```text
+https://github.com/Jovifei/tesla-master-glm.git
 ```
 
-## Configuration
+推荐流程：
 
-### AMap API Key
-For map functionality, obtain an API key from [AMAP](https://lbs.amap.com/) and set it in `local.properties`:
-```properties
-AMAP_API_KEY=your_api_key_here
+```powershell
+cd E:\project\tesla_master\app_glm
+git pull --rebase --autostash origin main
+git status
+git add <changed-files>
+git commit -m "docs: describe app_glm"
+git push origin main
 ```
 
-## Credits
+---
 
-Based on the original [TeslaMate](https://github.com/adriankumpf/teslamate) project for vehicle data logging.
+## English
 
-## License
+### Purpose
 
-Copyright © 2024 Jovi. All rights reserved.
+`app_glm` is a parallel/reference implementation of Tesla MateLink. It keeps a broad set of Android, iOS, Watch, Widget, shared model, and localization assets that can be used as engineering reference while developing the current `app_mimo` product track.
+
+It is not the current primary product line. `app_mimo` is the active app track; `app_glm` is best used as reference for:
+
+- Android Clean Architecture layering
+- Repository, Room, Retrofit, and mock/real switching patterns
+- Background sync, notifications, widgets, and Watch App organization
+- TeslaMate API types, mock data, and China map coordinate handling
+
+### Feature Scope
+
+| Area | Description |
+| --- | --- |
+| Vehicle status | Vehicle summary, battery, range, tire pressure, online state, and basic control states. |
+| Trips | Drive list, drive detail, statistics, destinations, and timeline. |
+| Charging | Charge history, charge detail, costs, time-of-use tariffs, and statistics. |
+| Energy analytics | Battery, efficiency, heatmap, vampire drain, range analysis, and yearly/monthly pages. |
+| Maps and China support | AMap integration, GCJ-02 coordinate conversion, and localization resources. |
+| Extensions | Android Widget, iOS Widget, watchOS companion, notifications, and background task source. |
+
+### Project Structure
+
+```text
+app_glm/
+|- android/                    Android app, Kotlin, Jetpack Compose
+|  `- app/src/main/java/com/teslamatelink/
+|     |- data/                 API, Room database, repositories
+|     |- domain/               Domain models and mapping logic
+|     |- ui/                   Compose screens and view models
+|     `- notification/         Workers, services, notifications
+|- ios/                        iOS SwiftUI app
+|  |- MateLink/                iOS app source
+|  |- MateLink Watch App/      watchOS companion source
+|  `- MateLinkWidget/          iOS widget source
+|- shared/                     Shared API types, mock data, test vectors
+`- web_matelink/               Localization resources, not a complete web app
+```
+
+### Current Status
+
+| Platform | Status |
+| --- | --- |
+| Android | Broad source coverage, including repositories, Room, Retrofit, Hilt, WorkManager, notifications, and Widget-related code. |
+| iOS | SwiftUI, Widget, and Watch App sources exist, but final build, signing, widget/watch wiring, and device proof require Mac/Xcode. |
+| Shared | API types, mock data, and GCJ-02 test vectors are present. |
+| Web | Currently localization resources only, not a complete web application. |
+
+### Android Development
+
+Requirements:
+
+- Android Studio
+- JDK 17
+- Android SDK
+
+Common commands:
+
+```powershell
+cd E:\project\tesla_master\app_glm\android
+.\gradlew.bat :app:assembleDebug
+.\gradlew.bat :app:testDebugUnitTest
+```
+
+Configuration notes:
+
+- AMap features require an API key in `local.properties`.
+- `local.properties`, `.gradle/`, `.idea/`, and `app/build/` are local generated files and should not be committed.
+
+### iOS / Watch / Widget Development
+
+Requirements:
+
+- Mac
+- Xcode
+- Apple Developer signing setup
+
+Notes:
+
+- iOS, Widget, and Watch sources can be used as product capability references, but target wiring, entitlements, App Groups, WatchConnectivity, and signing must be verified on Mac/Xcode.
+- Windows-side review is source-level only and does not prove Apple platform builds.
+
+### Shared Resources
+
+`shared/` contains cross-platform reference data:
+
+- `api-types.ts`: TeslaMate API type reference.
+- `mock_data.json`: mock data for development and screen demos.
+- `gcj02_test_vectors.json`: GCJ-02 coordinate conversion test vectors.
+
+### Relationship To app_mimo
+
+- `app_mimo` is the current primary product repository.
+- `app_glm` is a reference implementation and should not be copied wholesale into `app_mimo`.
+- Before borrowing code from `app_glm`, check `app_mimo`'s current architecture, routing, theme, and mock/real data boundaries.
+
+### Git
+
+Remote:
+
+```text
+https://github.com/Jovifei/tesla-master-glm.git
+```
+
+Recommended workflow:
+
+```powershell
+cd E:\project\tesla_master\app_glm
+git pull --rebase --autostash origin main
+git status
+git add <changed-files>
+git commit -m "docs: describe app_glm"
+git push origin main
+```
