@@ -35,8 +35,8 @@
 
 ## 5. L2 系统页（4页）
 
-- [ ] 5.1 设置 `4c90a050b87c44b1aaf73a8ba590ad96` — 还原 Android SettingsScreen + iOS SettingsView（服务器/Token/连接测试/语言/主题/模拟/实例状态）
-- [ ] 5.2 固件版本 `2c1bd185b2d14b5ba5647bd762c9c240` — 还原 Android UpdatesScreen + iOS UpdatesView（当前版本+历史时间线）
+- [x] 5.1 设置 `4c90a050b87c44b1aaf73a8ba590ad96` — 还原 Android SettingsScreen + iOS SettingsView（服务器/Token/连接测试/语言/主题/模拟/实例状态）
+- [x] 5.2 固件版本 `2c1bd185b2d14b5ba5647bd762c9c240` — 还原 Android UpdatesScreen + iOS UpdatesView（当前版本+历史时间线）
 - [x] 5.3 关于 `845c19f9afe94ddc9d1544b3a6936f1c` — 还原 Android AboutScreen + iOS AboutView（品牌+车辆摘要+版本+技术栈+开源许可）
 - [x] 5.4 哨兵历史 `7b959ff2df234fe4ba834c7eb96dcd9c` — 还原 Android SentryScreen + iOS SentryView（事件时间线+灵敏度；iOS 若缺则新建 Features/Sentry/）
 
