@@ -20,6 +20,7 @@ import com.teslamatelink.ui.efficiency.EfficiencyScreen
 import com.teslamatelink.ui.heatmap.HeatmapScreen
 import com.teslamatelink.ui.onboarding.OnboardingScreen
 import com.teslamatelink.ui.range.RangeScreen
+import com.teslamatelink.ui.sentry.SentryHistoryScreen
 import com.teslamatelink.ui.settings.AboutScreen
 import com.teslamatelink.ui.settings.SettingsScreen
 import com.teslamatelink.ui.statistics.DayDetailScreen
@@ -52,6 +53,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val MORE = "more"
     const val ABOUT = "about"
+    const val SENTRY_HISTORY = "sentry_history"
 
     fun driveDetail(id: Int) = "driveDetail/$id"
     fun chargeDetail(id: Int) = "chargeDetail/$id"
@@ -238,6 +240,11 @@ fun NavGraph(
         }
         composable(Routes.ABOUT) {
             AboutScreen(onNavigateBack = { navController.popBackStack() })
+        }
+
+        // -- Sentry History --
+        composable(Routes.SENTRY_HISTORY) {
+            SentryHistoryScreen(onNavigateBack = { navController.popBackStack() })
         }
     }
 }

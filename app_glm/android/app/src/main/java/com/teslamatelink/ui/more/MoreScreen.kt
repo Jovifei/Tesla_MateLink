@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.QueryStats
+import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material.icons.outlined.Timeline
@@ -74,6 +75,7 @@ private val analysisEntries = listOf(
     MoreEntry("能耗分析", "待机能耗分析", Routes.VAMPIRE, Icons.Outlined.NightsStay),
     MoreEntry("电池健康", "电池衰减与 SOH", "battery_health", Icons.Outlined.BatteryChargingFull, trailingValue = "95.8%", trailingValueGold = true),
     MoreEntry("时间线", "充电与行程时间线", "timeline", Icons.Outlined.Timeline),
+    MoreEntry("哨兵历史", "哨兵事件与记录", Routes.SENTRY_HISTORY, Icons.Outlined.Security),
 )
 
 /**

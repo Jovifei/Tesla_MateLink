@@ -124,6 +124,8 @@ struct MoreView: View {
             PlaceholderView(title: "设置")
         case "about":
             AboutView()
+        case "sentry_history":
+            SentryHistoryView()
         default:
             PlaceholderView(title: route)
         }
@@ -155,6 +157,7 @@ private let analysisEntries: [MoreEntry] = [
     MoreEntry("能耗分析", "待机能耗分析", "moon", "vampire"),
     MoreEntry("电池健康", "电池衰减与 SOH", "battery.100.bolt", "battery_health", trailingValue: "95.8%", trailingValueGold: true),
     MoreEntry("时间线", "充电与行程时间线", "clock.arrow.2.circlepath", "timeline"),
+    MoreEntry("哨兵历史", "哨兵事件与记录", "shield", "sentry_history"),
 ]
 
 private let reportEntries: [MoreEntry] = [
