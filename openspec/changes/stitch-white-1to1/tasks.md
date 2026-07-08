@@ -12,8 +12,8 @@
 
 ## 2. L1 校准（4页 — 对照真实 HTML 修正 prior 偏差）
 
-- [ ] 2.1 仪表盘 `405f645538ae4a788b30aa4f64550e6f` — 校准 Android DashboardScreen + iOS DashboardView（状态头/电池卡/充电卡/信息网格/7日趋势，中文 Tab「仪表盘」）
-- [ ] 2.2 行程历史 `11444dd2914644cab88e53dd6973e46e` — 校准 Android DriveListScreen + iOS DriveListView（月分组/卡片行/效率徽章，中文 Tab「行程」）
+- [x] 2.1 仪表盘 `405f645538ae4a788b30aa4f64550e6f` — 校准 Android DashboardScreen + iOS DashboardView（状态头/电池卡/充电卡/信息网格/7日趋势，中文 Tab「仪表盘」）
+- [x] 2.2 行程历史 `11444dd2914644cab88e53dd6973e46e` — 校准 Android DriveListScreen + iOS DriveListView（月分组/卡片行/效率徽章，中文 Tab「行程」）
 - [ ] 2.3 充电历史 `2958ceb895414130bb618a34682e26f7` — 校准 Android ChargeListScreen + iOS ChargeListView（实时置顶卡/月分组/AC-DC 标识，中文 Tab「充电」）
 - [ ] 2.4 更多菜单 `607f50c463444dbf8183d6f0e96dfabb` — 校准 Android MoreScreen + iOS MoreView（车辆摘要+分组导航+报告入口，中文 Tab「更多」）
 
