@@ -31,7 +31,7 @@
 - [x] 4.4 待机耗电 `78dd96dc2e1d4882a30b0af4f9b83f17` — 还原 Android VampireScreen + iOS VampireView（损耗+来源+趋势+优化建议）
 - [x] 4.5 热力图 `5ddffde05eba4fec9ba278857d5f5b24` — 还原 Android HeatmapScreen + iOS HeatmapView（24h网格+目的地+路线排行）
 - [x] 4.6 时间线 `e1b336b48d1c48cca53d693131a44839` — 还原 Android TimelineScreen + iOS TimelineView（24h活动轴+事件分段）
-- [ ] 4.7 里程钻取 `9d4bc5d2a8024d0c8397b7d3cd037848` — 还原 Android Statistics/MileageScreen + iOS StatisticsView/MileageView（年度+月度+场景+365热力+Top5+年→月→日钻取；超长 HTML 分段读取）
+- [x] 4.7 里程钻取 `9d4bc5d2a8024d0c8397b7d3cd037848` — 还原 Android Statistics/MileageScreen + iOS StatisticsView/MileageView（年度+月度+场景+365热力+Top5+年→月→日钻取；超长 HTML 分段读取）
 
 ## 5. L2 系统页（4页）
 
