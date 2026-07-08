@@ -1,387 +1,448 @@
 import SwiftUI
-import Charts
 
-// MARK: - Chart Data Model
-struct ChargeSample: Identifiable {
-    let id = UUID()
-    let minute: Int
-    let power: Double
-    let voltage: Double
-    let temperature: Double
-}
+// MARK: - Charge Detail View (Stitch White-Minimal 1:1)
 
-// MARK: - Charge Detail View
 struct ChargeDetailView: View {
     let charge: Charge
-    @EnvironmentObject var state: AppState
 
-    static let currencyFormatter: NumberFormatter = {
-        let f = NumberFormatter()
-        f.numberStyle = .currency
-        f.locale = Locale.current
-        return f
-    }()
+    @State private var selectedTab: CurveTab = .power
 
-    @State private var selectedTab: ChartTab = .power
-    @State private var visibleRange: ClosedRange<Int> = 0...29
-    @State private var isZoomed: Bool = false
+    private let sampleCount = 12
 
-    private let samples: [ChargeSample]
-    private let sampleCount = 30
-
-    enum ChartTab: String, CaseIterable {
-        case power, voltage, temp
-
+    enum CurveTab: String, CaseIterable, Identifiable {
+        case power, soc, voltage, temp
+        var id: String { rawValue }
         var label: String {
             switch self {
-            case .power: return "Power (kW)"
-            case .voltage: return "Voltage (V)"
-            case .temp: return "Temp (°C)"
-            }
-        }
-
-        var color: Color {
-            switch self {
-            case .power: return .orange
-            case .voltage: return .blue
-            case .temp: return .red
+            case .power: return "功率"
+            case .soc: return "电量"
+            case .voltage: return "电压"
+            case .temp: return "温度"
             }
         }
     }
 
-    init(charge: Charge) {
-        self.charge = charge
-        let duration = ChargeDetailView.computeDurationMinutes(charge: charge) ?? 45
-        let isDC = charge.chargeType == "DC"
-        var result: [ChargeSample] = []
-        for i in 0..<30 {
-            let minute = Int(round(Double(duration) * Double(i) / 29.0))
-            let power: Double
-            let voltage: Double
-            if isDC {
-                power = 50 + sin(Double(i) * 0.4) * 80 + Double.random(in: -7...7)
-                voltage = 380 + sin(Double(i) * 0.2) * 20 + Double.random(in: -5...5)
-            } else {
-                power = 8 + sin(Double(i) * 0.5) * 3 + Double.random(in: -1...1)
-                voltage = 230 + sin(Double(i) * 0.3) * 5 + Double.random(in: -1.5...1.5)
-            }
-            let temp = 32 + sin(Double(i) * 0.3) * 5 + Double.random(in: -1.5...1.5)
-            result.append(ChargeSample(minute: minute, power: power, voltage: voltage, temperature: temp))
-        }
-        self.samples = result
-    }
-
-    // MARK: - Computed Properties
+    // MARK: - Derived data
 
     private var isDC: Bool { charge.chargeType == "DC" }
 
-    private var durationMinutes: Int? {
-        ChargeDetailView.computeDurationMinutes(charge: charge)
+    private var durationMinutes: Int {
+        guard let end = charge.endDate,
+              let s = ISO8601Parser.parse(charge.startDate),
+              let e = ISO8601Parser.parse(end) else { return 135 }
+        return max(1, Int(e.timeIntervalSince(s) / 60))
     }
 
-    private static func computeDurationMinutes(charge: Charge) -> Int? {
-        guard let end = charge.endDate else { return nil }
-        if let s = ISO8601Parser.parse(charge.startDate), let e = ISO8601Parser.parse(end) {
-            return Int(e.timeIntervalSince(s) / 60)
-        }
-        return nil
+    private var startSoc: Int { charge.startBatteryLevel }
+    private var endSoc: Int { charge.endBatteryLevel ?? min(100, startSoc + 35) }
+
+    private var avgPowerKw: Double {
+        let hours = Double(durationMinutes) / 60.0
+        guard hours > 0 else { return 0 }
+        return charge.chargeEnergyAdded / hours
     }
 
-    private var efficiency: Double {
-        guard charge.chargeEnergyUsed > 0 else { return 100 }
-        return (charge.chargeEnergyAdded / charge.chargeEnergyUsed) * 100
-    }
-
-    private var visibleSamples: [ChargeSample] {
-        let clampedLower = max(visibleRange.lowerBound, 0)
-        let clampedUpper = min(visibleRange.upperBound, samples.count - 1)
-        guard clampedLower <= clampedUpper else { return samples }
-        return Array(samples[clampedLower...clampedUpper])
-    }
+    private var peakPowerKw: Double { isDC ? 120 : 7.4 }
 
     // MARK: - Body
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                headerCard
+            VStack(spacing: 32) {
+                overviewCard
+                batteryChangeCard
+                chargingCurveCard
                 statsGrid
-                if isDC {
-                    dcInfoCard
-                }
-                chartSection
-                    .id(selectedTab.rawValue)
+                chargingStagesCard
+                exportButton
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 24)
             .padding(.vertical, 8)
         }
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("Charge Detail")
+        .background(StitchColors.background)
+        .navigationTitle("充电详情")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { } label: {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(StitchColors.onSurface)
+                }
+            }
+        }
     }
 
-    // MARK: - Header Card
+    // MARK: - Overview Card
 
-    private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: isDC ? "bolt.fill" : "powerplug.fill")
-                    .font(.title3)
-                    .foregroundColor(isDC ? .orange : .blue)
-
-                Text(charge.address)
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .lineLimit(2)
-
+    private var overviewCard: some View {
+        StitchCard {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(charge.address.isEmpty ? (isDC ? "超充站" : "家充") : charge.address)
+                        .font(StitchFont.bodyLg())
+                        .fontWeight(.medium)
+                        .foregroundColor(StitchColors.onSurface)
+                    Text(formatLongDate(charge.startDate))
+                        .font(StitchFont.bodySm())
+                        .foregroundColor(StitchColors.onSurfaceVariant)
+                }
                 Spacer()
-
-                BadgeView(text: isDC ? "DC FAST" : "AC", color: isDC ? .orange : .blue)
+                HStack(spacing: 8) {
+                    dcAcTag
+                    HStack(alignment: .bottom, spacing: 4) {
+                        Text(String(format: "+%.1f", charge.chargeEnergyAdded))
+                            .font(StitchFont.dataLg())
+                            .foregroundColor(StitchColors.accent)
+                        Text("kWh")
+                            .font(StitchFont.labelCaps())
+                            .foregroundColor(StitchColors.onSurfaceVariant)
+                            .padding(.bottom, 3)
+                    }
+                }
             }
-
-            HStack(spacing: 4) {
-                Image(systemName: "clock")
-                    .font(.caption2)
-                Text(durationText)
-            }
-            .font(.caption)
-            .foregroundColor(.secondary)
         }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
-    private var durationText: String {
-        let startDate: Date = ISO8601Parser.parse(charge.startDate) ?? .distantPast
-        let start = startDate.formatted(date: .abbreviated, time: .shortened)
-        guard let endStr = charge.endDate,
-              let endDate = ISO8601Parser.parse(endStr)
-        else {
-            return "\(start)  ·  In progress..."
-        }
-        let end = endDate.formatted(date: .abbreviated, time: .shortened)
-        if let mins = durationMinutes {
-            return "\(start)  —  \(end)  ·  \(mins) min"
-        }
-        return "\(start)  —  \(end)"
+    private var dcAcTag: some View {
+        Text(isDC ? "DC" : "AC")
+            .font(.system(size: 10, weight: .bold))
+            .tracking(0.5)
+            .foregroundColor(isDC ? Color(hex: "F59E0B") : Color(hex: "3B82F6"))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(isDC ? Color(hex: "F59E0B") : Color(hex: "3B82F6"), lineWidth: 1)
+            )
     }
 
-    // MARK: - Stats Grid
+    // MARK: - Battery Change Card
+
+    private var batteryChangeCard: some View {
+        StitchCard {
+            Text("电量变化")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(StitchColors.onSurface)
+            Spacer().frame(height: 24)
+            GeometryReader { geo in
+                let w = geo.size.width
+                let startFrac = CGFloat(startSoc) / 100.0
+                let rangeFrac = CGFloat(max(0, endSoc - startSoc)) / 100.0
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(StitchColors.accent.opacity(0.10))
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(StitchColors.accent.opacity(0.35))
+                        .frame(width: w * rangeFrac)
+                        .offset(x: w * startFrac)
+                    HStack {
+                        Text("\(startSoc)%")
+                            .font(StitchFont.bodySm())
+                            .fontWeight(.medium)
+                            .foregroundColor(StitchColors.onSurface)
+                        Spacer()
+                        Text("+\(endSoc - startSoc)%")
+                            .font(StitchFont.bodySm())
+                            .fontWeight(.bold)
+                            .foregroundColor(StitchColors.accent)
+                        Spacer()
+                        Text("\(endSoc)%")
+                            .font(StitchFont.bodySm())
+                            .fontWeight(.medium)
+                            .foregroundColor(StitchColors.onSurface)
+                    }
+                    .padding(.horizontal, 16)
+                    .monospacedDigit()
+                }
+            }
+            .frame(height: 48)
+        }
+    }
+
+    // MARK: - Charging Curve Card
+
+    private var chargingCurveCard: some View {
+        StitchCard {
+            HStack {
+                Text("充电曲线")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(StitchColors.onSurface)
+                Spacer()
+                HStack(spacing: 16) {
+                    ForEach(CurveTab.allCases) { tab in
+                        VStack(spacing: 4) {
+                            Text(tab.label)
+                                .font(.system(size: 14, weight: selectedTab == tab ? .bold : .regular))
+                                .foregroundColor(selectedTab == tab ? StitchColors.onSurface : StitchColors.onSurfaceVariant)
+                            Rectangle()
+                                .fill(selectedTab == tab ? StitchColors.onSurface : Color.clear)
+                                .frame(width: 20, height: 2)
+                        }
+                        .onTapGesture { selectedTab = tab }
+                    }
+                }
+            }
+            Spacer().frame(height: 16)
+            CurveChart(values: curveValues, peakLabel: curvePeakLabel)
+                .frame(height: 180)
+            Spacer().frame(height: 16)
+            HStack {
+                ForEach(curveTimeAxis.indices, id: \.self) { i in
+                    Text(curveTimeAxis[i])
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .tracking(0.8)
+                        .foregroundColor(StitchColors.onSurfaceVariant)
+                    if i < curveTimeAxis.count - 1 { Spacer() }
+                }
+            }
+            Spacer().frame(height: 20)
+            Text("模拟数据 — 基于充电摘要")
+                .font(.system(size: 11))
+                .italic()
+                .foregroundColor(StitchColors.onSurfaceVariant)
+        }
+    }
+
+    // MARK: - Stats Grid (2x2)
 
     private var statsGrid: some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible(), spacing: 8),
-            GridItem(.flexible(), spacing: 8)
-        ], spacing: 8) {
-            StatCardView(title: "Energy Added", value: "\(charge.chargeEnergyAdded, specifier: "%.1f") kWh")
-            StatCardView(title: "Cost", value: charge.cost > 0 ? Self.currencyFormatter.string(from: NSNumber(value: charge.cost)) ?? "\(charge.cost)" : "Free")
-            StatCardView(title: "Efficiency", value: "\(efficiency, specifier: "%.1f")%")
-            StatCardView(title: "Battery", value: "\(charge.startBatteryLevel)% → \(charge.endBatteryLevel.map(String.init) ?? "?")%")
+        VStack(spacing: 16) {
+            HStack(spacing: 16) {
+                statCell(label: "充入电量", value: String(format: "%.1f", charge.chargeEnergyAdded), unit: "kWh")
+                statCell(label: "费用", value: charge.cost > 0 ? String(format: "¥%.2f", charge.cost) : "免费", unit: "")
+            }
+            HStack(spacing: 16) {
+                statCell(label: "平均功率", value: String(format: "%.1f", avgPowerKw), unit: "kW")
+                statCell(label: "用时", value: formatDuration(durationMinutes), unit: "")
+            }
         }
     }
 
-    // MARK: - DC Info Card
-
-    private var dcInfoCard: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "bolt.car.fill")
-                .font(.title3)
-                .foregroundColor(.orange)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("DC Fast Charging")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                if let brand = charge.fastChargerBrand {
-                    Text("\(brand)\(charge.fastChargerType.map { " · \($0)" } ?? "")")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+    private func statCell(label: String, value: String, unit: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(label)
+                .font(.system(size: 10, weight: .bold))
+                .tracking(0.5)
+                .foregroundColor(StitchColors.onSurfaceVariant)
+            Spacer(minLength: 8)
+            HStack(alignment: .bottom, spacing: 4) {
+                Spacer()
+                Text(value)
+                    .font(StitchFont.dataLg())
+                    .fontWeight(.bold)
+                    .foregroundColor(StitchColors.onSurface)
+                if !unit.isEmpty {
+                    Text(unit)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(StitchColors.onSurfaceVariant)
+                        .padding(.bottom, 3)
                 }
             }
-
-            Spacer()
         }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(StitchColors.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.border, lineWidth: 1))
     }
 
-    // MARK: - Chart Section
+    // MARK: - Charging Stages Card
 
-    private var chartSection: some View {
-        VStack(spacing: 12) {
-            Picker("Chart Metric", selection: $selectedTab) {
-                ForEach(ChartTab.allCases, id: \.self) { tab in
-                    Text(tab.label).tag(tab)
-                }
-            }
-            .pickerStyle(.segmented)
-
-            chartContent
-                .frame(height: 300)
-                .chartYScale(domain: yDomain)
-            Text("Simulated data — detailed charging telemetry not yet available from API")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center)
-
-            if isZoomed {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        resetZoom()
-                    }
-                } label: {
-                    Label("Reset Zoom", systemImage: "arrow.counterclockwise")
-                        .font(.caption)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .tint(selectedTab.color)
-                .transition(.opacity.combined(with: .move(edge: .bottom)))
-            }
-        }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .animation(.easeInOut(duration: 0.25), value: isZoomed)
+    private struct Stage {
+        let name: String
+        let range: String
+        let minutes: Int
+        let weight: CGFloat
+        let done: Bool
     }
 
-    // MARK: - Chart Content
+    private var stages: [Stage] {
+        let total = durationMinutes
+        let cc = Int(Double(total) * 0.78)
+        let cv = Int(Double(total) * 0.15)
+        let trickle = max(0, total - cc - cv)
+        return [
+            Stage(name: "恒流段", range: "0-80%", minutes: cc, weight: 0.80, done: true),
+            Stage(name: "恒压段", range: "80-95%", minutes: cv, weight: 0.15, done: false),
+            Stage(name: "涓流段", range: "95-100%", minutes: trickle, weight: 0.05, done: false)
+        ]
+    }
 
-    private var chartContent: some View {
-        Chart {
-            ForEach(visibleSamples) { sample in
-                LineMark(
-                    x: .value("Time", sample.minute),
-                    y: .value(selectedTab.label, value(for: sample))
-                )
-                .foregroundStyle(selectedTab.color.gradient)
-                .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-                .interpolationMethod(.catmullRom)
-            }
-        }
-        .chartXAxis {
-            AxisMarks(values: .automatic(desiredCount: 6)) { value in
-                AxisValueLabel {
-                    if let minute = value.as(Int.self) {
-                        Text("\(minute) min")
-                            .font(.caption2)
-                    }
-                }
-                AxisGridLine()
-            }
-        }
-        .chartYAxis {
-            AxisMarks(position: .leading) { value in
-                AxisValueLabel {
-                    if let v = value.as(Double.self) {
-                        Text(v, format: .number.precision(.fractionLength(0)))
-                            .font(.caption2)
-                    }
-                }
-                AxisGridLine()
-            }
-        }
-        .chartOverlay { _ in
+    private var chargingStagesCard: some View {
+        StitchCard {
+            Text("充电阶段")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(StitchColors.onSurface)
+            Spacer().frame(height: 24)
             GeometryReader { geo in
-                Rectangle()
-                    .fill(.clear)
-                    .contentShape(Rectangle())
-                    .gesture(
-                        DragGesture(minimumDistance: 10)
-                            .onEnded { drag in
-                                let totalWidth = geo.size.width
-                                let x1 = min(drag.startLocation.x, drag.location.x)
-                                let x2 = max(drag.startLocation.x, drag.location.x)
-                                let fraction1 = max(0, x1 / totalWidth)
-                                let fraction2 = min(1, x2 / totalWidth)
-                                let lower = Int(fraction1 * CGFloat(sampleCount - 1))
-                                let upper = Int(fraction2 * CGFloat(sampleCount - 1))
-                                withAnimation(.easeInOut(duration: 0.25)) {
-                                    visibleRange = lower...upper
-                                    isZoomed = lower > 0 || upper < sampleCount - 1
-                                }
-                            }
-                    )
-                    .onTapGesture(count: 2) {
-                        if isZoomed {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                resetZoom()
-                            }
-                        }
+                HStack(spacing: 0) {
+                    ForEach(stages.indices, id: \.self) { i in
+                        Rectangle()
+                            .fill(i == 0 ? StitchColors.onSurface : StitchColors.surfaceContainerHigh)
+                            .frame(width: geo.size.width * stages[i].weight)
                     }
+                }
+            }
+            .frame(height: 12)
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            Spacer().frame(height: 16)
+            VStack(spacing: 12) {
+                ForEach(stages.indices, id: \.self) { i in
+                    let s = stages[i]
+                    HStack {
+                        HStack(spacing: 8) {
+                            Image(systemName: s.done ? "checkmark.circle.fill" : "circle")
+                                .font(.system(size: 16))
+                                .foregroundColor(s.done ? StitchColors.onSurface : StitchColors.onSurfaceVariant)
+                            Text("\(s.name) (\(s.range))")
+                                .font(StitchFont.bodySm())
+                                .foregroundColor(s.done ? StitchColors.onSurface : StitchColors.onSurfaceVariant)
+                        }
+                        Spacer()
+                        Text(formatDuration(s.minutes))
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundColor(StitchColors.onSurfaceVariant)
+                    }
+                }
             }
         }
-        .chartPlotStyle { plotArea in
-            plotArea
-                .background(.ultraThinMaterial.opacity(0.3))
-        }
     }
 
-    // MARK: - Helpers
+    // MARK: - Export Button
 
-    private func value(for sample: ChargeSample) -> Double {
+    private var exportButton: some View {
+        Button { } label: {
+            Text("导出此充电记录")
+                .font(.system(size: 12, weight: .bold))
+                .tracking(0.6)
+                .foregroundColor(StitchColors.onSurface)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+        }
+        .background(StitchColors.background)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(StitchColors.border, lineWidth: 1))
+    }
+
+    // MARK: - Curve helpers
+
+    private var curveValues: [Double] {
         switch selectedTab {
-        case .power:  return sample.power
-        case .voltage: return sample.voltage
-        case .temp:   return sample.temperature
+        case .power:
+            let shape: [Double] = [0, 0.4, 0.75, 0.95, 1, 0.92, 0.8, 0.6, 0.4, 0.22, 0.1, 0.04]
+            return shape.map { $0 * peakPowerKw }
+        case .soc:
+            let s = Double(startSoc)
+            let e = Double(max(startSoc + 1, endSoc))
+            return (0..<sampleCount).map { s + (e - s) * (Double($0) / Double(sampleCount - 1)) }
+        case .voltage:
+            return [230, 235, 240, 245, 250, 252, 250, 246, 242, 238, 234, 230]
+        case .temp:
+            return [22, 24, 26, 28, 30, 31, 30, 28, 26, 24, 22, 21]
         }
     }
 
-    private var yDomain: ClosedRange<Double> {
-        let vals = visibleSamples.map(value(for:))
-        guard let min = vals.min(), let max = vals.max(), min < max else {
-            return 0...100
+    private var curvePeakLabel: String {
+        switch selectedTab {
+        case .power: return String(format: "%.1f kW 峰值", peakPowerKw)
+        case .soc: return "\(endSoc)% 峰值"
+        case .voltage: return "252 V 峰值"
+        case .temp: return "31°C 峰值"
         }
-        let padding = (max - min) * 0.12
-        return (min - padding)...(max + padding)
     }
 
-    private func resetZoom() {
-        visibleRange = 0...(sampleCount - 1)
-        isZoomed = false
+    private var curveTimeAxis: [String] {
+        let start: String = {
+            let iso = charge.startDate
+            if iso.count >= 16 {
+                let idx = iso.index(iso.startIndex, offsetBy: 11)
+                let end = iso.index(iso.startIndex, offsetBy: 16)
+                return String(iso[idx..<end])
+            }
+            return "18:30"
+        }()
+        return [start, "", "", "结束"]
+    }
+
+    // MARK: - Format helpers
+
+    private func formatDuration(_ minutes: Int) -> String {
+        let h = minutes / 60
+        let m = minutes % 60
+        return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+    }
+
+    private func formatLongDate(_ iso: String) -> String {
+        guard iso.count >= 16 else { return iso }
+        let chars = Array(iso)
+        let month = Int(String(chars[5...6])) ?? 1
+        let day = Int(String(chars[8...9])) ?? 1
+        let time = String(chars[11...15])
+        return "\(month)月\(day)日 \(time)"
     }
 }
 
-// MARK: - Helper Views
+// MARK: - Curve Chart (gold single line, peak dot, baseline)
 
-struct BadgeView: View {
-    let text: String
-    let color: Color
-
-    var body: some View {
-        Text(text)
-            .font(.caption2)
-            .fontWeight(.semibold)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
-            .background(color.opacity(0.18))
-            .foregroundColor(color)
-            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-    }
-}
-
-struct StatCardView: View {
-    let title: String
-    let value: String
+private struct CurveChart: View {
+    let values: [Double]
+    let peakLabel: String
 
     var body: some View {
-        VStack(spacing: 5) {
-            Text(title)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-            Text(value)
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            let baseLineY = h - 8
+            let topPad: CGFloat = 24
+            let usableH = baseLineY - topPad
+            let maxV = values.max() ?? 1
+            let minV = values.min() ?? 0
+            let range = (maxV - minV) > 0 ? (maxV - minV) : 1
+
+            func px(_ i: Int) -> CGFloat { values.count > 1 ? w * CGFloat(i) / CGFloat(values.count - 1) : 0 }
+            func py(_ v: Double) -> CGFloat { baseLineY - CGFloat((v - minV) / range) * usableH }
+
+            let peakIdx = values.firstIndex(of: maxV) ?? 0
+
+            ZStack {
+                // baseline
+                Path { p in
+                    p.move(to: CGPoint(x: 0, y: baseLineY))
+                    p.addLine(to: CGPoint(x: w, y: baseLineY))
+                }
+                .stroke(StitchColors.border, lineWidth: 1)
+
+                // smooth gold curve
+                Path { p in
+                    guard values.count > 1 else { return }
+                    p.move(to: CGPoint(x: px(0), y: py(values[0])))
+                    for i in 1..<values.count {
+                        let prev = CGPoint(x: px(i - 1), y: py(values[i - 1]))
+                        let cur = CGPoint(x: px(i), y: py(values[i]))
+                        let midX = (prev.x + cur.x) / 2
+                        p.addCurve(to: cur,
+                                   control1: CGPoint(x: midX, y: prev.y),
+                                   control2: CGPoint(x: midX, y: cur.y))
+                    }
+                }
+                .stroke(StitchColors.accent, style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
+
+                // peak dot
+                Circle()
+                    .fill(StitchColors.accent)
+                    .frame(width: 8, height: 8)
+                    .position(x: px(peakIdx), y: py(maxV))
+
+                // peak label
+                VStack {
+                    Text(peakLabel)
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundColor(StitchColors.accent)
+                    Spacer()
+                }
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .padding(.horizontal, 6)
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -390,24 +451,21 @@ struct StatCardView: View {
 #Preview {
     let sample = Charge(
         id: 1, carId: 1,
-        startDate: "2025-06-22T14:30:00.000Z",
-        endDate: "2025-06-22T15:15:00.000Z",
-        chargeEnergyAdded: 32.5,
-        chargeEnergyUsed: 36.2,
-        startBatteryLevel: 15,
-        endBatteryLevel: 72,
-        startIdealRangeKm: 45,
-        endIdealRangeKm: 215,
-        cost: 48.50,
-        chargeType: "DC",
-        address: "Tesla Supercharger, Shanghai",
-        fastChargerBrand: "Tesla",
-        fastChargerType: "V3"
+        startDate: "2025-07-01T18:30:00.000Z",
+        endDate: "2025-07-01T20:45:00.000Z",
+        chargeEnergyAdded: 38.5,
+        chargeEnergyUsed: 40.2,
+        startBatteryLevel: 65,
+        endBatteryLevel: 100,
+        startIdealRangeKm: 200,
+        endIdealRangeKm: 400,
+        cost: 9.25,
+        chargeType: "AC",
+        address: "家充",
+        fastChargerBrand: nil,
+        fastChargerType: nil
     )
-    let appState = AppState()
     NavigationStack {
         ChargeDetailView(charge: sample)
-            .environmentObject(appState)
-            .onAppear { appState.loadCars() }
     }
 }
