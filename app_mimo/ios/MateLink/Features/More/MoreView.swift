@@ -7,6 +7,9 @@ struct MoreView: View {
         NavigationStack {
             List {
                 Section("Vehicle") {
+                    NavigationLink { CurrentChargeView() } label: {
+                        Label("Current Charge", systemImage: "bolt.circle")
+                    }
                     NavigationLink { BatteryHealthView() } label: {
                         Label(L10n.string("battery_health.title"), systemImage: "battery.100.bolt")
                     }
@@ -42,6 +45,9 @@ struct MoreView: View {
                     }
                     NavigationLink { ExportView() } label: {
                         Label("Export Data", systemImage: "square.and.arrow.up")
+                    }
+                    NavigationLink { Vehicle3DView() } label: {
+                        Label("3D Vehicle Preview", systemImage: "car.2")
                     }
                 }
 

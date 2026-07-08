@@ -196,6 +196,11 @@ fun DashboardScreen(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.battery_trend), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.battery_trend_estimated_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 BatteryTrendChart(currentBatteryLevel = status.batteryLevel ?: 0)
             }
@@ -234,11 +239,17 @@ private fun StateBadge(state: String) {
         "asleep" -> SwissMuted to stringResource(R.string.state_asleep)
         else -> SwissMuted to stringResource(R.string.state_offline)
     }
-    SuggestionChip(
-        onClick = {},
-        label = { Text(label, color = Color.White) },
-        colors = SuggestionChipDefaults.suggestionChipColors(containerColor = color)
-    )
+    Surface(
+        color = color,
+        shape = MaterialTheme.shapes.extraLarge
+    ) {
+        Text(
+            text = label,
+            color = Color.White,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        )
+    }
 }
 
 @Composable
@@ -262,13 +273,16 @@ private fun InfoCard(
 
 @Composable
 private fun StatusChip(icon: String, label: String, active: Boolean) {
-    SuggestionChip(
-        onClick = {},
-        label = { Text("$icon $label", style = MaterialTheme.typography.bodySmall) },
-        colors = SuggestionChipDefaults.suggestionChipColors(
-            containerColor = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+    Surface(
+        color = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        shape = MaterialTheme.shapes.extraLarge
+    ) {
+        Text(
+            text = "$icon $label",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
         )
-    )
+    }
 }
 
 @Composable

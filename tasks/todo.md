@@ -225,3 +225,87 @@ Use child-Claude with the `mimo-1m` profile for bounded fixes, while Codex revie
 - Package 4 result: child-Claude changed iOS `TimelineViewModel` to branch on `AppState.isMockMode`, use `state.real.fetch(...)` for real drives/charges, and show an explicit error empty state instead of silently falling back to mock.
 - Package 5 result: child-Claude did not complete the docs update within its turn budget, so Codex performed a bounded reconciliation in `app_mimo/docs/STITCH_PAGE_MAPPING.md`. The document now records the current 4-tab/More state, P0/P1 fixes, iOS Widget deferred status, and Java/Mac verification limits. `docs/git_ref` remained untouched.
 - Final Windows-feasible verification: P0/P1 static searches passed; `git diff --check -- app_mimo tasks/todo.md` passed; native Android build remains blocked because `java` is unavailable; native iOS build remains Mac/Xcode-gated.
+
+---
+
+# MateLink Android Completion Audit and iOS Parity Plan - 2026-07-08
+
+## Goal
+
+Audit the current `app_mimo` Android app pages and logic before continuing iOS parity work. Identify bugs, page/route gaps, data-boundary issues, and high-value optimization work. Keep `docs/git_ref` read-only.
+
+## Plan
+
+- [x] Inspect current Android entry shell, route graph, and page reachability.
+- [x] Inspect Android data flow, mock/real boundary, settings/onboarding behavior, and background/widget risks.
+- [x] Inspect iOS page inventory and compare it to Android feature coverage.
+- [x] Run feasible static/build checks in this Windows environment.
+- [x] Produce a review-style finding list and iOS parity implementation recommendations.
+
+## Review Notes
+
+- This is an audit pass only unless a follow-up explicitly asks for fixes.
+- Android shell is substantially in place, but completion should not be accepted yet: debug Settings still exposes a Palette Preview button wired to a default no-op callback, several registered routes are not reachable from More, and the Dashboard battery trend is generated synthetic data presented as a normal trend card.
+- iOS has a broad page inventory, but it is not parity-complete: Current Charge is status-derived instead of using the dedicated current-charge endpoint, Sentry History is explicitly mock/unavailable in real mode, and multiple analysis/report screens swallow real API failures into empty arrays.
+- Windows-feasible verification only: `java` and `xcodebuild` are unavailable on this machine, so native Android/iOS compile proof remains blocked. `git diff --check -- app_mimo tasks/todo.md` passed.
+
+---
+
+# MateLink Android Fix and iOS Parity Execution - 2026-07-08
+
+## Goal
+
+Execute the approved repair plan for `app_mimo`: fix Android unreachable/no-op UI and misleading demo data, then align iOS real/mock data behavior and core page parity. Keep `docs/git_ref` read-only.
+
+## Plan
+
+- [x] Dispatch/fix Android P0: remove Palette Preview no-op and wire More entries for existing routes.
+- [x] Review Android P0 with route/static searches.
+- [x] Dispatch/fix Android P1: make dashboard synthetic battery trend and placeholder surfaces honest.
+- [x] Review Android P1 with source inspection/static searches.
+- [x] Dispatch/fix iOS P0: Current Charge real endpoint, Add Instance error handling, Sentry unavailable honesty.
+- [x] Review iOS P0 with source inspection/static searches.
+- [x] Dispatch/fix iOS P1: replace silent real fetch failures with explicit error states across analysis/report pages.
+- [x] Review iOS P1 with source inspection/static searches.
+- [x] Update `app_mimo/docs/STITCH_PAGE_MAPPING.md` with fixed/still-valid/deferred state.
+- [x] Run Windows-feasible verification and summarize Java/Xcode-gated checks.
+
+## Review Notes
+
+- child-Claude is preferred for bounded implementation packages; Codex owns review/integration and may make tiny deterministic fixes when dispatch fails or costs more than direct repair.
+- Android P0 dispatch returned no usable output and made no file changes, so Codex applied the bounded fix directly. Static review: Palette Preview symbols no longer match under Android source; More now exposes Annual Report, Export Data, 3D Vehicle Preview, and Current Charge callbacks wired to existing NavGraph destinations.
+- Android P1 review: Dashboard synthetic 7-day battery trend now renders an explicit estimated/demo note next to the chart; no data-layer API was invented.
+- iOS P0 review: `ApiClient.getCurrentCharge` now throws instead of swallowing failures; `CurrentChargeView` verifies `/charges/current` in real mode and shows unavailable errors; Add Instance save failures remain on screen; Sentry real mode was already explicit unavailable.
+- iOS P1 review: static search for `try? await api.fetch` and `try? await state.connect` under `app_mimo/ios/MateLink` returns no matches; affected analysis/report/dashboard/charge pages now surface load errors instead of silently empty arrays.
+- Docs reconciliation added to `app_mimo/docs/STITCH_PAGE_MAPPING.md`; `docs/git_ref` remains untouched.
+- Final verification: Android base `values/strings.xml` now parses as XML after fixing pre-existing malformed loading string tags; `git diff --check -- app_mimo tasks/todo.md` passes; `java`, `swift`, and `xcodebuild` remain unavailable, so native Android/iOS compilation is still toolchain-gated.
+
+---
+
+# MateLink Interaction Closure Execution - 2026-07-08
+
+## Goal
+
+Close visible page navigation and button-click gaps in `app_mimo` without changing `docs/git_ref`. Keep the focus on reachable screens, honest non-actionable UI, and Android/iOS entry parity.
+
+## Plan
+
+- [x] Fix Android Dashboard controls that look clickable but have no action.
+- [x] Review Android Settings and existing More route wiring for remaining product no-ops.
+- [x] Add iOS More/Settings/Dashboard navigation entries for Current Charge, Tariff Config, and deferred Vehicle 3D.
+- [x] Update `app_mimo/docs/STITCH_PAGE_MAPPING.md` with interaction reconciliation.
+- [x] Run Windows-feasible static verification and record Java/Xcode proof boundaries.
+
+## Review Notes
+
+- Subagent sidecar: explorer dispatched to independently audit visible no-op controls and route parity gaps.
+- Existing worktree has prior `app_mimo` edits; this round must layer narrowly on top of them and not revert user/previous-agent changes.
+- Android Dashboard state/status chips are static pills now; `SuggestionChip` and empty `onClick` no longer match in `DashboardScreen.kt`.
+- Sidecar audit caught a real Android Settings dead click: `onNavigateToTariffConfig` was not forwarded into `SettingsContent`; fixed by passing the callback through.
+- Android Settings product path was reviewed after the callback fix: route/action controls are wired; remaining empty handlers are previews/defaults or read-only dropdown text fields.
+- iOS More now links to `CurrentChargeView` and `Vehicle3DView`; iOS Settings links to `TariffConfigView`; iOS Dashboard links its primary cards to existing detail pages.
+- iOS Dashboard Location now routes to a new `LocationDetailView` instead of Timeline, aligning the visible location card with Android's Where Was I/location-detail intent.
+- iOS `Vehicle3DView` is intentionally a deferred placeholder, not a fake 3D renderer.
+- Deferred parity gaps from sidecar: Android lacks Heatmap/Top Destinations rows; iOS lacks Android Saved Trips entry.
+- Final static verification: Android tariff callback and visible card both match; Dashboard no-op chip search returns no matches; iOS new destination searches match; Android base strings XML parses; `git diff --check -- app_mimo tasks/todo.md` passes with line-ending warnings only.
+- Toolchain boundary: `java`, `swift`, and `xcodebuild` are unavailable on this Windows machine, so native Android/iOS compile proof remains deferred.

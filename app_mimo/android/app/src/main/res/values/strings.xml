@@ -26,6 +26,7 @@
     <string name="high_soc_warning">High charge level - consider reducing to 80-90% for daily use</string>
     <string name="tire_pressure">Tire Pressure</string>
     <string name="battery_trend">7-Day Battery Trend</string>
+    <string name="battery_trend_estimated_note">Estimated demo trend based on the current battery level until history data is connected.</string>
     <string name="km_range">%d km range</string>
     <string name="charge_limit">Limit: %s</string>
     <string name="vehicle">Vehicle</string>
@@ -50,7 +51,7 @@
     <string name="charge_remaining">Remaining</string>
 
     <!-- Timeline -->
-    <string name="timeline_title">时间线</string>
+    <string name="timeline_title">Timeline</string>
     <string name="timeline_empty">暂无事件</string>
     <string name="timeline_drive">行驶</string>
     <string name="timeline_charge">充电</string>
@@ -86,6 +87,7 @@
     <string name="about">About</string>
     <string name="version">Version</string>
     <string name="more_section_analysis">Data Analysis</string>
+    <string name="more_section_reports">Reports</string>
     <string name="more_section_system">System</string>
     <string name="more_status_title">Verification Status</string>
     <string name="more_status_body">Some destinations still rely on preview, mock, or cached data until a TeslaMate connection is verified.</string>
@@ -100,6 +102,9 @@
     <string name="more_item_range">Range</string>
     <string name="more_item_vampire">Standby Drain</string>
     <string name="more_item_timeline">Timeline</string>
+    <string name="more_item_annual_report">Annual Report</string>
+    <string name="more_item_export_data">Export Data</string>
+    <string name="more_item_vehicle_3d_preview">3D Vehicle Preview</string>
     <string name="about_tagline">Your Tesla data companion</string>
     <string name="about_tech_stack">Tech Stack</string>
     <string name="about_tech_android">Android - Kotlin - Jetpack Compose - Hilt - Room</string>
@@ -208,7 +213,7 @@
 
     <!-- Widget -->
     <string name="widget_error_configure">Error loading widget</string>
-    <string name="widget_loading">Loading…</string>
+    <string name="widget_loading">Loading...</string>
     <string name="no_vehicles_found">No vehicles found</string>
     <string name="error_loading_data">Error loading data</string>
     <string name="widget_select_car_title">Select Car</string>
@@ -381,7 +386,7 @@
 
     <!-- Charging notifications -->
     <string name="charging_notification_title">Charging</string>
-    <string name="charging_notification_loading">Loading charging data…</string>
+    <string name="charging_notification_loading">Loading charging data...</string>
     <string name="charging_notification_dc_finished_title">DC Charging Complete</string>
     <string name="charging_notification_dc_finished_content">Your Tesla has finished DC charging.</string>
     <string name="charging_channel_name">Charging</string>
@@ -542,7 +547,7 @@
     <string name="current_charge_estimated_end">Estimated End</string>
     <string name="current_charge_live">Live</string>
     <string name="current_charge_not_charging">Not Charging</string>
-    <string name="current_charge_starting">Starting…</string>
+    <string name="current_charge_starting">Starting...</string>
     <string name="current_charge_unsupported">Unsupported</string>
     <string name="current_max">Current Max</string>
     <string name="current_min">Current Min</string>
@@ -700,7 +705,7 @@
     <string name="settings_resync_dialog_text_suffix">and re-download from server.</string>
     <string name="settings_resync_dialog_title">Resync Data</string>
     <string name="settings_resync_hint">Force full data resync</string>
-    <string name="settings_resyncing">Resyncing…</string>
+    <string name="settings_resyncing">Resyncing...</string>
     <string name="settings_save">Save</string>
     <string name="settings_secondary_server">Secondary Server</string>
     <string name="settings_secondary_url_hint">Fallback server URL</string>
@@ -745,7 +750,7 @@
     <string name="stats_records">Records</string>
     <string name="stats_sync_complete">Sync Complete</string>
     <string name="stats_sync_percent">%%</string>
-    <string name="stats_syncing">Syncing…</string>
+    <string name="stats_syncing">Syncing...</string>
     <string name="stats_temperature_extremes">Temperature Extremes</string>
     <string name="stats_title">Stats</string>
     <string name="stats_total_charges">Total Charges</string>
@@ -773,7 +778,7 @@
     <string name="weather_card_title">Weather</string>
     <string name="weather_distance">Distance</string>
     <string name="weather_end">End</string>
-    <string name="weather_loading">Loading weather…</string>
+    <string name="weather_loading">Loading weather...</string>
     <string name="weather_start">Start</string>
     <string name="weather_time">Time</string>
     <string name="weather_unavailable">Weather unavailable</string>

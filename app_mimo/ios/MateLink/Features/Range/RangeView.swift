@@ -13,6 +13,7 @@ struct RangeTrip: Identifiable {
 struct RangeView: View {
     @EnvironmentObject var state: AppState
     @State private var trips: [RangeTrip] = []
+    @State private var loadError: String?
 
     var avgDiff: Double {
         guard !trips.isEmpty else { return 0 }
@@ -44,6 +45,11 @@ struct RangeView: View {
                         Text("Rated range vs actual distance per trip")
                             .font(.caption).foregroundColor(.secondary)
                     }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal)
+
+                    if let loadError {
+                        EmptyStateView("Range Data Unavailable", systemImage: "exclamationmark.triangle", message: loadError)
+                            .padding(.top, 24)
+                    }
 
                     // Summary Cards
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
@@ -87,24 +93,31 @@ struct RangeView: View {
     }
 
     func loadData() async {
-        let drives: [Drive] = await {
+        loadError = nil
+        do {
+            let rawDrives: [Drive]
             if state.isMockMode {
-                return await state.mock.getDrives(state.currentCarId)
+                rawDrives = await state.mock.getDrives(state.currentCarId)
             } else if let api = state.real {
-                return (try? await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")) ?? []
+                rawDrives = try await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")
+            } else {
+                throw URLError(.notConnectedToInternet)
             }
-            return []
-        }().filter { $0.distanceKm > 5 }.suffix(30)
-        trips = drives.map { d in
-            let estimated = Int(d.startIdealRangeKm - d.endIdealRangeKm)  // rated range consumed
-            let actual = Int(d.distanceKm)                                  // actual distance driven
-            return RangeTrip(
-                date: String(d.startDate.prefix(10)),
-                estimated: estimated,
-                actual: actual,
-                diff: d.outsideTempAvg,
-                temp: d.outsideTempAvg
-            )
+            let drives = rawDrives.filter { $0.distanceKm > 5 }.suffix(30)
+            trips = drives.map { d in
+                let estimated = Int(d.startIdealRangeKm - d.endIdealRangeKm)  // rated range consumed
+                let actual = Int(d.distanceKm)                                  // actual distance driven
+                return RangeTrip(
+                    date: String(d.startDate.prefix(10)),
+                    estimated: estimated,
+                    actual: actual,
+                    diff: d.outsideTempAvg,
+                    temp: d.outsideTempAvg
+                )
+            }
+        } catch {
+            trips = []
+            loadError = "Unable to load real drive data: \(error.localizedDescription)"
         }
     }
 }

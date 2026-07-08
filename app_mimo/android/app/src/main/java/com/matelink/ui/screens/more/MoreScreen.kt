@@ -59,6 +59,7 @@ import java.util.Locale
  *
  * Groups:
  *  - Data analysis: Statistics, Battery health, Mileage, Trips
+ *  - Reports: Annual report, export, vehicle preview, current charge
  *  - System: Software updates, Sentry history, Settings, About
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,7 +78,11 @@ fun MoreScreen(
     onNavigateToCost: (carId: Int) -> Unit = {},
     onNavigateToRange: (carId: Int) -> Unit = {},
     onNavigateToVampire: (carId: Int) -> Unit = {},
-    onNavigateToTimeline: (carId: Int) -> Unit = {}
+    onNavigateToTimeline: (carId: Int) -> Unit = {},
+    onNavigateToAnnualReport: (carId: Int) -> Unit = {},
+    onNavigateToExport: (carId: Int) -> Unit = {},
+    onNavigateToVehicle3d: (carId: Int) -> Unit = {},
+    onNavigateToCurrentCharge: (carId: Int) -> Unit = {}
 ) {
     val palette = swissPalette()
     Scaffold(
@@ -169,6 +174,35 @@ fun MoreScreen(
                         icon = Icons.Default.Timeline,
                         title = stringResource(R.string.more_item_timeline),
                         onClick = { onNavigateToTimeline(carId) }
+                    )
+                }
+            }
+
+            item { SectionHeader(stringResource(R.string.more_section_reports)) }
+            item {
+                SectionCard {
+                    MoreRow(
+                        icon = Icons.Default.Analytics,
+                        title = stringResource(R.string.more_item_annual_report),
+                        onClick = { onNavigateToAnnualReport(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.Update,
+                        title = stringResource(R.string.more_item_export_data),
+                        onClick = { onNavigateToExport(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.VerifiedUser,
+                        title = stringResource(R.string.more_item_vehicle_3d_preview),
+                        onClick = { onNavigateToVehicle3d(carId) }
+                    )
+                    MoreDivider()
+                    MoreRow(
+                        icon = Icons.Default.Bolt,
+                        title = stringResource(R.string.current_charge),
+                        onClick = { onNavigateToCurrentCharge(carId) }
                     )
                 }
             }

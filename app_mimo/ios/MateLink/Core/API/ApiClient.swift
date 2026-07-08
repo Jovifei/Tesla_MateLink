@@ -68,7 +68,7 @@ actor TeslaMateAPI {
     }
 
     func getCurrentCharge(_ carId: Int) async throws -> Charge? {
-        return try? await fetch("/api/v1/cars/\(carId)/charges/current")
+        try await fetch("/api/v1/cars/\(carId)/charges/current")
     }
 
     func getChargeDetail(_ carId: Int, chargeId: Int) async throws -> Charge {

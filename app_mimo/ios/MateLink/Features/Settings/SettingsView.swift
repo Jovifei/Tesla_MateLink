@@ -35,6 +35,11 @@ struct SettingsView: View {
                 .disabled(state.serverURL.isEmpty || isTestingConnection)
             }
             Section(L10n.string("preferences")) {
+                NavigationLink {
+                    TariffConfigView()
+                } label: {
+                    Label("Tariff Config", systemImage: "clock.badge.checkmark")
+                }
                 Toggle("Dark Mode", isOn: $state.isDarkMode)
             }
             Section("Development") {

@@ -642,7 +642,11 @@ fun NavGraph(
                 onNavigateToCost = { navController.navigate(Screen.Cost(it, route.exteriorColor)) },
                 onNavigateToRange = { navController.navigate(Screen.Range(it, route.exteriorColor)) },
                 onNavigateToVampire = { navController.navigate(Screen.Vampire(it, route.exteriorColor)) },
-                onNavigateToTimeline = { navController.navigate(Screen.Timeline(it, route.exteriorColor)) }
+                onNavigateToTimeline = { navController.navigate(Screen.Timeline(it, route.exteriorColor)) },
+                onNavigateToAnnualReport = { navController.navigate(Screen.AnnualReport(it)) },
+                onNavigateToExport = { navController.navigate(Screen.Export(it)) },
+                onNavigateToVehicle3d = { navController.navigate(Screen.Vehicle3d(it)) },
+                onNavigateToCurrentCharge = { navController.navigate(Screen.CurrentCharge(it, route.exteriorColor)) }
             )
         }
 

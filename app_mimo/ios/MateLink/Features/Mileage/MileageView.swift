@@ -9,12 +9,16 @@ struct MileageView: View {
     @State private var drives: [Drive] = []
     @State private var battery: BatteryHealth?
     @State private var loading = true
+    @State private var loadError: String?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 if loading {
                     ProgressView("Loading...").padding(40)
+                } else if let loadError {
+                    EmptyStateView("Mileage Unavailable", systemImage: "exclamationmark.triangle", message: loadError)
+                        .padding(40)
                 } else {
                     VStack(spacing: 16) {
                         summaryRow
@@ -155,13 +159,24 @@ struct MileageView: View {
 
     func load() async {
         loading = true
+        loadError = nil
         let carId = state.currentCarId
         if state.isMockMode {
             drives = await state.mock.getDrives(carId)
             battery = await state.mock.getBatteryHealth(carId)
         } else if let api = state.real {
-            drives = (try? await api.fetch("/api/v1/cars/\(carId)/drives")) ?? []
-            battery = try? await api.fetch("/api/v1/cars/\(carId)/battery-health")
+            do {
+                drives = try await api.fetch("/api/v1/cars/\(carId)/drives")
+                battery = try await api.fetch("/api/v1/cars/\(carId)/battery-health")
+            } catch {
+                drives = []
+                battery = nil
+                loadError = "Unable to load real mileage data: \(error.localizedDescription)"
+            }
+        } else {
+            drives = []
+            battery = nil
+            loadError = "No TeslaMate instance is configured."
         }
         loading = false
     }

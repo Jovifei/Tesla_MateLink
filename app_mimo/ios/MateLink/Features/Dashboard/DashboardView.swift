@@ -5,6 +5,7 @@ struct DashboardView: View {
     @State private var status: CarStatus?
     @State private var showCarSwitcher = false
     @State private var isRefreshing = false
+    @State private var loadError: String?
 
     var body: some View {
         NavigationStack {
@@ -34,9 +35,14 @@ struct DashboardView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("📍 Location").font(.caption).foregroundColor(.secondary)
                         if let s = status {
-                            AmapView(latitude: s.latitude, longitude: s.longitude, title: "Current Location")
-                                .frame(height: 150)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            NavigationLink {
+                                LocationDetailView(status: s)
+                            } label: {
+                                AmapView(latitude: s.latitude, longitude: s.longitude, title: "Current Location")
+                                    .frame(height: 150)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                            .buttonStyle(.plain)
                             Text("Elevation: \(Int(s.elevation))m").font(.caption2).foregroundColor(.secondary)
                         } else {
                             Text("Loading map...").font(.caption).foregroundColor(.secondary)
@@ -51,8 +57,19 @@ struct DashboardView: View {
                     // Battery + Range
                     if let s = status {
                         HStack(spacing: 12) {
-                            StatCard(title: "Battery", value: "\(Int(s.batteryLevel))%", subtitle: "\(s.usableBatteryRangeKm) km range", color: StitchColors.primary)
-                            StatCard(title: "Odometer", value: "\(s.odometer.formatted()) km", subtitle: "Total mileage", color: .secondary)
+                            NavigationLink {
+                                BatteryHealthView()
+                            } label: {
+                                StatCard(title: "Battery", value: "\(Int(s.batteryLevel))%", subtitle: "\(s.usableBatteryRangeKm) km range", color: StitchColors.primary)
+                            }
+                            .buttonStyle(.plain)
+
+                            NavigationLink {
+                                MileageView()
+                            } label: {
+                                StatCard(title: "Odometer", value: "\(s.odometer.formatted()) km", subtitle: "Total mileage", color: .secondary)
+                            }
+                            .buttonStyle(.plain)
                         }.padding(.horizontal)
 
                         // High SOC Warning
@@ -66,7 +83,13 @@ struct DashboardView: View {
 
                         // Charging card
                         if s.state == .charging {
-                            ChargingCard(status: s).padding(.horizontal)
+                            NavigationLink {
+                                CurrentChargeView()
+                            } label: {
+                                ChargingCard(status: s)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal)
                         }
 
                         // Climate + Sentry + Lock + Plug
@@ -86,7 +109,19 @@ struct DashboardView: View {
                         }.padding(.horizontal)
 
                         // 7-Day Battery Trend
-                        BatteryTrendCard()
+                        NavigationLink {
+                            StatisticsView()
+                        } label: {
+                            BatteryTrendCard()
+                        }
+                        .buttonStyle(.plain)
+                    } else if let loadError {
+                        EmptyStateView(
+                            "Dashboard Unavailable",
+                            systemImage: "exclamationmark.triangle",
+                            message: loadError
+                        )
+                        .padding(40)
                     } else {
                         ProgressView("Loading...").padding(40)
                     }
@@ -106,10 +141,19 @@ struct DashboardView: View {
         guard !isRefreshing else { return }
         isRefreshing = true
         defer { isRefreshing = false }
+        loadError = nil
         if state.isMockMode {
             status = await state.mock.mockStatus(state.currentCarId)
         } else if let api = state.real {
-            status = try? await api.fetch("/api/v1/cars/\(state.currentCarId)/status")
+            do {
+                status = try await api.fetch("/api/v1/cars/\(state.currentCarId)/status")
+            } catch {
+                status = nil
+                loadError = "Unable to load real vehicle status: \(error.localizedDescription)"
+            }
+        } else {
+            status = nil
+            loadError = "No TeslaMate instance is configured."
         }
         // Write widget data to AppGroup UserDefaults
         if let s = status, let defaults = UserDefaults(suiteName: "group.com.matelink") {

@@ -35,6 +35,7 @@ struct StatisticsView: View {
     @EnvironmentObject var state: AppState
     @State private var drives: [Drive] = []
     @State private var loading = true
+    @State private var loadError: String?
 
     private let calendar = Calendar.current
 
@@ -50,6 +51,12 @@ struct StatisticsView: View {
                 if loading {
                     ProgressView("Loading statistics...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let loadError {
+                    StatisticsEmptyStateView(
+                        title: "Statistics Unavailable",
+                        systemImage: "exclamationmark.triangle",
+                        message: loadError
+                    )
                 } else if drives.isEmpty {
                     StatisticsEmptyStateView(
                         title: "No Drives Yet",
@@ -203,10 +210,19 @@ struct StatisticsView: View {
 
     private func load() async {
         loading = true
+        loadError = nil
         if state.isMockMode {
             drives = await state.mock.getDrives(state.currentCarId)
         } else if let api = state.real {
-            drives = (try? await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")) ?? []
+            do {
+                drives = try await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")
+            } catch {
+                drives = []
+                loadError = "Unable to load real drive data: \(error.localizedDescription)"
+            }
+        } else {
+            drives = []
+            loadError = "No TeslaMate instance is configured."
         }
         loading = false
     }

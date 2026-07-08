@@ -3,6 +3,7 @@ import SwiftUI
 struct ChargeListView: View {
     @EnvironmentObject var state: AppState; @State private var charges: [Charge] = []; @State private var loading = true
     @State private var status: CarStatus?
+    @State private var loadError: String?
 
     private var showsCurrentCharge: Bool {
         guard let s = status else { return false }
@@ -13,6 +14,10 @@ struct ChargeListView: View {
         NavigationStack {
             Group {
                 if loading { ProgressView("Loading...").padding() }
+                else if let loadError {
+                    EmptyStateView("Charge History Unavailable", systemImage: "exclamationmark.triangle", message: loadError)
+                        .padding()
+                }
                 else {
                     List {
                         if showsCurrentCharge {
@@ -55,6 +60,7 @@ struct ChargeListView: View {
 
     func load() async {
         let carId = state.currentCarId
+        loadError = nil
         if charges.isEmpty {
             loading = true
         }
@@ -70,8 +76,20 @@ struct ChargeListView: View {
             do {
                 let fresh: [Charge] = try await api.fetch("/api/v1/cars/\(carId)/charges")
                 charges = fresh; await api.cacheCharges(fresh, carId: carId)
-            } catch { /* stale cache stays visible */ }
-            status = try? await api.fetch("/api/v1/cars/\(carId)/status")
+            } catch {
+                if charges.isEmpty {
+                    loadError = "Unable to load real charge history: \(error.localizedDescription)"
+                }
+            }
+            do {
+                status = try await api.fetch("/api/v1/cars/\(carId)/status")
+            } catch {
+                if loadError == nil && charges.isEmpty {
+                    loadError = "Unable to load real vehicle status: \(error.localizedDescription)"
+                }
+            }
+        } else {
+            loadError = "No TeslaMate instance is configured."
         }
         loading = false
     }

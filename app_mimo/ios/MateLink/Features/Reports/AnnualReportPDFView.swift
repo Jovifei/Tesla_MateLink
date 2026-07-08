@@ -14,6 +14,7 @@ struct AnnualReportPDFView: View {
     @State private var showShare = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var loadError: String?
 
     private let calendar = Calendar.current
 
@@ -57,6 +58,12 @@ struct AnnualReportPDFView: View {
             if loading {
                 ProgressView("Loading report data...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let loadError {
+                EmptyStateView(
+                    "Annual Report Unavailable",
+                    systemImage: "exclamationmark.triangle",
+                    message: loadError
+                )
             } else if yearDrives.isEmpty && yearCharges.isEmpty {
                 EmptyStateView(
                     "No Data for \(selectedYear)",
@@ -218,12 +225,23 @@ struct AnnualReportPDFView: View {
 
     private func load() async {
         loading = true
+        loadError = nil
         if state.isMockMode {
             drives = await state.mock.getDrives(state.currentCarId)
             charges = await state.mock.getCharges(state.currentCarId)
         } else if let api = state.real {
-            drives = (try? await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")) ?? []
-            charges = (try? await api.fetch("/api/v1/cars/\(state.currentCarId)/charges")) ?? []
+            do {
+                drives = try await api.fetch("/api/v1/cars/\(state.currentCarId)/drives")
+                charges = try await api.fetch("/api/v1/cars/\(state.currentCarId)/charges")
+            } catch {
+                drives = []
+                charges = []
+                loadError = "Unable to load real report data: \(error.localizedDescription)"
+            }
+        } else {
+            drives = []
+            charges = []
+            loadError = "No TeslaMate instance is configured."
         }
         if availableYears.isEmpty {
             // no data

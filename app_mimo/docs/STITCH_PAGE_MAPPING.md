@@ -1,5 +1,28 @@
 # MateLink Stitch 1:1 — Baseline Page Mapping
 
+## 2026-07-08 repair reconciliation
+
+- Fixed: Android Settings no longer exposes the removed Palette Preview debug route as a no-op button.
+- Fixed: Android More now exposes existing Annual Report, Export Data, 3D Vehicle Preview, and Current Charge routes.
+- Fixed: Android Dashboard marks the synthetic 7-day battery trend as an estimated demo until real history data is connected.
+- Fixed: iOS `CurrentChargeView` verifies the real `/charges/current` endpoint in real mode and shows an unavailable state on failure instead of silently deriving everything from `/status`.
+- Fixed: iOS Add Instance only dismisses after `AppState.connect` succeeds; save failures remain visible on the form.
+- Fixed: iOS analysis/report real-mode fetches no longer use `try? await api.fetch(...) ?? []`; failures now surface as explicit error/unavailable states.
+- Still deferred: iOS Widget remains source-only without target, entitlements, or App Group wiring.
+- Still gated: Android native build requires Java/Gradle on this machine; iOS native build requires Mac/Xcode/XcodeGen/CocoaPods.
+
+## 2026-07-08 interaction reconciliation
+
+- Fixed: Android Dashboard state and status chips are now static pills instead of clickable Material chips with empty handlers.
+- Confirmed: Android Settings product buttons route to `NavGraph` or call their ViewModel/instance callbacks; remaining empty handlers in that file are preview defaults or read-only text-field shims.
+- Fixed: iOS More now exposes Current Charge and a deferred 3D Vehicle Preview entry.
+- Fixed: iOS Settings now exposes Tariff Config from the preferences section.
+- Fixed: iOS Dashboard primary cards now click through to Battery Health, Mileage, Location Detail, Current Charge, and Statistics.
+- Fixed: Android Settings now forwards the Tariff Config route into the visible settings content; the tariff card is no longer a dead click.
+- Deferred: iOS 3D Vehicle Preview is a wired placeholder until the native rendering stack is selected.
+- Deferred: Android still lacks first-class Heatmap and Top Destinations entries to match iOS More.
+- Deferred: iOS still lacks the Android Saved Trips entry; Drive History remains available as the second tab.
+
 > 范围：`app_mimo/`（Android · iOS · Web）vs Stitch 白色简约瑞士风项目 `11493757920836657212`（Precision Minimalist）。
 > 依据：`docs/PRD/MateLink_Stitch_Swiss_PRD_2026-07-05.md`、`docs/PRD/MateLink_UI_PRD.md`、`app_mimo/README.md` 及三端真实源码文件。
 > 基准日期：2026-07-05。仅记录仓库现状，不臆测不存在的文件。

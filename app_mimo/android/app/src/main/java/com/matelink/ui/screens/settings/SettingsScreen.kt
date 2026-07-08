@@ -87,7 +87,6 @@ import com.matelink.ui.theme.StatusSuccess
 @Composable
 fun SettingsScreen(
     onNavigateToDashboard: () -> Unit,
-    onNavigateToPalettePreview: () -> Unit = {},
     onNavigateToTariffConfig: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
     instanceViewModel: InstanceViewModel = hiltViewModel()
@@ -148,7 +147,7 @@ fun SettingsScreen(
                 onSave = {
                     viewModel.saveSettings(onNavigateToDashboard)
                 },
-                onPalettePreview = onNavigateToPalettePreview,
+                onNavigateToTariffConfig = onNavigateToTariffConfig,
                 onForceResync = viewModel::forceResync,
                 onSimulateTpmsWarning = viewModel::simulateTpmsWarning,
                 onClearTpmsWarning = viewModel::clearTpmsWarning,
@@ -232,7 +231,6 @@ private fun SettingsContent(
     onMockModeChange: (Boolean) -> Unit = {},
     onTestConnection: () -> Unit,
     onSave: () -> Unit,
-    onPalettePreview: () -> Unit = {},
     onNavigateToTariffConfig: () -> Unit = {},
     onForceResync: () -> Unit = {},
     onSimulateTpmsWarning: (TirePosition) -> Unit = {},
@@ -889,19 +887,10 @@ private fun SettingsContent(
             }
         }
 
-        // Debug: Palette Preview button (only visible in debug builds)
         if (com.matelink.BuildConfig.DEBUG) {
             var tpmsDropdownExpanded by remember { mutableStateOf(false) }
 
             Spacer(modifier = Modifier.height(32.dp))
-            OutlinedButton(
-                onClick = onPalettePreview,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.settings_palette_preview))
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             // TPMS Debug: Simulate Warning with tire selection
             Box {

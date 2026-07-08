@@ -6,8 +6,10 @@ struct AddInstanceView: View {
     @State private var serverURL: String = ""
     @State private var apiToken: String = ""
     @State private var testing: Bool = false
+    @State private var saving: Bool = false
     @State private var testResult: String?
     @State private var testSuccess: Bool = false
+    @State private var saveError: String?
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -39,13 +41,24 @@ struct AddInstanceView: View {
                 }
 
                 Section {
-                    Button("Save & Connect") {
+                    Button {
                         Task {
-                            try? await state.connect(url: serverURL, token: apiToken)
-                            dismiss()
+                            await saveAndConnect()
+                        }
+                    } label: {
+                        HStack {
+                            if saving {
+                                ProgressView().padding(.trailing, 4)
+                            }
+                            Text(saving ? "Saving..." : "Save & Connect")
                         }
                     }
-                    .disabled(serverURL.isEmpty || !testSuccess)
+                    .disabled(serverURL.isEmpty || !testSuccess || saving)
+
+                    if let saveError {
+                        Label(saveError, systemImage: "xmark.circle.fill")
+                            .foregroundColor(.red)
+                    }
                 }
             }
             .navigationTitle("Add Instance")
@@ -61,6 +74,7 @@ struct AddInstanceView: View {
     func testConnection() {
         testing = true
         testResult = nil
+        saveError = nil
         Task {
             do {
                 let api = TeslaMateAPI(baseURL: serverURL, token: apiToken.isEmpty ? nil : apiToken)
@@ -72,6 +86,19 @@ struct AddInstanceView: View {
                 testSuccess = false
             }
             testing = false
+        }
+    }
+
+    func saveAndConnect() async {
+        saving = true
+        saveError = nil
+        do {
+            try await state.connect(url: serverURL, token: apiToken)
+            saving = false
+            dismiss()
+        } catch {
+            saveError = "Save failed: \(error.localizedDescription)"
+            saving = false
         }
     }
 }

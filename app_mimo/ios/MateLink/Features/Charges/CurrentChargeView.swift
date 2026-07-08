@@ -8,7 +8,9 @@ import Charts
 struct CurrentChargeView: View {
     @EnvironmentObject var state: AppState
     @State private var status: CarStatus?
+    @State private var currentCharge: Charge?
     @State private var loading = true
+    @State private var loadError: String?
     @State private var now = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -21,7 +23,13 @@ struct CurrentChargeView: View {
             Group {
                 if loading {
                     ProgressView("Loading...").padding(40)
-                } else if let s = status, s.state == .charging || s.pluggedIn {
+                } else if let loadError {
+                    EmptyStateView(
+                        "Current Charge Unavailable",
+                        systemImage: "exclamationmark.triangle",
+                        message: loadError
+                    )
+                } else if let s = status, (state.isMockMode ? (s.state == .charging || s.pluggedIn) : (currentCharge != nil)) {
                     content(for: s)
                 } else {
                     EmptyStateView(
@@ -143,7 +151,7 @@ struct CurrentChargeView: View {
             }
             .frame(height: 180)
 
-            Text("Derived from current charger power — live endpoint not yet available.")
+            Text(state.isMockMode ? "Demo curve derived from mock charger power." : "Session verified by /charges/current; curve derived from live status power.")
                 .font(.caption2).foregroundColor(.secondary)
         }
         .padding()
@@ -202,10 +210,21 @@ struct CurrentChargeView: View {
 
     func refresh() async {
         loading = true
+        loadError = nil
+        currentCharge = nil
+        status = nil
         if state.isMockMode {
             status = await state.mock.mockStatus(state.currentCarId)
         } else if let api = state.real {
-            status = try? await api.fetch("/api/v1/cars/\(state.currentCarId)/status")
+            do {
+                currentCharge = try await api.getCurrentCharge(state.currentCarId)
+                status = try await api.fetch("/api/v1/cars/\(state.currentCarId)/status")
+            } catch {
+                status = nil
+                loadError = "Unable to load the real current-charge endpoint: \(error.localizedDescription)"
+            }
+        } else {
+            loadError = "No TeslaMate instance is configured."
         }
         loading = false
     }
