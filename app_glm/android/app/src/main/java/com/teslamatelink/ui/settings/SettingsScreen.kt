@@ -1,9 +1,10 @@
 package com.teslamatelink.ui.settings
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,32 +12,35 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,14 +50,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import com.teslamatelink.R
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.teslamatelink.data.local.SecureSettingsDataStore
 import com.teslamatelink.data.local.SettingsDataStore
 import com.teslamatelink.data.model.Instance
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import com.teslamatelink.ui.components.ChipStatus
+import com.teslamatelink.ui.components.StitchStatusChip
+import com.teslamatelink.ui.theme.JetBrainsMonoFamily
+import com.teslamatelink.ui.theme.StitchColors
 import kotlinx.coroutines.launch
 
 /**
@@ -77,6 +86,115 @@ object AppSettings {
     }
 }
 
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text.uppercase(),
+        color = StitchColors.OnSurfaceVariant,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 0.6.sp,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+}
+
+@Composable
+private fun StitchInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    visualTransformation: VisualTransformation = VisualTransformation.None
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = label,
+            color = StitchColors.Primary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(4.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = StitchColors.Primary,
+                unfocusedBorderColor = StitchColors.Border,
+                focusedContainerColor = StitchColors.White,
+                unfocusedContainerColor = StitchColors.White,
+                focusedTextColor = StitchColors.OnSurface,
+                unfocusedTextColor = StitchColors.OnSurface,
+                cursorColor = StitchColors.Primary
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            visualTransformation = visualTransformation,
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontFamily = JetBrainsMonoFamily,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        )
+    }
+}
+
+@Composable
+private fun DropdownSelector(
+    label: String,
+    selected: String,
+    options: List<String>,
+    onSelect: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            color = StitchColors.OnSurface,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal
+        )
+        Box {
+            Row(
+                modifier = Modifier
+                    .border(1.dp, StitchColors.Border, RoundedCornerShape(4.dp))
+                    .clickable { expanded = true }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = selected,
+                    color = StitchColors.OnSurface,
+                    fontSize = 14.sp
+                )
+                Icon(
+                    Icons.Filled.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = StitchColors.OnSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                options.forEach { opt ->
+                    DropdownMenuItem(
+                        text = { Text(opt) },
+                        onClick = { onSelect(opt); expanded = false }
+                    )
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -84,11 +202,10 @@ fun SettingsScreen(
     onNavigateToAbout: () -> Unit,
     onNavigateToDashboard: () -> Unit
 ) {
-    val context = LocalContext.current
+    val context = androidx.compose.ui.platform.LocalContext.current
     val scope = rememberCoroutineScope()
-    val settingsDataStore = remember { SettingsDataStore(context, com.teslamatelink.data.local.SecureSettingsDataStore(context)) }
+    val settingsDataStore = remember { SettingsDataStore(context, SecureSettingsDataStore(context)) }
 
-    // Use shared AppSettings so values persist across recompositions
     var serverUrl by remember { mutableStateOf(AppSettings.serverUrl) }
     var apiToken by remember { mutableStateOf(AppSettings.apiToken) }
     var isDarkTheme by remember { mutableStateOf(AppSettings.isDarkTheme) }
@@ -98,8 +215,12 @@ fun SettingsScreen(
     var newInstanceName by remember { mutableStateOf("") }
     var newInstanceUrl by remember { mutableStateOf("") }
     var newInstanceToken by remember { mutableStateOf("") }
+    var testingConnection by remember { mutableStateOf(false) }
+    var connectionResult by remember { mutableStateOf<String?>(null) }
+    var connectionSuccess by remember { mutableStateOf(false) }
+    var language by remember { mutableStateOf("中文 (Chinese)") }
+    var themeMode by remember { mutableStateOf("Light Mode") }
 
-    // Load instances from DataStore on first composition
     LaunchedEffect(Unit) {
         settingsDataStore.instances.collect { loaded ->
             if (loaded.isNotEmpty() && AppSettings.instances.isEmpty()) {
@@ -127,12 +248,26 @@ fun SettingsScreen(
     }
 
     Scaffold(
+        containerColor = StitchColors.White,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.settings)) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = StitchColors.White),
+                title = {
+                    Text(
+                        text = "设置",
+                        color = StitchColors.OnSurface,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.24).sp
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "返回",
+                            tint = StitchColors.OnSurface
+                        )
                     }
                 }
             )
@@ -143,206 +278,305 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 24.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            // Instances
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(stringResource(R.string.instances), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        IconButton(onClick = { showAddInstanceDialog = true }) {
-                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_instance))
+            // ── Section 1: 实例 ─────────────────────────────────────
+            Column {
+                SectionLabel("实例")
+                androidx.compose.material3.Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = StitchColors.White,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, StitchColors.Border),
+                    shadowElevation = 0.dp,
+                    tonalElevation = 0.dp
+                ) {
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        val activeInstance = AppSettings.instances.find { it.id == AppSettings.activeInstanceId }
+                        if (activeInstance != null) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = activeInstance.name,
+                                        color = StitchColors.OnSurface,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = activeInstance.serverUrl,
+                                        color = StitchColors.OnSurfaceVariant,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = JetBrainsMonoFamily
+                                    )
+                                }
+                                StitchStatusChip(text = "已连接", status = ChipStatus.ONLINE)
+                            }
+                        } else {
+                            Text(
+                                text = "未配置实例",
+                                color = StitchColors.OnSurfaceVariant,
+                                fontSize = 14.sp
+                            )
                         }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AppSettings.instances.forEach { instance ->
+
+                        // Other switchable instances
+                        AppSettings.instances.filter { it.id != AppSettings.activeInstanceId }.forEach { inst ->
+                            Divider(
+                                color = StitchColors.Border,
+                                modifier = Modifier.padding(vertical = 12.dp)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        AppSettings.switchInstance(inst)
+                                        serverUrl = inst.serverUrl
+                                        apiToken = inst.apiToken
+                                        scope.launch {
+                                            settingsDataStore.saveActiveInstanceId(inst.id)
+                                            settingsDataStore.saveServerUrl(inst.serverUrl)
+                                        }
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(inst.name, color = StitchColors.OnSurface, fontSize = 16.sp)
+                                    Text(
+                                        inst.serverUrl,
+                                        color = StitchColors.OnSurfaceVariant,
+                                        fontSize = 14.sp,
+                                        fontFamily = JetBrainsMonoFamily
+                                    )
+                                }
+                                Text(
+                                    "切换",
+                                    color = StitchColors.Primary,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
+                                .clickable { showAddInstanceDialog = true },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = "添加实例",
+                                tint = StitchColors.Primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                "添加实例",
+                                color = StitchColors.Primary,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ── Section 2: 连接 ────────────────────────────────────
+            Column {
+                SectionLabel("连接")
+                androidx.compose.material3.Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = StitchColors.White,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, StitchColors.Border),
+                    shadowElevation = 0.dp,
+                    tonalElevation = 0.dp
+                ) {
+                    Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        StitchInputField(
+                            value = serverUrl,
+                            onValueChange = { serverUrl = it; AppSettings.serverUrl = it },
+                            label = "服务器地址"
+                        )
+                        StitchInputField(
+                            value = apiToken,
+                            onValueChange = { apiToken = it; AppSettings.apiToken = it },
+                            label = "API 令牌",
+                            keyboardType = KeyboardType.Password,
+                            visualTransformation = PasswordVisualTransformation()
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            OutlinedButton(
+                                onClick = {
+                                    testingConnection = true
+                                    connectionResult = null
+                                    scope.launch {
+                                        kotlinx.coroutines.delay(800)
+                                        connectionSuccess = serverUrl.isNotBlank()
+                                        connectionResult = if (connectionSuccess) "连接成功" else "地址无效"
+                                        testingConnection = false
+                                    }
+                                },
+                                enabled = !testingConnection && serverUrl.isNotBlank(),
+                                modifier = Modifier.weight(1f).height(48.dp),
+                                shape = RoundedCornerShape(4.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = StitchColors.White,
+                                    contentColor = StitchColors.OnSurface
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, StitchColors.Border)
+                            ) {
+                                Text(if (testingConnection) "测试中..." else "测试连接", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                            Button(
+                                onClick = {
+                                    AppSettings.serverUrl = serverUrl
+                                    AppSettings.apiToken = apiToken
+                                    scope.launch {
+                                        settingsDataStore.saveServerUrl(serverUrl)
+                                        settingsDataStore.saveApiToken(apiToken)
+                                    }
+                                    onNavigateToDashboard()
+                                },
+                                modifier = Modifier.weight(1f).height(48.dp),
+                                shape = RoundedCornerShape(4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = StitchColors.Primary,
+                                    contentColor = StitchColors.OnPrimary
+                                )
+                            ) {
+                                Text("保存", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                        connectionResult?.let { result ->
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            if (connectionSuccess) StitchColors.StatusOnline else StitchColors.Error,
+                                            androidx.compose.foundation.shape.CircleShape
+                                        )
+                                )
+                                Text(
+                                    result,
+                                    color = if (connectionSuccess) StitchColors.StatusOnline else StitchColors.Error,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── Section 3: 显示 ────────────────────────────────────
+            Column {
+                SectionLabel("显示")
+                androidx.compose.material3.Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = StitchColors.White,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, StitchColors.Border),
+                    shadowElevation = 0.dp,
+                    tonalElevation = 0.dp
+                ) {
+                    Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        DropdownSelector(
+                            label = "语言",
+                            selected = language,
+                            options = listOf("English", "中文 (Chinese)", "Deutsch"),
+                            onSelect = { language = it }
+                        )
+                        Divider(color = StitchColors.Border)
+                        DropdownSelector(
+                            label = "主题",
+                            selected = themeMode,
+                            options = listOf("System", "Light Mode", "Dark Mode"),
+                            onSelect = {
+                                themeMode = it
+                                isDarkTheme = it == "Dark Mode"
+                                AppSettings.isDarkTheme = isDarkTheme
+                            }
+                        )
+                        Divider(color = StitchColors.Border)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(instance.name, style = MaterialTheme.typography.bodyMedium)
-                                Text(instance.serverUrl, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    "模拟模式",
+                                    color = StitchColors.OnSurface,
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    "使用模拟数据进行测试",
+                                    color = StitchColors.OnSurfaceVariant,
+                                    fontSize = 14.sp
+                                )
                             }
-                            if (instance.id == AppSettings.activeInstanceId) {
-                                Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                            } else {
-                                TextButton(onClick = {
-                                    AppSettings.switchInstance(instance)
-                                    serverUrl = instance.serverUrl
-                                    apiToken = instance.apiToken
-                                    scope.launch {
-                                        settingsDataStore.saveActiveInstanceId(instance.id)
-                                        settingsDataStore.saveServerUrl(instance.serverUrl)
-                                    }
-                                }) {
-                                    Text(stringResource(R.string.switch_instance))
-                                }
-                            }
-                        }
-                        HorizontalDivider()
-                    }
-                    if (AppSettings.instances.isEmpty()) {
-                        Text(
-                            stringResource(R.string.no_instances),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            // Connection
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.server_connection), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = serverUrl,
-                        onValueChange = {
-                            serverUrl = it
-                            AppSettings.serverUrl = it
-                        },
-                        label = { Text(stringResource(R.string.server_url)) },
-                        leadingIcon = { Icon(Icons.Filled.Link, contentDescription = null) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = apiToken,
-                        onValueChange = {
-                            apiToken = it
-                            AppSettings.apiToken = it
-                        },
-                        label = { Text(stringResource(R.string.api_token)) },
-                        leadingIcon = { Icon(Icons.Filled.VpnKey, contentDescription = null) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        onClick = onNavigateToDashboard,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.save_reconnect))
-                    }
-                }
-            }
-
-            // Appearance
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.appearance), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (isDarkTheme) Icons.Filled.DarkMode else Icons.Filled.LightMode,
-                                contentDescription = null
+                            Switch(
+                                checked = isMockMode,
+                                onCheckedChange = {
+                                    isMockMode = it
+                                    AppSettings.isMockMode = it
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = StitchColors.White,
+                                    checkedTrackColor = StitchColors.Primary,
+                                    uncheckedThumbColor = StitchColors.White,
+                                    uncheckedTrackColor = StitchColors.SurfaceContainerHighest
+                                )
                             )
-                            Spacer(modifier = Modifier.padding(start = 12.dp))
-                            Text(stringResource(R.string.dark_theme))
                         }
-                        Switch(checked = isDarkTheme, onCheckedChange = {
-                            isDarkTheme = it
-                            AppSettings.isDarkTheme = it
-                        })
                     }
                 }
             }
 
-            // Debug
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.debug), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(stringResource(R.string.mock_mode))
-                        Switch(checked = isMockMode, onCheckedChange = {
-                            isMockMode = it
-                            AppSettings.isMockMode = it
-                        })
-                    }
-                    Text(
-                        stringResource(R.string.mock_mode_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            // Data Source
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.data_source), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(stringResource(R.string.use_real_data))
-                        Switch(checked = useRealDataSource, onCheckedChange = { newValue ->
-                            useRealDataSource = newValue
-                            scope.launch {
-                                settingsDataStore.setUseRealDataSource(newValue)
-                            }
-                        })
-                    }
-                    Text(
-                        stringResource(R.string.use_real_data_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            // About
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+            // ── Section 4: 关于 ────────────────────────────────────
+            Column {
+                SectionLabel("关于")
+                androidx.compose.material3.Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = StitchColors.White,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, StitchColors.Border),
+                    shadowElevation = 0.dp,
+                    tonalElevation = 0.dp
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Info, contentDescription = null)
-                        Spacer(modifier = Modifier.padding(start = 12.dp))
-                        Text(stringResource(R.string.about), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    }
-                    Button(onClick = onNavigateToAbout) {
-                        Text(stringResource(R.string.open))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onNavigateToAbout() }
+                            .padding(24.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "MateLink 应用",
+                            color = StitchColors.OnSurface,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                "v1.2.4 (构建 420)",
+                                color = StitchColors.OnSurfaceVariant,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = JetBrainsMonoFamily
+                            )
+                            Text(
+                                "October 24, 2023",
+                                color = StitchColors.OnSurfaceVariant,
+                                fontSize = 14.sp
+                            )
+                        }
                     }
                 }
             }
@@ -352,25 +586,25 @@ fun SettingsScreen(
     if (showAddInstanceDialog) {
         AlertDialog(
             onDismissRequest = { showAddInstanceDialog = false },
-            title = { Text(stringResource(R.string.add_instance)) },
+            title = { Text("添加实例") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = newInstanceName,
                         onValueChange = { newInstanceName = it },
-                        label = { Text(stringResource(R.string.instance_name)) },
+                        label = { Text("实例名称") },
                         singleLine = true
                     )
                     OutlinedTextField(
                         value = newInstanceUrl,
                         onValueChange = { newInstanceUrl = it },
-                        label = { Text(stringResource(R.string.server_url)) },
+                        label = { Text("服务器地址") },
                         singleLine = true
                     )
                     OutlinedTextField(
                         value = newInstanceToken,
                         onValueChange = { newInstanceToken = it },
-                        label = { Text(stringResource(R.string.api_token)) },
+                        label = { Text("API 令牌") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                     )
@@ -401,12 +635,10 @@ fun SettingsScreen(
                         showAddInstanceDialog = false
                     },
                     enabled = newInstanceName.isNotBlank() && newInstanceUrl.isNotBlank()
-                ) { Text(stringResource(R.string.save)) }
+                ) { Text("保存") }
             },
             dismissButton = {
-                TextButton(onClick = { showAddInstanceDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
+                TextButton(onClick = { showAddInstanceDialog = false }) { Text("取消") }
             }
         )
     }
